@@ -32,7 +32,7 @@ This library provides safe construction and subscription to publishers that conf
     
     ```
     --------> A single publisher can never publish anything.
-    -----x--> A single publisher can fail.
+    -----x--> A single publisher can fail before publishing an element.
     --o--|--> A single publisher can publish one value and complete.
     ```
     
@@ -42,7 +42,7 @@ This library provides safe construction and subscription to publishers that conf
     
     ```
     --------> A maybe publisher can never publish anything.
-    -----x--> A maybe publisher can fail.
+    -----x--> A maybe publisher can fail before publishing an element.
     -----|--> A maybe publisher can complete without publishing any value.
     --o--|--> A maybe publisher can publish one value and complete.
     ```
@@ -116,7 +116,7 @@ When you import CombineTraits in an existing library or application, you will qu
 
 ```
 --------> A single publisher can never publish anything.
------x--> A single publisher can fail.
+-----x--> A single publisher can fail before publishing an element.
 --o--|--> A single publisher can publish one value and complete.
 ```
 
@@ -447,7 +447,7 @@ class MyViewController: UIViewController {
 
 ```
 --------> A maybe publisher can never publish anything.
------x--> A maybe publisher can fail.
+-----x--> A maybe publisher can fail before publishing an element.
 -----|--> A maybe publisher can complete without publishing any value.
 --o--|--> A maybe publisher can publish one value and complete.
 ```
