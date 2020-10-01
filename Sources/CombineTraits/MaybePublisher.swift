@@ -101,7 +101,7 @@ import Foundation
 /// maybe publishers:
 ///
 ///         // Completes without publishing any value.
-///         AnyMaybePublisher.empty
+///         AnyMaybePublisher.empty()
 ///
 ///         // Publishes one value, and then completes.
 ///         AnyMaybePublisher.just(value)

@@ -28,7 +28,7 @@ This library provides both safe  *subscription* and *construction* of publishers
         
 - **[Single Publishers]** are guaranteed to publish exactly one value, or an error.
     
-    In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
+    The Combine `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
     --------> A single publisher can never publish anything.
@@ -38,7 +38,7 @@ This library provides both safe  *subscription* and *construction* of publishers
     
 - **[Maybe Publishers]** are guaranteed to publish exactly zero value, or one value, or an error:
     
-    In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
+    The Combine `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
     --------> A maybe publisher can never publish anything.
@@ -113,7 +113,7 @@ Your applications and libraries will quickly benefit from CombineTraits in three
 --o--|--> A single publisher can publish one value and complete.
 ```
 
-In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `SinglePublisher`.
+This library extends many Combine publishers with this protocol, such as `Just`, `Future` and `URLSession.DataTaskPublisher`.
 
 Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single value.
 
@@ -451,7 +451,7 @@ class MyViewController: UIViewController {
 --o--|--> A maybe publisher can publish one value and complete.
 ```
 
-In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
+This library extends many Combine publishers with this protocol, such as `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher`.
 
 Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one value.
 
