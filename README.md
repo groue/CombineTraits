@@ -125,7 +125,7 @@ Conversely, `Publishers.Sequence` is not a single publisher, because not all seq
 - [TraitPublishers.Single]
 - [SingleSubscription]
 
-#### AnySinglePublisher
+### AnySinglePublisher
 
 `AnySinglePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
     
@@ -159,7 +159,7 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 ```
 
-#### `sinkSingle(receive:)`
+### `sinkSingle(receive:)`
 
 The `sinkSingle(receive:)` method simplifies handling of single publisher results:
     
@@ -456,7 +456,7 @@ Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequ
 - [TraitPublishers.Maybe]
 - [MaybeSubscription]
 
-#### AnyMaybePublisher
+### AnyMaybePublisher
 
 `AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
     
@@ -490,7 +490,7 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 }
 ```
 
-#### `sinkMaybe(receive:)`
+### `sinkMaybe(receive:)`
 
 The `sinkMaybe(receive:)` method simplifies handling of maybe publisher results:
     
