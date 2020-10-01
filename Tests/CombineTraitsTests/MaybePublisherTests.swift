@@ -444,4 +444,30 @@ class MaybePublisherTests: XCTestCase {
         accept1(.fail(TestError()))
         accept2(.fail(TestError()))
     }
+    
+    // MARK: - sinkMaybe
+    
+    func test_sinkMaybe() {
+        func test<P: MaybePublisher>(publisher: P, synchronouslyCompletesWithResult expectedResult: MaybeResult<P.Output, P.Failure>)
+        where P.Output: Equatable, P.Failure: Equatable
+        {
+            var result: MaybeResult<P.Output, P.Failure>?
+            _ = publisher.sinkMaybe(receive: { result = $0 })
+            XCTAssertEqual(result, expectedResult)
+        }
+        
+        struct TestError: Error, Equatable { }
+        
+        test(
+            publisher: Just(1),
+            synchronouslyCompletesWithResult: .success(1))
+        
+        test(
+            publisher: Empty(outputType: Int.self, failureType: Never.self),
+            synchronouslyCompletesWithResult: .empty)
+        
+        test(
+            publisher: Fail(outputType: Int.self, failure: TestError()),
+            synchronouslyCompletesWithResult: .failure(TestError()))
+    }
 }

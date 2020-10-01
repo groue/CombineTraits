@@ -397,4 +397,26 @@ class SinglePublisherTests: XCTestCase {
         accept1(.fail(TestError()))
         accept2(.fail(TestError()))
     }
+    
+    // MARK: - sinkSingle
+    
+    func test_sinkSingle() {
+        func test<P: SinglePublisher>(publisher: P, synchronouslyCompletesWithResult expectedResult: Result<P.Output, P.Failure>)
+        where P.Output: Equatable, P.Failure: Equatable
+        {
+            var result: Result<P.Output, P.Failure>?
+            _ = publisher.sinkSingle(receive: { result = $0 })
+            XCTAssertEqual(result, expectedResult)
+        }
+        
+        struct TestError: Error, Equatable { }
+        
+        test(
+            publisher: Just(1),
+            synchronouslyCompletesWithResult: .success(1))
+        
+        test(
+            publisher: Fail(outputType: Int.self, failure: TestError()),
+            synchronouslyCompletesWithResult: .failure(TestError()))
+    }
 }
