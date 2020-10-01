@@ -119,10 +119,10 @@ let cancellable = namePublisher().sink(
     receiveCompletion: { completion in
         switch completion {
         case .finished:
-            // It is ok if no name was received?
+            // It is ok if no name was received before completion?
             break
         case let .failure(error):
-            // It is ok if a name was received?
+            // It is ok if a name was received before the failure?
             handle(error)
         }
     },
@@ -225,7 +225,7 @@ let cancellable = namePublisher().sink(
                 handleNoName()
             }
         case let .failure(error):
-            // It is ok if a name was received?
+            // It is ok if a name was received before the failure?
             handle(error)
         }
     },
