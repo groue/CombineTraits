@@ -51,37 +51,6 @@ This library provides safe construction and subscription to publishers that conf
 
 **CombineTraits carefully preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
-In the sample code below, we see "single publishers" in action:
-
-- Functions prefer returning `AnySinglePublisher` instead of `AnyPublisher`, in order to provide trait guarantees.
-- We use the regular `map` and `flatMap` operators.
-- The subscription prefers using `sinkSingle`, instead of `sink`, in order to simplify result handling.
-
-```swift
-/// A publisher that downloads some API model
-func downloadPublisher() -> AnySinglePublisher<APIModel, Error> { ... }
-
-/// A publisher that saves a model on disk
-func savePublisher(_ model: Model) -> AnySinglePublisher<Void, Error> { ... }
-
-/// A publisher that downloads and saves
-func refreshPublisher() -> AnySinglePublisher<Void, Error> {
-    downloadPublisher()
-        .map { apiModel in Model(apiModel) }
-        .flatMap { model in savePublisher(model) }
-        .eraseToAnySinglePublisher()
-}
-
-let cancellable = refreshPublisher().sinkSingle { result in
-    switch result {
-    case .success:
-        print("Refresh succeeded")
-    case let .failure(error):
-        print("Refresh failed: \(error)")
-    }
-}
-```
-
 Your applications and libraries will quickly benefit from CombineTraits in three steps:
 
 1. Watch for `AnyPublisher` results that would benefit from traits.
@@ -98,11 +67,35 @@ Your applications and libraries will quickly benefit from CombineTraits in three
     +        .eraseToAnySinglePublisher()
      }
      
+    -func nextNamePublisher() -> AnyPublisher<Name, Never> {
+    +func nextNamePublisher() -> AnyMaybePublisher<Name, Never> {
+         nameSubject
+             .prefix(1)
+    -        .eraseToAnyPublisher()
+    +        .assertMaybe()
+    +        .eraseToAnyMaybePublisher()
+     }
+    ```
+     
 3. Replace `sink` with `sinkSingle` or `sinkMaybe`:
     
     ```diff
     -let cancellable = refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
-    +let cancellable = refreshPublisher().sinkSingle { result in ... }
+    +let cancellable = refreshPublisher().sinkSingle { result in
+    +    switch result {
+    +    case .success: ...
+    +    case let .failure(error): ...
+    +    }
+    +}
+     
+    -let cancellable = nextNamePublisher().sink(receiveCompletion:..., receiveValue: ...)
+    +let cancellable = nextNamePublisher().sinkMaybe { result in
+    +    switch result {
+    +    case .empty: ...
+    +    case let .success(name): ...
+    +    case let .failure(error): ...
+    +    }
+    +}
     ```
 
 # Documentation
