@@ -61,14 +61,14 @@ Once you have a publisher that conforms to `SinglePublisher`, you have access to
 - An `AnySinglePublisher` type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
     
     ```swift
-    /// Publishes a name
+    /// 😎 Publishes exactly one name
     func namePublisher() -> AnySinglePublisher<String, Error>
     ```
     
-    Compare with the regular `AnyPublisher`, where documentation is the only way to express the single value guarantee:
+    Compare with the regular `AnyPublisher`, where documentation is the only way to express the "single" guarantee:
     
     ```swift
-    /// Trust us: this publisher can only publish one name, or an error.
+    /// 🤔 Trust us: this publisher can only publish one name, or an error.
     func namePublisher() -> AnyPublisher<String, Error>
     ```
     
@@ -137,14 +137,14 @@ Once you have a publisher that conforms to `MaybePublisher`, you have access to 
 - An `AnyMaybePublisher` type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
     
     ```swift
-    /// Maybe publishes a name
+    /// 😎 Maybe publishes a name
     func namePublisher() -> AnyMaybePublisher<String, Error>
     ```
     
     Compare with the regular `AnyPublisher`, where documentation is the only way to express the "maybe" guarantee:
     
     ```swift
-    /// Trust us: this publisher can only publish zero or one name, or an error.
+    /// 🤔 Trust us: this publisher can only publish zero or one name, or an error.
     func namePublisher() -> AnyPublisher<String, Error>
     ```
     
