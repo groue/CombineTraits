@@ -16,7 +16,7 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications. One must generally assume that publishers may publish zero, one, or more values before it completes.
+CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications. One must generally assume that publishers may publish zero, one, or more values before they complete.
 
 We have to rely on the context or the documentation in order to lift doubts. For example, publishers of the result of a network request are assumed to publish one value, or the eventual network error. We often do not deal with odd cases such as a completion without any value, or several published values.
 
