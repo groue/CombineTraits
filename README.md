@@ -67,8 +67,8 @@ Your applications and libraries will quickly benefit from CombineTraits in three
     +        .eraseToAnySinglePublisher()
      }
      
-    -func nextNamePublisher() -> AnyPublisher<Name, Never> {
-    +func nextNamePublisher() -> AnyMaybePublisher<Name, Never> {
+    -func nextNamePublisher() -> AnyPublisher<String, Error> {
+    +func nextNamePublisher() -> AnyMaybePublisher<String, Error> {
          nameSubject
              .prefix(1)
     -        .eraseToAnyPublisher()
