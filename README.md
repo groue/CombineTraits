@@ -15,11 +15,13 @@ Quite often, we have to rely on the context or the documentation in order to lif
 
 And sometimes, we build a publisher that we *think* will publish a single value before completion. Unfortunately we write bugs and our publisher fails to honor its own contract. This can trigger bugs in other parts of our application.
 
-**In both cases, the compiler did not help us writing code that is guaranteed to be correct.** That's what CombineTraits is about.
+**In both cases, the compiler did not help us writing code that is guaranteed to be correct.**
 
-This library comes with support for two publisher traits:
+That's what this library is about: safe construction and subscription to publishers that conform to specific **traits**:
         
-- **Single** publishers are guaranteed to publish exactly one element, or an error:
+- **Single** publishers are guaranteed to publish exactly one element, or an error.
+    
+    In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
     --------> A single publisher can never publish anything.
@@ -28,6 +30,8 @@ This library comes with support for two publisher traits:
     ```
     
 - **Maybe** publishers are guaranteed to publish exactly zero element, or one element, or an error:
+    
+    In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
     --------> A maybe publisher can never publish anything.
@@ -353,7 +357,7 @@ class MyViewController: UIViewController {
     @IBAction func pickPhoneNumber() {
         PhoneNumberPublisher(presentingContactPickerFrom: self)
             .sink { contact in
-                // hande contact
+                // handle contact
             }
             .store(in: &cancellables)
     }
@@ -652,7 +656,7 @@ class MyViewController: UIViewController {
     @IBAction func pickPhoneNumber() {
         PhoneNumberPublisher(presentingContactPickerFrom: self)
             .sinkMaybe { result in
-                // hande result
+                // handle result
             }
             .store(in: &cancellables)
     }
