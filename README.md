@@ -17,7 +17,7 @@ And sometimes, we build a publisher that we *think* will publish a single value 
 
 **In both cases, the compiler did not help us writing code that is guaranteed to be correct.**
 
-That's what this library is about: safe construction and subscription to publishers that conform to specific **traits**:
+This library provides safe construction and subscription to publishers that conform to specific traits.
         
 - **Single** publishers are guaranteed to publish exactly one element, or an error.
     
@@ -39,6 +39,41 @@ That's what this library is about: safe construction and subscription to publish
     -----|--> A maybe publisher can complete without publishing any value.
     --o--|--> A maybe publisher can publish one value and complete.
     ```
+
+## Usage
+
+**CombineTraits carefully preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
+
+In the sample code below, see how:
+
+- Functions prefer returning `AnySinglePublisher` instead of `AnyPublisher`, in order to provide trait guarantees.
+- We use the regular `map` and `flatMap` operators.
+- The subscription prefers using `sinkSingle`, instead of `sink`, in order to simplify result handling.
+
+```swift
+/// A publisher that downloads some API model
+func downloadPublisher() -> AnySinglePublisher<APIModel, Error> { ... }
+
+/// A publisher that saves a model on disk
+func savePublisher(_ model: Model) -> AnySinglePublisher<Void, Error> { ... }
+
+/// A publisher that downloads and saves
+func refreshPublisher() -> AnySinglePublisher<Void, Error> {
+    downloadPublisher()
+        .map { apiModel in Model(apiModel) }
+        .flatMap { model in savePublisher(model) }
+        .eraseToAnySinglePublisher()
+}
+
+let cancellable = refreshPublisher().sinkSingle { result in
+    switch result {
+    case .success:
+        print("Refresh succeeded")
+    case let .failure(error):
+        print("Refresh failed: \(error)")
+    }
+}
+```
 
 # Documentation
 
