@@ -21,16 +21,20 @@ This library comes with support for two publisher traits:
         
 - **Single** publishers are guaranteed to publish exactly one element, or an error:
     
-        --------> A single publisher can never publish anything.
-        -----x--> A single publisher can fail.
-        --o--|--> A single publisher can publish one value and complete.
+    ```
+    --------> A single publisher can never publish anything.
+    -----x--> A single publisher can fail.
+    --o--|--> A single publisher can publish one value and complete.
+    ```
     
 - **Maybe** publishers are guaranteed to publish exactly zero element, or one element, or an error:
     
-        --------> A maybe publisher can never publish anything.
-        -----x--> A maybe publisher can fail.
-        -----|--> A maybe publisher can complete without publishing any value.
-        --o--|--> A maybe publisher can publish one value and complete.
+    ```
+    --------> A maybe publisher can never publish anything.
+    -----x--> A maybe publisher can fail.
+    -----|--> A maybe publisher can complete without publishing any value.
+    --o--|--> A maybe publisher can publish one value and complete.
+    ```
 
 # Documentation
 
