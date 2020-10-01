@@ -3,6 +3,8 @@ import XCTest
 import CombineTraitsTests
 
 var tests = [XCTestCaseEntry]()
-tests += MaybeSubscriptionTests.allTests(),
+tests += MaybePublisherTests.allTests()
+tests += MaybeSubscriptionTests.allTests()
 tests += SinglePublisherTests.allTests()
+tests += SingleSubscriptionTests.allTests()
 XCTMain(tests)
