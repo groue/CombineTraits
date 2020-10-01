@@ -94,8 +94,8 @@ When you import CombineTraits in an existing library or application, you will qu
 3. Replace `sink` with `sinkSingle` or `sinkMaybe`:
     
     ```diff
-    -refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
-    +refreshPublisher().sinkSingle { result in ... }
+    -let cancellable = refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
+    +let cancellable = refreshPublisher().sinkSingle { result in ... }
     ```
 
 # Documentation
