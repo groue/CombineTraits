@@ -18,13 +18,13 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications: one must generally assume that it may publish zero, one, or more values before it completes.
 
-Quite often, we have to rely on the context or the documentation in order to lift doubts. For example, we expect a publisher that publishes the result of some network request to publish only one value, or the eventual network error. We do not deal with odd cases such as a completion without any value, or several published values.
+We have to rely on the context or the documentation in order to lift doubts. For example, publishers of the result of a network request are assumed to publish one value, or the eventual network error. We often do not deal with odd cases such as a completion without any value, or several published values.
 
-And sometimes, we build a publisher that we *think* will publish a single value before completion. Unfortunately we write bugs and our publisher fails to honor its own contract. This can trigger bugs in other parts of our application.
+But sometimes, publishers do not honor this implicit contract, due to a misunderstanding, or a bug if the publisher definition. This can trigger bugs.
 
-**In both cases, the compiler did not help us writing code that is guaranteed to be correct.**
+**The compiler does not help us writing code that is guaranteed to be correct.**
 
-This library provides safe construction and subscription to publishers that conform to specific traits.
+This library provides both safe  *subscription* and *construction* of publishers that conform to specific traits:
         
 - **Single** publishers are guaranteed to publish exactly one value, or an error.
     
