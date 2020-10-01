@@ -203,9 +203,8 @@ let cancellable = namePublisher().sink(
 
 For example, in the sample code below, we build a new single publisher from several other ones. Note how:
 
-- The `Publishers.Map` built by the Combine `map` method call did not lose the single trait.
-- The `Publishers.FlatMap` built by the Combine `flatMap` method call did not lose the single trait.
-- The final `eraseToAnySinglePublisher()` method call is only available because the compiler could prove that we chain single publishers together in a way that builds a new single publisher.
+- Both the Combine `map` and `flatMap` methods did not lose the single trait.
+- The final `eraseToAnySinglePublisher()` method is only available because the compiler could prove that we combine single publishers in a way that is guaranteed to build a new single publisher.
 
 ```swift
 /// A publisher that downloads some API model
