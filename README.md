@@ -8,8 +8,8 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 ---
 
 <p align="center">
-    <a href="#usage">Usage</a> &bull;
-    <a href="#documentation">Documentation</a> &bull;
+    <a href="#usage">👀 Usage</a> &bull;
+    <a href="#documentation">📗 Documentation</a>
 </p>
 
 ---
