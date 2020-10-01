@@ -150,7 +150,7 @@ See also [TraitPublishers.Single] and [SingleSubscription].
 --o--|--> A maybe publisher can publish one value and complete.
 ```
 
-In the Combine framework, the built-in `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
+In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
 
 Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one element.
 

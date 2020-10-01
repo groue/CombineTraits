@@ -6,8 +6,9 @@ import Foundation
 /// `MaybePublisher` is the protocol for "maybe publishers", which publish
 /// exactly zero element, or one element, or an error.
 ///
-/// Combine's `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are
-/// examples of publishers that conform to `MaybePublisher`.
+/// In the Combine framework, the built-in `Empty`, `Just`, `Future` and
+/// `URLSession.DataTaskPublisher` are examples of publishers that conform
+/// to `MaybePublisher`.
 ///
 /// Conversely, `Publishers.Sequence` is not a maybe publisher, because not all
 /// sequences contain zero or one element.

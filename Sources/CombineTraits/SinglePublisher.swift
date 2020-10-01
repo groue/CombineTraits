@@ -6,8 +6,9 @@ import Foundation
 /// `SinglePublisher` is the protocol for "single publishers", which publish
 /// exactly one element, or an error.
 ///
-/// Combine's `Just`, `Future` and `URLSession.DataTaskPublisher` are examples
-/// of publishers that conform to `SinglePublisher`.
+/// In the Combine framework, the built-in `Just`, `Future` and
+/// `URLSession.DataTaskPublisher` are examples of publishers that conform
+/// to `SinglePublisher`.
 ///
 /// Conversely, `Publishers.Sequence` is not a single publisher, because not all
 /// sequences contain a single element.
