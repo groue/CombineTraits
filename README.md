@@ -82,7 +82,7 @@ let cancellable = refreshPublisher().sinkSingle { result in
 }
 ```
 
-When you import CombineTraits in an existing library or application, you will quickly benefit from it in three steps:
+Your applications and libraries will quickly benefit from CombineTraits in three steps:
 
 1. Watch for `AnyPublisher` results that would benefit from traits.
 
