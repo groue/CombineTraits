@@ -1,7 +1,7 @@
 CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?style=flat)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/groue/CombineTraits.svg?maxAge=2592000)](/LICENSE)
 =============
 
-### Guarantees on the number of elements published by Combine publishers
+### Guarantees on the number of values published by Combine publishers
 
 **Requirements**: iOS 13.0+ / OSX 10.15+ / tvOS 13.0+ / watchOS 6.0+ &bull; Swift 5.3+ / Xcode 12.0+
 
@@ -16,7 +16,7 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many elements can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications: one must generally assume that it may publish zero, one, or more elements before it completes.
+CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications: one must generally assume that it may publish zero, one, or more values before it completes.
 
 Quite often, we have to rely on the context or the documentation in order to lift doubts. For example, we expect a publisher that publishes the result of some network request to publish only one value, or the eventual network error. We do not deal with odd cases such as a completion without any value, or several published values.
 
@@ -26,7 +26,7 @@ And sometimes, we build a publisher that we *think* will publish a single value 
 
 This library provides safe construction and subscription to publishers that conform to specific traits.
         
-- **Single** publishers are guaranteed to publish exactly one element, or an error.
+- **Single** publishers are guaranteed to publish exactly one value, or an error.
     
     In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
@@ -36,7 +36,7 @@ This library provides safe construction and subscription to publishers that conf
     --o--|--> A single publisher can publish one value and complete.
     ```
     
-- **Maybe** publishers are guaranteed to publish exactly zero element, or one element, or an error:
+- **Maybe** publishers are guaranteed to publish exactly zero value, or one value, or an error:
     
     In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
@@ -105,7 +105,7 @@ Your applications and libraries will quickly benefit from CombineTraits in three
 
 ## The SinglePublisher Protocol
 
-**`SinglePublisher` is the protocol for publishers that publish exactly one element, or an error.**
+**`SinglePublisher` is the protocol for publishers that publish exactly one value, or an error.**
 
 ```
 --------> A single publisher can never publish anything.
@@ -115,7 +115,7 @@ Your applications and libraries will quickly benefit from CombineTraits in three
 
 In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `SinglePublisher`.
 
-Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single element.
+Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single value.
 
 - [AnySinglePublisher]
 - [`sinkSingle(receive:)`]
@@ -233,20 +233,20 @@ There are a few ways to get such a single publisher:
 
 - **Compiler-checked single publishers** are publishers that conform to the `SinglePublisher` protocol. This is the case of `Just` and `Fail`, for example. Some publishers conditionally conform to `SinglePublisher`, such as `Publishers.Map`, when the upstream publisher is a single publisher.
     
-    When you define a publisher type that publishes exactly one element, or an error, you can turn it into a single publisher with an extension:
+    When you define a publisher type that publishes exactly one value, or an error, you can turn it into a single publisher with an extension:
     
     ```swift
     struct MySinglePublisher: Publisher { ... }
     extension MySinglePublisher: SinglePublisher { }
     ```
 
-- **Runtime-checked single publishers** are publishers that conform to the `SinglePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly one element, or an error.
+- **Runtime-checked single publishers** are publishers that conform to the `SinglePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly one value, or an error.
     
     You build a checked single publisher with one of those methods:
     
-    - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one element, or an error.
+    - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one value, or an error.
     
-    - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one element, or an error.
+    - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one value, or an error.
         
         For example:
         
@@ -264,24 +264,24 @@ There are a few ways to get such a single publisher:
     For example:
     
     ```swift
-    // CORRECT: those publish exactly one element, or an error.
+    // CORRECT: those publish exactly one value, or an error.
     [1].publisher.uncheckedSingle()
     [1, 2].publisher.prefix(1).uncheckedSingle()
     
-    // WRONG: does not publish any element
+    // WRONG: does not publish any value
     Empty().uncheckedSingle()
     
-    // WRONG: publishes more than one element
+    // WRONG: publishes more than one value
     [1, 2].publisher.uncheckedSingle()
     
-    // WRONG: does not publish exactly one element, or an error
+    // WRONG: does not publish exactly one value, or an error
     Just(1).append(Fail(error)).uncheckedSingle()
     
-    // WARNING: may not publish exactly one element, or an error
+    // WARNING: may not publish exactly one value, or an error
     someSubject.prefix(1).uncheckedSingle()
     ```
     
-    The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one element, or an error, are undefined.
+    The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one value, or an error, are undefined.
 
 See also [Basic Single Publishers], [TraitPublishers.Single] and [SingleSubscription].
 
@@ -436,7 +436,7 @@ class MyViewController: UIViewController {
 
 ## The MaybePublisher Protocol
 
-**`MaybePublisher` is the protocol for publishers that publish exactly zero element, or one element, or an error.**
+**`MaybePublisher` is the protocol for publishers that publish exactly zero value, or one value, or an error.**
 
 ```
 --------> A maybe publisher can never publish anything.
@@ -447,7 +447,7 @@ class MyViewController: UIViewController {
 
 In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
 
-Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one element.
+Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one value.
 
 - [AnyMaybePublisher]
 - [`sinkMaybe(receive:)`]
@@ -543,20 +543,20 @@ There are a few ways to get such a maybe publisher:
 
 - **Compiler-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol. This is the case of `Empty`, `Just` and `Fail`, for example. Some publishers conditionally conform to `MaybePublisher`, such as `Publishers.Map`, when the upstream publisher is a maybe publisher.
     
-    When you define a publisher type that publishes exactly zero element, or one element, or an error, you can turn it into a maybe publisher with an extension:
+    When you define a publisher type that publishes exactly zero value, or one value, or an error, you can turn it into a maybe publisher with an extension:
     
     ```swift
     struct MyMaybePublisher: Publisher { ... }
     extension MyMaybePublisher: MaybePublisher { }
     ```
 
-- **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero element, or one element, or an error.
+- **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero value, or one value, or an error.
     
     You build a checked maybe publisher with one of those methods:
     
-    - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero element, or one element, or an error.
+    - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero value, or one value, or an error.
     
-    - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero element, or one element, or an error.
+    - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero value, or one value, or an error.
         
         For example:
         
@@ -573,20 +573,20 @@ There are a few ways to get such a maybe publisher:
     For example:
     
     ```swift
-    // CORRECT: those publish exactly zero element, or one element, or an error.
+    // CORRECT: those publish exactly zero value, or one value, or an error.
     Array<Int>().publisher.uncheckedMaybe()
     [1].publisher.uncheckedMaybe()
     [1, 2].publisher.prefix(1).uncheckedMaybe()
     someSubject.prefix(1).uncheckedMaybe()
     
-    // WRONG: publishes more than one element
+    // WRONG: publishes more than one value
     [1, 2].publisher.uncheckedMaybe()
     
-    // WRONG: does not publish exactly zero element, or one element, or an error
+    // WRONG: does not publish exactly zero value, or one value, or an error
     Just(1).append(Fail(error)).uncheckedMaybe()
     ```
     
-    The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero element, or one element, or an error, are undefined.
+    The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero value, or one value, or an error, are undefined.
 
 See also [Basic Maybe Publishers], [TraitPublishers.Maybe] and [MaybeSubscription].
 
