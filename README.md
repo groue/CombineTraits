@@ -46,7 +46,13 @@ This library comes with support for two publisher traits:
 
 `SinglePublisher` is the protocol for "single publishers", which publish exactly one element, or an error.
 
-Combine's `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `SinglePublisher`.
+```
+--------> A single publisher can never publish anything.
+-----x--> A single publisher can fail.
+--o--|--> A single publisher can publish one value and complete.
+```
+
+In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `SinglePublisher`.
 
 Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single element.
 
@@ -137,7 +143,14 @@ See also [TraitPublishers.Single] and [SingleSubscription].
 
 `MaybePublisher` is the protocol for "maybe publishers", which publish exactly zero element, or one element, or an error.
 
-Combine's `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
+```
+--------> A maybe publisher can never publish anything.
+-----x--> A maybe publisher can fail.
+-----|--> A maybe publisher can complete without publishing any value.
+--o--|--> A maybe publisher can publish one value and complete.
+```
+
+In the Combine framework, the built-in `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are examples of publishers that conform to `MaybePublisher`.
 
 Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one element.
 
