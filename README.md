@@ -40,7 +40,6 @@ This library comes with support for two publisher traits:
 
 - [The SinglePublisher Protocol]
 - [The MaybePublisher Protocol]
-- [Tools]
 
 ## The SinglePublisher Protocol
 
@@ -60,6 +59,8 @@ Conversely, `Publishers.Sequence` is not a single publisher, because not all seq
 - [`sinkSingle(receive:)`]
 - [Building Single Publishers]
 - [Basic Single Publishers]
+- [TraitPublishers.Single]
+- [SingleSubscription]
 
 #### AnySinglePublisher
 
@@ -180,7 +181,7 @@ There are a few ways to get such a single publisher:
     
     The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one element, or an error, are undefined.
 
-See also [TraitPublishers.Single] and [SingleSubscription].
+See also [Basic Single Publishers], [TraitPublishers.Single] and [SingleSubscription].
 
 ### Basic Single Publishers
 
@@ -196,6 +197,9 @@ AnySinglePublisher.fail(error)
 // Never publishes any value, never completes.
 AnySinglePublisher.never()
 ```
+
+### TraitPublishers.Single
+### SingleSubscription
 
 ## The MaybePublisher Protocol
 
@@ -216,6 +220,8 @@ Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequ
 - [`sinkMaybe(receive:)`]
 - [Building Maybe Publishers]
 - [Basic Maybe Publishers]
+- [TraitPublishers.Maybe]
+- [MaybeSubscription]
 
 #### AnyMaybePublisher
 
@@ -339,20 +345,27 @@ There are a few ways to get such a maybe publisher:
     
     The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero element, or one element, or an error, are undefined.
 
-See also [TraitPublishers.Maybe] and [MaybeSubscription].
+See also [Basic Maybe Publishers], [TraitPublishers.Maybe] and [MaybeSubscription].
 
 ### Basic Maybe Publishers
 
-## Tools
+`AnyMaybePublisher` comes with factory methods that build basic maybe publishers:
 
-- [TraitPublishers.Single]
-- [TraitPublishers.Maybe]
-- [SingleSubscription]
-- [MaybeSubscription]
+```swift
+// Completes without publishing any value.
+AnyMaybePublisher.empty
 
-### TraitPublishers.Single
+// Publishes one value, and then completes.
+AnyMaybePublisher.just(value)
+
+// Fails with the given error.
+AnyMaybePublisher.fail(error)
+
+// Never publishes any value, never completes.
+AnyMaybePublisher.never()
+```
+
 ### TraitPublishers.Maybe
-### SingleSubscription
 ### MaybeSubscription
 
 
