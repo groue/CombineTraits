@@ -6,8 +6,10 @@ import XCTest
 class PublisherTraitsMaybeTests: XCTestCase {
     func test_PublisherTraitsMaybe_is_a_MaybePublisher() {
         // This test passes if this test compiles
-        func f<P: MaybePublisher>(_ p: P) { }
-        func g<Output, Failure>(_ p: PublisherTraits.Maybe<Output, Failure>) { f(p) }
+        func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) { }
+        func f<Output, Failure>(_ p: PublisherTraits.Maybe<Output, Failure>) {
+            acceptSomeMaybePublisher(p)
+        }
     }
     
     func test_PublisherTraitsMaybe_is_deferred() {

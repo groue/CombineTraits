@@ -15,10 +15,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -44,10 +44,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -74,10 +74,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -98,10 +98,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -134,10 +134,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             subject.send(1)
@@ -169,10 +169,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -205,10 +205,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -230,10 +230,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -260,10 +260,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -292,10 +292,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -317,10 +317,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -347,10 +347,10 @@ class MaybePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -367,11 +367,11 @@ class MaybePublisherTests: XCTestCase {
         func accept2(_ p: AnyMaybePublisher<Int, Error>) { }
         func accept3(_ p: AnyMaybePublisher<Never, Never>) { }
         func accept4(_ p: AnyMaybePublisher<Never, Error>) { }
-
+        
         // The various ways to build a publisher...
         let p1 = AnyMaybePublisher.empty(outputType: Int.self, failureType: Error.self)
         let p2 = AnyMaybePublisher<Int, Error>.empty()
-
+        
         // ... build the expected types.
         accept2(p1)
         accept2(p2)
@@ -469,5 +469,26 @@ class MaybePublisherTests: XCTestCase {
         test(
             publisher: Fail(outputType: Int.self, failure: TestError()),
             synchronouslyCompletesWithResult: .failure(TestError()))
+    }
+    
+    // MARK: - Maybe Publisher Relationships
+    
+    func test_relationships() {
+        // This test passes if this test compiles
+        
+        func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) {
+            acceptAnyMaybePublisher(p.eraseToAnyMaybePublisher())
+        }
+        
+        func acceptAnyMaybePublisher<Output, Failure>(_ p: AnyMaybePublisher<Output, Failure>) {
+            acceptSomeMaybePublisher(p)
+        }
+        
+        func acceptSomePublisher<P: Publisher>(_ p: P) {
+            acceptAnyMaybePublisher(p.uncheckedMaybe())
+            acceptSomeMaybePublisher(p.assertMaybe())
+            acceptSomeMaybePublisher(p.checkMaybe())
+            acceptSomeMaybePublisher(p.uncheckedMaybe())
+        }
     }
 }

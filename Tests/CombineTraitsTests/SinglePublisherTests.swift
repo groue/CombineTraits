@@ -15,10 +15,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -44,10 +44,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -79,10 +79,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -103,10 +103,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -139,10 +139,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             subject.send(1)
@@ -174,10 +174,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -210,10 +210,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -235,10 +235,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -265,10 +265,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1, handler: nil)
@@ -297,10 +297,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -323,10 +323,10 @@ class SinglePublisherTests: XCTestCase {
             receiveCompletion: {
                 completion = $0
                 expectation.fulfill()
-        },
+            },
             receiveValue: {
                 value = $0
-        })
+            })
         
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
@@ -418,5 +418,44 @@ class SinglePublisherTests: XCTestCase {
         test(
             publisher: Fail(outputType: Int.self, failure: TestError()),
             synchronouslyCompletesWithResult: .failure(TestError()))
+    }
+    
+    // MARK: - Single Publisher Relationships
+    
+    func test_relationships() {
+        // This test passes if this test compiles
+        
+        func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) {
+            acceptAnyMaybePublisher(p.eraseToAnyMaybePublisher())
+        }
+        
+        func acceptSomeSinglePublisher<P: SinglePublisher>(_ p: P) {
+            acceptAnyMaybePublisher(p.eraseToAnyMaybePublisher())
+            acceptAnySinglePublisher(p.eraseToAnySinglePublisher())
+            acceptSomeMaybePublisher(p)
+        }
+        
+        func acceptAnyMaybePublisher<Output, Failure>(_ p: AnyMaybePublisher<Output, Failure>) {
+            acceptSomeMaybePublisher(p)
+        }
+        
+        func acceptAnySinglePublisher<Output, Failure>(_ p: AnySinglePublisher<Output, Failure>) {
+            acceptSomeMaybePublisher(p)
+            acceptSomeSinglePublisher(p)
+        }
+        
+        func acceptSomePublisher<P: Publisher>(_ p: P) {
+            acceptAnyMaybePublisher(p.uncheckedMaybe())
+            acceptAnySinglePublisher(p.uncheckedSingle())
+            acceptSomeMaybePublisher(p.assertMaybe())
+            acceptSomeMaybePublisher(p.assertSingle())
+            acceptSomeMaybePublisher(p.checkMaybe())
+            acceptSomeMaybePublisher(p.checkSingle())
+            acceptSomeMaybePublisher(p.uncheckedMaybe())
+            acceptSomeMaybePublisher(p.uncheckedSingle())
+            acceptSomeSinglePublisher(p.assertSingle())
+            acceptSomeSinglePublisher(p.checkSingle())
+            acceptSomeSinglePublisher(p.uncheckedSingle())
+        }
     }
 }

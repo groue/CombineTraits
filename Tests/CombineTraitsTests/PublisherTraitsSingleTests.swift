@@ -6,8 +6,10 @@ import XCTest
 class PublisherTraitsSingleTests: XCTestCase {
     func test_PublisherTraitsSingle_is_a_SinglePublisher() {
         // This test passes if this test compiles
-        func f<P: SinglePublisher>(_ p: P) { }
-        func g<Output, Failure>(_ p: PublisherTraits.Single<Output, Failure>) { f(p) }
+        func acceptSomeSinglePublisher<P: SinglePublisher>(_ p: P) { }
+        func f<Output, Failure>(_ p: PublisherTraits.Single<Output, Failure>) {
+            acceptSomeSinglePublisher(p)
+        }
     }
     
     func test_PublisherTraitsSingle_is_deferred() {
