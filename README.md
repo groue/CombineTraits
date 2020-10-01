@@ -50,69 +50,92 @@ Combine's `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of pu
 
 Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single element.
 
-- [SinglePublisher Benefits]
+- [SinglePublisher Usage]
+    - [AnySinglePublisher]
+    - [`sinkSingle(receive:)`]
 - [Building Single Publishers]
 - [Basic Single Publishers]
 
-### SinglePublisher Benefits
+### SinglePublisher Usage
 
 Once you have a publisher that conforms to `SinglePublisher`, you have access to two desirable tools:
 
-- An `AnySinglePublisher` type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
-    
-    ```swift
-    /// 😎 Publishes exactly one name
-    func namePublisher() -> AnySinglePublisher<String, Error>
-    ```
-    
-    Compare with the regular `AnyPublisher`, where documentation is the only way to express the "single" guarantee:
-    
-    ```swift
-    /// 🤔 Trust us: this publisher can only publish one name, or an error.
-    func namePublisher() -> AnyPublisher<String, Error>
-    ```
-    
-    You build an `AnySinglePublisher` with the `eraseToAnySinglePublisher()` method:
-    
-    ```swift
-    mySinglePublisher.eraseToAnySinglePublisher()
-    ```
+- [AnySinglePublisher]
+- [`sinkSingle(receive:)`]
 
-- A `sinkSingle(receive:)` method that simplifies handling of single publisher results:
+#### AnySinglePublisher
+
+`AnySinglePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
     
-    ```swift
-    // 😎 There are only two cases to handle
-    let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) in
-        switch result {
-        case let .success(name):
-            handle(name)
+```swift
+/// 😎 Publishes exactly one name
+func namePublisher() -> AnySinglePublisher<String, Error>
+```
+
+Compare with the regular `AnyPublisher`, where documentation is the only way to express the "single" guarantee:
+
+```swift
+/// 🤔 Trust us: this publisher can only publish one name, or an error.
+func namePublisher() -> AnyPublisher<String, Error>
+```
+
+You build an `AnySinglePublisher` with the `SinglePublisher.eraseToAnySinglePublisher()` method. For example:
+
+```swift
+func namePublisher() -> AnySinglePublisher<String, Error> {
+    Just("Alice")
+        .setFailureType(to: Error.self)
+        .eraseToAnySinglePublisher()
+}
+```
+
+Don't miss [Basic Single Publishers] for some handy shortcuts:
+
+```swift
+func namePublisher() -> AnySinglePublisher<String, Error> {
+    .just("Alice")
+}
+```
+
+
+
+#### `sinkSingle(receive:)`
+
+The `sinkSingle(receive:)` method simplifies handling of single publisher results:
+    
+```swift
+// 😎 There are only two cases to handle
+let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) in
+    switch result {
+    case let .success(name):
+        handle(name)
+    case let .failure(error):
+        handle(error)
+    }
+}
+```
+
+Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
+
+```swift
+// 🤔 There are a certain amount of cases to handle
+let cancellable = namePublisher().sink(
+    receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            // It is ok is no name was received?
+            break
         case let .failure(error):
+            // It is ok is a name was received?
             handle(error)
         }
-    }
-    ```
-    
-    Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
-    
-    ```swift
-    // 🤔 There are a certain amount of cases to handle
-    let cancellable = namePublisher().sink(
-        receiveCompletion: { completion in
-            switch completion {
-            case .finished:
-                // It is ok is no name was received?
-                break
-            case let .failure(error):
-                // It is ok is a name was received?
-                handle(error)
-            }
-        },
-        receiveValue: { name in
-            // It is ok to receive several names?
-            handle(name)
-        })
-    }
-    ```
+    },
+    receiveValue: { name in
+        // It is ok to receive several names?
+        handle(name)
+    })
+}
+```
 
 ### Building Single Publishers
 
@@ -128,76 +151,97 @@ Combine's `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are exampl
 
 Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one element.
 
-- [MaybePublisher Benefits]
+- [MaybePublisher Usage]
+    - [AnyMaybePublisher]
+    - [`sinkMaybe(receive:)`]
 - [Building Maybe Publishers]
 - [Basic Maybe Publishers]
 
-### MaybePublisher Benefits
+### MaybePublisher Usage
 
 Once you have a publisher that conforms to `MaybePublisher`, you have access to two desirable tools:
 
-- An `AnyMaybePublisher` type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
-    
-    ```swift
-    /// 😎 Maybe publishes a name
-    func namePublisher() -> AnyMaybePublisher<String, Error>
-    ```
-    
-    Compare with the regular `AnyPublisher`, where documentation is the only way to express the "maybe" guarantee:
-    
-    ```swift
-    /// 🤔 Trust us: this publisher can only publish zero or one name, or an error.
-    func namePublisher() -> AnyPublisher<String, Error>
-    ```
-    
-    You build an `AnyMaybePublisher` with the `eraseToAnyMaybePublisher()` method:
-    
-    ```swift
-    myMaybePublisher.eraseToAnyMaybePublisher()
-    ```
+- [AnyMaybePublisher]
+- [`sinkMaybe(receive:)`]
 
-- A `sinkMaybe(receive:)` method that simplifies handling of maybe publisher results:
+#### AnyMaybePublisher
+
+`AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
     
-    ```swift
-    // 😎 There are only three cases to handle
-    let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
-        switch result {
-        case let .empty:
-            handleNoName()
-        case let .success(name):
-            handle(name)
+```swift
+/// 😎 Maybe publishes a name
+func namePublisher() -> AnyMaybePublisher<String, Error>
+```
+
+Compare with the regular `AnyPublisher`, where documentation is the only way to express the "maybe" guarantee:
+
+```swift
+/// 🤔 Trust us: this publisher can only publish zero or one name, or an error.
+func namePublisher() -> AnyPublisher<String, Error>
+```
+
+You build an `AnyMaybePublisher` with the `MaybePublisher.eraseToAnyMaybePublisher()` method. For example:
+
+```swift
+func namePublisher() -> AnyMaybePublisher<String, Error> {
+    Just("Alice")
+        .setFailureType(to: Error.self)
+        .eraseToAnyMaybePublisher()
+}
+```
+
+Don't miss [Basic Maybe Publishers] for some handy shortcuts:
+
+```swift
+func namePublisher() -> AnyMaybePublisher<String, Error> {
+    .just("Alice")
+}
+```
+
+#### `sinkMaybe(receive:)`
+
+The `sinkMaybe(receive:)` method simplifies handling of maybe publisher results:
+    
+```swift
+// 😎 There are only three cases to handle
+let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
+    switch result {
+    case let .empty:
+        handleNoName()
+    case let .success(name):
+        handle(name)
+    case let .failure(error):
+        handle(error)
+    }
+}
+```
+
+Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
+
+```swift
+// 🤔 There are a certain amount of cases to handle
+var nameReceived = false
+let cancellable = namePublisher().sink(
+    receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            // Is the `nameReceived` variable thread-safe?
+            if !nameReceived {
+                handleNoName()
+            }
         case let .failure(error):
+            // It is ok is a name was received?
             handle(error)
         }
-    }
-    ```
-    
-    Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
-    
-    ```swift
-    // 🤔 There are a certain amount of cases to handle
-    var nameReceived = false
-    let cancellable = namePublisher().sink(
-        receiveCompletion: { completion in
-            switch completion {
-            case .finished:
-                // Is the `nameReceived` variable thread-safe?
-                if !nameReceived {
-                    handleNoName()
-                }
-            case let .failure(error):
-                // It is ok is a name was received?
-                handle(error)
-            }
-        },
-        receiveValue: { name in
-            // It is ok to receive several names?
-            // Is the `nameReceived` variable thread-safe?
-            nameReceived = true
-            handle(name)
-        })
-    }
-    ```
+    },
+    receiveValue: { name in
+        // It is ok to receive several names?
+        // Is the `nameReceived` variable thread-safe?
+        nameReceived = true
+        handle(name)
+    })
+}
+```
 
 ### Building Maybe Publishers
 
@@ -222,11 +266,15 @@ See also [TraitPublishers.Maybe] and [MaybeSubscription].
 [Combine]: https://developer.apple.com/documentation/combine
 [Release Notes]: CHANGELOG.md
 [The SinglePublisher Protocol]: #the-singlepublisher-protocol
-[SinglePublisher Benefits]: #singlepublisher-benefits
+[SinglePublisher Usage]: #singlepublisher-usage
+[AnySinglePublisher]: #anysinglepublisher
+[`sinkSingle(receive:)`]: #sinksinglereceive
 [Building Single Publishers]: #building-single-publishers
 [Basic Single Publishers]: #basic-single-publishers
 [The MaybePublisher Protocol]: #the-maybepublisher-protocol
-[MaybePublisher Benefits]: #maybepublisher-benefits
+[MaybePublisher Usage]: #maybepublisher-usage
+[AnyMaybePublisher]: #anymaybepublisher
+[`sinkMaybe(receive:)`]: #sinkmaybereceive
 [Building Maybe Publishers]: #building-maybe-publishers
 [Basic Maybe Publishers]: #basic-maybe-publishers
 [Tools]: #Tools
