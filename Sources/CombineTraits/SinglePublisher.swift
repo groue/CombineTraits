@@ -3,11 +3,11 @@ import Foundation
 
 // MARK: - SinglePublisher
 
-/// The protocol for "single publishers", which publish exactly one element, or
-/// an error.
+/// `SinglePublisher` is the protocol for "single publishers", which publish
+/// exactly one element, or an error.
 ///
-/// `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of
-/// publishers that conform to `SinglePublisher`.
+/// Combine's `Just`, `Future` and `URLSession.DataTaskPublisher` are examples
+/// of publishers that conform to `SinglePublisher`.
 ///
 /// Conversely, `Publishers.Sequence` is not a single publisher, because not all
 /// sequences contain a single element.
@@ -17,7 +17,7 @@ import Foundation
 /// Once you have a publisher that conforms to `SinglePublisher`, you have
 /// access to two desirable tools:
 ///
-/// - A `AnySinglePublisher` type that hides details you don’t want to expose
+/// - An `AnySinglePublisher` type that hides details you don’t want to expose
 ///   across API boundaries. For example, the user of the publisher below knows
 ///   that it publishes exactly one `String`, no more, no less:
 ///

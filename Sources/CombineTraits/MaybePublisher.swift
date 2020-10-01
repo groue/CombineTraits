@@ -3,11 +3,11 @@ import Foundation
 
 // MARK: - MaybePublisher
 
-/// The protocol for "maybe publishers", which publish exactly zero element, or
-/// one element, or an error.
+/// `MaybePublisher` is the protocol for "maybe publishers", which publish
+/// exactly zero element, or one element, or an error.
 ///
-/// `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are examples of
-/// publishers that conform to `MaybePublisher`.
+/// Combine's `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are
+/// examples of publishers that conform to `MaybePublisher`.
 ///
 /// Conversely, `Publishers.Sequence` is not a maybe publisher, because not all
 /// sequences contain zero or one element.
@@ -17,7 +17,7 @@ import Foundation
 /// Once you have a publisher that conforms to `MaybePublisher`, you have
 /// access to two desirable tools:
 ///
-/// - A `AnyMaybePublisher` type that hides details you don’t want to expose
+/// - An `AnyMaybePublisher` type that hides details you don’t want to expose
 ///   across API boundaries. For example, the user of the publisher below knows
 ///   that it publishes exactly zero or one `String`, but no more:
 ///
