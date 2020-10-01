@@ -137,14 +137,14 @@ Conversely, `Publishers.Sequence` is not a single publisher, because not all seq
 `AnySinglePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
     
 ```swift
-/// 😎 Publishes exactly one name
+/// 👍 Publishes exactly one name
 func namePublisher() -> AnySinglePublisher<String, Error>
 ```
 
 Compare with the regular `AnyPublisher`, where documentation is the only way to express the "single" guarantee:
 
 ```swift
-/// 🤔 Trust us: this publisher can only publish one name, or an error.
+/// 😥 Trust us: this publisher can only publish one name, or an error.
 func namePublisher() -> AnyPublisher<String, Error>
 ```
 
@@ -171,7 +171,7 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 The `sinkSingle(receive:)` method simplifies handling of single publisher results:
     
 ```swift
-// 😎 There are only two cases to handle
+// 👍 There are only two cases to handle
 let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) in
     switch result {
     case let .success(name):
@@ -185,7 +185,7 @@ let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) i
 Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
 
 ```swift
-// 🤔 There are a certain amount of cases to handle
+// 😥 There are a certain amount of cases to handle
 let cancellable = namePublisher().sink(
     receiveCompletion: { completion in
         switch completion {
@@ -468,14 +468,14 @@ Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequ
 `AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
     
 ```swift
-/// 😎 Maybe publishes a name
+/// 👍 Maybe publishes a name
 func namePublisher() -> AnyMaybePublisher<String, Error>
 ```
 
 Compare with the regular `AnyPublisher`, where documentation is the only way to express the "maybe" guarantee:
 
 ```swift
-/// 🤔 Trust us: this publisher can only publish zero or one name, or an error.
+/// 😥 Trust us: this publisher can only publish zero or one name, or an error.
 func namePublisher() -> AnyPublisher<String, Error>
 ```
 
@@ -502,7 +502,7 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 The `sinkMaybe(receive:)` method simplifies handling of maybe publisher results:
     
 ```swift
-// 😎 There are only three cases to handle
+// 👍 There are only three cases to handle
 let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
     switch result {
     case let .empty:
@@ -518,7 +518,7 @@ let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error
 Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
 
 ```swift
-// 🤔 There are a certain amount of cases to handle
+// 😥 There are a certain amount of cases to handle
 var nameReceived = false
 let cancellable = namePublisher().sink(
     receiveCompletion: { completion in
