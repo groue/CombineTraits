@@ -81,6 +81,7 @@ Once you have a publisher that conforms to `SinglePublisher`, you have access to
 - A `sinkSingle(receive:)` method that simplifies handling of single publisher results:
     
     ```swift
+    // 😎 There are only two cases to handle
     let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) in
         switch result {
         case let .success(name):
@@ -94,6 +95,7 @@ Once you have a publisher that conforms to `SinglePublisher`, you have access to
     Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
     
     ```swift
+    // 🤔 There are a certain amount of cases to handle
     let cancellable = namePublisher().sink(
         receiveCompletion: { completion in
             switch completion {
@@ -157,6 +159,7 @@ Once you have a publisher that conforms to `MaybePublisher`, you have access to 
 - A `sinkMaybe(receive:)` method that simplifies handling of maybe publisher results:
     
     ```swift
+    // 😎 There are only three cases to handle
     let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
         switch result {
         case let .empty:
@@ -172,6 +175,7 @@ Once you have a publisher that conforms to `MaybePublisher`, you have access to 
     Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
     
     ```swift
+    // 🤔 There are a certain amount of cases to handle
     var nameReceived = false
     let cancellable = namePublisher().sink(
         receiveCompletion: { completion in
