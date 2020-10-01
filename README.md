@@ -44,7 +44,7 @@ This library provides safe construction and subscription to publishers that conf
 
 **CombineTraits carefully preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
-In the sample code below, see how:
+In the sample code below, we see "single publishers" in action:
 
 - Functions prefer returning `AnySinglePublisher` instead of `AnyPublisher`, in order to provide trait guarantees.
 - We use the regular `map` and `flatMap` operators.
@@ -74,6 +74,29 @@ let cancellable = refreshPublisher().sinkSingle { result in
     }
 }
 ```
+
+When you import CombineTraits in an existing library or application, you will quickly benefit from it in three steps:
+
+1. Watch for `AnyPublisher` results that would benefit from traits.
+
+2. Replace `AnyPublisher` with `AnySinglePublisher` or `AnyMaybePublisher`:
+    
+    ```diff
+    -func refreshPublisher() -> AnyPublisher<Void, Error> {
+    +func refreshPublisher() -> AnySinglePublisher<Void, Error> {
+         downloadPublisher()
+             .map { apiModel in Model(apiModel) }
+             .flatMap { model in savePublisher(model) }
+    -        .eraseToAnyPublisher()
+    +        .eraseToAnySinglePublisher()
+     }
+     
+3. Replace `sink` with `sinkSingle` or `sinkMaybe`:
+    
+    ```diff
+    -refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
+    +refreshPublisher().sinkSingle { result in ... }
+    ```
 
 # Documentation
 
