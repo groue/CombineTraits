@@ -57,6 +57,7 @@ Conversely, `Publishers.Sequence` is not a single publisher, because not all seq
 
 - [AnySinglePublisher]
 - [`sinkSingle(receive:)`]
+- [Composing Single Publishers]
 - [Building Single Publishers]
 - [Basic Single Publishers]
 - [TraitPublishers.Single]
@@ -134,6 +135,34 @@ let cancellable = namePublisher().sink(
 }
 ```
 
+### Composing Single Publishers
+
+**Single publishers compose well together.**
+
+For example, in the sample code below, we build a new single publisher from several other ones. Note how:
+
+- The `Publishers.Map` built by the Combine `map` method call did not lose the single trait.
+- The `Publishers.FlatMap` built by the Combine `flatMap` method call did not lose the single trait.
+- The final `eraseToAnySinglePublisher()` method call is only available because the compiler could prove that we chain single publishers together in a way that builds a new single publisher.
+
+```swift
+/// A publisher that downloads some API model
+func downloadPublisher() -> AnySinglePublisher<APIModel, Error> { ... }
+
+/// A publisher that saves a model on disk
+func savePublisher(_ model: Model) -> AnySinglePublisher<Void, Error> { ... }
+
+/// A publisher that downloads and saves
+func refreshPublisher() -> AnySinglePublisher<Void, Error> {
+    downloadPublisher()
+        .map { apiModel in Model(apiModel) }
+        .flatMap { model in savePublisher(model) }
+        .eraseToAnySinglePublisher()
+}
+```
+
+> :bulb: **Tip**: As soon as you can call the `eraseToAnySinglePublisher()` method, you are sure that you have built a single publisher that will honor its contract.
+
 ### Building Single Publishers
 
 In order to benefit from the `SinglePublisher` protocol, you need a concrete publisher that conforms to this protocol.
@@ -196,6 +225,14 @@ AnySinglePublisher.fail(error)
 
 // Never publishes any value, never completes.
 AnySinglePublisher.never()
+```
+
+They are quite handy:
+
+```swift
+func namePublisher() -> AnySinglePublisher<String, Error> {
+    .just("Alice")
+}
 ```
 
 ### TraitPublishers.Single
@@ -365,6 +402,14 @@ AnyMaybePublisher.fail(error)
 AnyMaybePublisher.never()
 ```
 
+They are quite handy:
+
+```swift
+func namePublisher() -> AnyMaybePublisher<String, Error> {
+    .just("Alice")
+}
+```
+
 ### TraitPublishers.Maybe
 ### MaybeSubscription
 
@@ -375,6 +420,7 @@ AnyMaybePublisher.never()
 [The SinglePublisher Protocol]: #the-singlepublisher-protocol
 [AnySinglePublisher]: #anysinglepublisher
 [`sinkSingle(receive:)`]: #sinksinglereceive
+[Composing Single Publishers]: #composing-single-publishers
 [Building Single Publishers]: #building-single-publishers
 [Basic Single Publishers]: #basic-single-publishers
 [The MaybePublisher Protocol]: #the-maybepublisher-protocol
