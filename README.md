@@ -206,7 +206,7 @@ There are a few ways to get such a single publisher:
     
     // WARNING: may not publish exactly one element, or an error
     someSubject.prefix(1).uncheckedSingle()
-    ```swift
+    ```
     
     The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one element, or an error, are undefined.
 
