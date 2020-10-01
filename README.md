@@ -602,7 +602,7 @@ See also [Basic Maybe Publishers], [PublisherTraits.Maybe] and [MaybeSubscriptio
 
 ```swift
 // Completes without publishing any value.
-AnyMaybePublisher.empty
+AnyMaybePublisher.empty()
 
 // Publishes one value, and then completes.
 AnyMaybePublisher.just(value)
