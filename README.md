@@ -264,6 +264,103 @@ let publisher = TraitPublishers.Single<String, MyError> { promise in
 
 ### SingleSubscription
 
+`SingleSubscription` is a ready-made Combine Subscription that helps you building single publishers that wrap complex asynchronous apis.
+
+```swift
+open class SingleSubscription<Downstream: Subscriber, Context>: NSObject, Subscription {
+    public init(downstream: Downstream, context: Context)
+    
+    /// Subclasses must override and eventually call the `receive` function
+    open func start(with context: Context) { }
+    
+    /// Subclasses can override and perform eventual cleanup after the
+    /// subscription was cancelled.
+    open func didCancel(with context: Context) { }
+    
+    public func receive(_ result: Result<Downstream.Input, Downstream.Failure>)
+}
+```
+
+It is designed to be subclassed. Your custom subscriptions will override the `start(with:)` method in order to start their job, call the `receive(_:)` method in order to complete, and override `didCancel(with:)` when they should perform cancellation cleanup.
+
+For example, let's build a publisher that lets a user pick a phone number from their address book:
+
+```swift
+import Combine
+import CombineTraits
+import ContactsUI
+import UIKit
+
+/// A publisher that presents the contact picker and lets the user pick
+/// a phone number.
+///
+/// It publishes a phone number, or nil if the user dismisses the contact
+/// picker without making any choice.
+///
+/// It must be subscribed from the main thread.
+struct PhoneNumberPublisher: SinglePublisher {
+    typealias Output = CNPhoneNumber?
+    typealias Failure = Never
+    
+    let viewController: UIViewController
+    
+    init(presentingContactPickerFrom viewController: UIViewController) {
+        self.viewController = viewController
+    }
+    
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        let subscription = Subscription(
+            downstream: subscriber,
+            context: viewController)
+        subscriber.receive(subscription: subscription)
+    }
+    
+    private class Subscription<Downstream: Subscriber>:
+        SingleSubscription<Downstream, UIViewController>,
+        CNContactPickerDelegate
+    where
+        Downstream.Input == PhoneNumberPublisher.Output,
+        Downstream.Failure == PhoneNumberPublisher.Failure
+    {
+        override func start(with viewController: UIViewController) {
+            let contactPicker = CNContactPickerViewController()
+            contactPicker.displayedPropertyKeys = [CNContactPhoneNumbersKey]
+            contactPicker.delegate = self
+            viewController.present(contactPicker, animated: true, completion: nil)
+        }
+        
+        override func didCancel(with viewController: UIViewController) {
+            viewController.dismiss(animated: true)
+        }
+        
+        // CNContactPickerDelegate
+        func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+            receive(.success(nil))
+        }
+        
+        // CNContactPickerDelegate
+        func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
+            if let phoneNumber = contactProperty.value as? CNPhoneNumber {
+                receive(.success(phoneNumber))
+            }
+        }
+    }
+}
+
+// Usage:
+
+class MyViewController: UIViewController {
+    @IBAction func pickPhoneNumber() {
+        PhoneNumberPublisher(presentingContactPickerFrom: self)
+            .sink { contact in
+                // hande contact
+            }
+            .store(in: &cancellables)
+    }
+}
+```
+
+
 ## The MaybePublisher Protocol
 
 **`MaybePublisher` is the protocol for publishers that publish exactly zero element, or one element, or an error.**
@@ -465,6 +562,102 @@ let publisher = TraitPublishers.Maybe<String, MyError> { promise in
 - It can complete right on subscription, or at any time in the future.
 
 ### MaybeSubscription
+
+`MaybeSubscription` is a ready-made Combine Subscription that helps you building maybe publishers that wrap complex asynchronous apis.
+
+```swift
+open class MaybeSubscription<Downstream: Subscriber, Context>: NSObject, Subscription {
+    public init(downstream: Downstream, context: Context)
+    
+    /// Subclasses must override and eventually call the `receive` function
+    open func start(with context: Context) { }
+    
+    /// Subclasses can override and perform eventual cleanup after the
+    /// subscription was cancelled.
+    open func didCancel(with context: Context) { }
+    
+    public func receive(_ result: MaybeResult<Downstream.Input, Downstream.Failure>)
+}
+```
+
+It is designed to be subclassed. Your custom subscriptions will override the `start(with:)` method in order to start their job, call the `receive(_:)` method in order to complete, and override `didCancel(with:)` when they should perform cancellation cleanup.
+
+For example, let's build a publisher that lets a user pick a phone number from their address book:
+
+```swift
+import Combine
+import CombineTraits
+import ContactsUI
+import UIKit
+
+/// A publisher that presents the contact picker and lets the user pick
+/// a phone number.
+///
+/// It publishes a phone number, or nothing if the user dismisses the contact
+/// picker without making any choice.
+///
+/// It must be subscribed from the main thread.
+struct PhoneNumberPublisher: MaybePublisher {
+    typealias Output = CNPhoneNumber
+    typealias Failure = Never
+    
+    let viewController: UIViewController
+    
+    init(presentingContactPickerFrom viewController: UIViewController) {
+        self.viewController = viewController
+    }
+    
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        let subscription = Subscription(
+            downstream: subscriber,
+            context: viewController)
+        subscriber.receive(subscription: subscription)
+    }
+    
+    private class Subscription<Downstream: Subscriber>:
+        MaybeSubscription<Downstream, UIViewController>,
+        CNContactPickerDelegate
+    where
+        Downstream.Input == CNPhoneNumber,
+        Downstream.Failure == Never
+    {
+        override func start(with viewController: UIViewController) {
+            let contactPicker = CNContactPickerViewController()
+            contactPicker.displayedPropertyKeys = [CNContactPhoneNumbersKey]
+            contactPicker.delegate = self
+            viewController.present(contactPicker, animated: true, completion: nil)
+        }
+        
+        override func didCancel(with viewController: UIViewController) {
+            viewController.dismiss(animated: true)
+        }
+        
+        // CNContactPickerDelegate
+        func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+            receive(.empty)
+        }
+        
+        // CNContactPickerDelegate
+        func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
+            if let phoneNumber = contactProperty.value as? CNPhoneNumber {
+                receive(.success(phoneNumber))
+            }
+        }
+    }
+}
+
+// Usage:
+
+class MyViewController: UIViewController {
+    @IBAction func pickPhoneNumber() {
+        PhoneNumberPublisher(presentingContactPickerFrom: self)
+            .sinkMaybe { result in
+                // hande result
+            }
+            .store(in: &cancellables)
+    }
+}
+```
 
 
 [AnyPublisher]: https://developer.apple.com/documentation/combine/anypublisher
