@@ -16,17 +16,17 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications. One must generally assume that publishers may publish zero, one, or more values before they complete.
+CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. One must generally assume that publishers may publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-We have to rely on the context or the documentation in order to lift doubts. For example, publishers of the result of a network request are assumed to publish one value, or the eventual network error. We often do not deal with odd cases such as a completion without any value, or several published values.
+We have to rely on the context, or the documentation, in order to lift doubts. For example, publishers of the result of a network request are assumed to publish one value, or the eventual network error. We often do not deal with edge cases such as a completion without any value, or several published values.
 
 But sometimes, publishers do not honor this implicit contract, due to a misunderstanding, or a bug if the publisher definition. This can trigger bugs.
 
 **The compiler does not help us writing code that is guaranteed to be correct.**
 
-This library provides both safe  *subscription* and *construction* of publishers that conform to specific traits:
+This library provides both safe  *subscription* and *construction* of publishers that explicitly conform to specific traits:
         
-- **Single** publishers are guaranteed to publish exactly one value, or an error.
+- **[Single Publishers]** are guaranteed to publish exactly one value, or an error.
     
     In the Combine framework, the built-in `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
@@ -36,7 +36,7 @@ This library provides both safe  *subscription* and *construction* of publishers
     --o--|--> A single publisher can publish one value and complete.
     ```
     
-- **Maybe** publishers are guaranteed to publish exactly zero value, or one value, or an error:
+- **[Maybe Publishers]** are guaranteed to publish exactly zero value, or one value, or an error:
     
     In the Combine framework, the built-in `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
@@ -100,10 +100,10 @@ Your applications and libraries will quickly benefit from CombineTraits in three
 
 # Documentation
 
-- [The SinglePublisher Protocol]
-- [The MaybePublisher Protocol]
+- [Single Publishers]
+- [Maybe Publishers]
 
-## The SinglePublisher Protocol
+## Single Publishers
 
 **`SinglePublisher` is the protocol for publishers that publish exactly one value, or an error.**
 
@@ -440,7 +440,7 @@ class MyViewController: UIViewController {
 ```
 
 
-## The MaybePublisher Protocol
+## Maybe Publishers
 
 **`MaybePublisher` is the protocol for publishers that publish exactly zero value, or one value, or an error.**
 
@@ -760,13 +760,13 @@ class MyViewController: UIViewController {
 [AnyPublisher]: https://developer.apple.com/documentation/combine/anypublisher
 [Combine]: https://developer.apple.com/documentation/combine
 [Release Notes]: CHANGELOG.md
-[The SinglePublisher Protocol]: #the-singlepublisher-protocol
+[Single Publishers]: #single-publishers
 [AnySinglePublisher]: #anysinglepublisher
 [`sinkSingle(receive:)`]: #sinksinglereceive
 [Composing Single Publishers]: #composing-single-publishers
 [Building Single Publishers]: #building-single-publishers
 [Basic Single Publishers]: #basic-single-publishers
-[The MaybePublisher Protocol]: #the-maybepublisher-protocol
+[Maybe Publishers]: #maybe-publishers
 [AnyMaybePublisher]: #anymaybepublisher
 [`sinkMaybe(receive:)`]: #sinkmaybereceive
 [Building Maybe Publishers]: #building-maybe-publishers
