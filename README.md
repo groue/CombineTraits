@@ -236,6 +236,32 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 ```
 
 ### TraitPublishers.Single
+
+`TraitPublishers.Single` is a single publisher which allows you to dynamically send success or failure events.
+
+This lets you easily create custom single publishers to wrap any non-publisher asynchronous work.
+
+You return a cancellable object from the closure in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
+
+```swift
+let publisher = TraitPublishers.Single<String, MyError> { promise in
+    // Eventually send completion event, now or in the future:
+    promise(.success("Alice"))
+    // OR
+    promise(.failure(SomeError()))
+    
+    return AnyCancellable { 
+        // Perform cleanup
+    }
+}
+```
+
+`TraitPublishers.Single` can be seen as a "deferred future" single publisher:
+
+- Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
+- It can complete right on subscription, or at any time in the future.
+
+
 ### SingleSubscription
 
 ## The MaybePublisher Protocol
@@ -411,6 +437,33 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 ```
 
 ### TraitPublishers.Maybe
+
+`TraitPublishers.Maybe` is a maybe publisher which allows you to dynamically send success or failure events.
+
+This lets you easily create custom maybe publishers to wrap any non-publisher asynchronous work.
+
+You return a cancellable object from the closure in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
+
+```swift
+let publisher = TraitPublishers.Maybe<String, MyError> { promise in
+    // Eventually send completion event, now or in the future:
+    promise(.empty)
+    // OR
+    promise(.success("Alice"))
+    // OR
+    promise(.failure(SomeError()))
+    
+    return AnyCancellable { 
+        // Perform cleanup
+    }
+}
+```
+
+`TraitPublishers.Maybe` is a "deferred" maybe publisher:
+
+- Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
+- It can complete right on subscription, or at any time in the future.
+
 ### MaybeSubscription
 
 
