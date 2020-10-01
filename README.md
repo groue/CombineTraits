@@ -122,7 +122,7 @@ Conversely, `Publishers.Sequence` is not a single publisher, because not all seq
 - [Composing Single Publishers]
 - [Building Single Publishers]
 - [Basic Single Publishers]
-- [TraitPublishers.Single]
+- [PublisherTraits.Single]
 - [SingleSubscription]
 
 ### AnySinglePublisher
@@ -282,7 +282,7 @@ There are a few ways to get such a single publisher:
     
     The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one value, or an error, are undefined.
 
-See also [Basic Single Publishers], [TraitPublishers.Single] and [SingleSubscription].
+See also [Basic Single Publishers], [PublisherTraits.Single] and [SingleSubscription].
 
 ### Basic Single Publishers
 
@@ -307,20 +307,20 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 ```
 
-### TraitPublishers.Single
+### PublisherTraits.Single
 
-`TraitPublishers.Single` is a single publisher which allows you to dynamically send success or failure events.
+`PublisherTraits.Single` is a single publisher which allows you to dynamically send success or failure events.
 
 It lets you easily create custom single publishers to wrap any non-publisher asynchronous work.
 
 You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
 
 ```swift
-let publisher = TraitPublishers.Single<String, MyError> { promise in
+let publisher = PublisherTraits.Single<String, MyError> { promise in
     // Eventually send completion event, now or in the future:
     promise(.success("Alice"))
     // OR
-    promise(.failure(SomeError()))
+    promise(.failure(MyError()))
     
     return AnyCancellable { 
         // Perform cleanup
@@ -328,11 +328,18 @@ let publisher = TraitPublishers.Single<String, MyError> { promise in
 }
 ```
 
-`TraitPublishers.Single` can be seen as a "deferred future" single publisher:
+`PublisherTraits.Single` can be seen as a "deferred future" single publisher:
 
 - Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
 - It can complete right on subscription, or at any time in the future.
 
+When needed, `PublisherTraits.Single` can forward its job to another single publisher:
+
+```swift
+let publisher = PublisherTraits.Single<String, MyError> { promise in
+    return otherSinglePublisher.sinkSingle(receive: promise)
+}
+```
 
 ### SingleSubscription
 
@@ -452,7 +459,7 @@ Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequ
 - [`sinkMaybe(receive:)`]
 - [Building Maybe Publishers]
 - [Basic Maybe Publishers]
-- [TraitPublishers.Maybe]
+- [PublisherTraits.Maybe]
 - [MaybeSubscription]
 
 ### AnyMaybePublisher
@@ -587,7 +594,7 @@ There are a few ways to get such a maybe publisher:
     
     The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero value, or one value, or an error, are undefined.
 
-See also [Basic Maybe Publishers], [TraitPublishers.Maybe] and [MaybeSubscription].
+See also [Basic Maybe Publishers], [PublisherTraits.Maybe] and [MaybeSubscription].
 
 ### Basic Maybe Publishers
 
@@ -615,22 +622,22 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 }
 ```
 
-### TraitPublishers.Maybe
+### PublisherTraits.Maybe
 
-`TraitPublishers.Maybe` is a maybe publisher which allows you to dynamically send success or failure events.
+`PublisherTraits.Maybe` is a maybe publisher which allows you to dynamically send success or failure events.
 
 It lets you easily create custom single publishers to wrap any non-publisher asynchronous work.
 
 You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
 
 ```swift
-let publisher = TraitPublishers.Maybe<String, MyError> { promise in
+let publisher = PublisherTraits.Maybe<String, MyError> { promise in
     // Eventually send completion event, now or in the future:
     promise(.empty)
     // OR
     promise(.success("Alice"))
     // OR
-    promise(.failure(SomeError()))
+    promise(.failure(MyError()))
     
     return AnyCancellable { 
         // Perform cleanup
@@ -638,10 +645,18 @@ let publisher = TraitPublishers.Maybe<String, MyError> { promise in
 }
 ```
 
-`TraitPublishers.Maybe` is a "deferred" maybe publisher:
+`PublisherTraits.Maybe` is a "deferred" maybe publisher:
 
 - Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
 - It can complete right on subscription, or at any time in the future.
+
+When needed, `PublisherTraits.Maybe` can forward its job to another maybe publisher:
+
+```swift
+let publisher = PublisherTraits.Maybe<String, MyError> { promise in
+    return otherMaybePublisher.sinkMaybe(receive: promise)
+}
+```
 
 ### MaybeSubscription
 
@@ -757,7 +772,7 @@ class MyViewController: UIViewController {
 [Building Maybe Publishers]: #building-maybe-publishers
 [Basic Maybe Publishers]: #basic-maybe-publishers
 [Tools]: #Tools
-[TraitPublishers.Single]: #traitpublisherssingle
-[TraitPublishers.Maybe]: #traitpublishersmaybe
+[PublisherTraits.Single]: #publishertraitssingle
+[PublisherTraits.Maybe]: #publishertraitsmaybe
 [SingleSubscription]: #singlesubscription
 [MaybeSubscription]: #maybesubscription

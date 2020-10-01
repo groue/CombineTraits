@@ -236,4 +236,20 @@ class PublisherTraitsMaybeTests: XCTestCase {
             XCTAssertTrue(disposed)
         }
     }
+    
+    func test_forwarding() {
+        let upstream = Just(1)
+        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+            return upstream.sinkMaybe(receive: promise)
+        }
+        
+        var completion: Subscribers.Completion<Never>?
+        var value: Int?
+        _ = publisher.sink(
+            receiveCompletion: { completion = $0 },
+            receiveValue: { value = $0 })
+        
+        XCTAssertEqual(value, 1)
+        XCTAssertEqual(completion, .finished)
+    }
 }
