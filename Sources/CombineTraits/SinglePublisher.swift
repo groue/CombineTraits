@@ -3,8 +3,8 @@ import Foundation
 
 // MARK: - SinglePublisher
 
-/// `SinglePublisher` is the protocol for "single publishers", which publish
-/// exactly one element, or an error.
+/// `SinglePublisher` is the protocol for publishers that publish exactly one
+/// element, or an error.
 ///
 /// In the Combine framework, the built-in `Just`, `Future` and
 /// `URLSession.DataTaskPublisher` are examples of publishers that conform

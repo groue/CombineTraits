@@ -3,8 +3,8 @@ import Foundation
 
 // MARK: - MaybePublisher
 
-/// `MaybePublisher` is the protocol for "maybe publishers", which publish
-/// exactly zero element, or one element, or an error.
+/// `MaybePublisher` is the protocol for publishers that publish exactly zero
+/// element, or one element, or an error.
 ///
 /// In the Combine framework, the built-in `Empty`, `Just`, `Future` and
 /// `URLSession.DataTaskPublisher` are examples of publishers that conform

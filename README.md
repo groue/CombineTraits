@@ -44,7 +44,7 @@ This library comes with support for two publisher traits:
 
 ## The SinglePublisher Protocol
 
-**`SinglePublisher` is the protocol for "single publishers". They publish exactly one element, or an error.**
+**`SinglePublisher` is the protocol for publishers that publish exactly one element, or an error.**
 
 ```
 --------> A single publisher can never publish anything.
@@ -141,7 +141,7 @@ See also [TraitPublishers.Single] and [SingleSubscription].
 
 ## The MaybePublisher Protocol
 
-**`MaybePublisher` is the protocol for "maybe publishers". They publish exactly zero element, or one element, or an error.**
+**`MaybePublisher` is the protocol for publishers that publish exactly zero element, or one element, or an error.**
 
 ```
 --------> A maybe publisher can never publish anything.
