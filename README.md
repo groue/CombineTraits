@@ -50,18 +50,10 @@ Combine's `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of pu
 
 Conversely, `Publishers.Sequence` is not a single publisher, because not all sequences contain a single element.
 
-- [SinglePublisher Usage]
-    - [AnySinglePublisher]
-    - [`sinkSingle(receive:)`]
-- [Building Single Publishers]
-- [Basic Single Publishers]
-
-### SinglePublisher Usage
-
-Once you have a publisher that conforms to `SinglePublisher`, you have access to two desirable tools:
-
 - [AnySinglePublisher]
 - [`sinkSingle(receive:)`]
+- [Building Single Publishers]
+- [Basic Single Publishers]
 
 #### AnySinglePublisher
 
@@ -96,8 +88,6 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
     .just("Alice")
 }
 ```
-
-
 
 #### `sinkSingle(receive:)`
 
@@ -151,18 +141,10 @@ Combine's `Empty`, Just`, `Future` and `URLSession.DataTaskPublisher` are exampl
 
 Conversely, `Publishers.Sequence` is not a maybe publisher, because not all sequences contain zero or one element.
 
-- [MaybePublisher Usage]
-    - [AnyMaybePublisher]
-    - [`sinkMaybe(receive:)`]
-- [Building Maybe Publishers]
-- [Basic Maybe Publishers]
-
-### MaybePublisher Usage
-
-Once you have a publisher that conforms to `MaybePublisher`, you have access to two desirable tools:
-
 - [AnyMaybePublisher]
 - [`sinkMaybe(receive:)`]
+- [Building Maybe Publishers]
+- [Basic Maybe Publishers]
 
 #### AnyMaybePublisher
 
@@ -266,13 +248,11 @@ See also [TraitPublishers.Maybe] and [MaybeSubscription].
 [Combine]: https://developer.apple.com/documentation/combine
 [Release Notes]: CHANGELOG.md
 [The SinglePublisher Protocol]: #the-singlepublisher-protocol
-[SinglePublisher Usage]: #singlepublisher-usage
 [AnySinglePublisher]: #anysinglepublisher
 [`sinkSingle(receive:)`]: #sinksinglereceive
 [Building Single Publishers]: #building-single-publishers
 [Basic Single Publishers]: #basic-single-publishers
 [The MaybePublisher Protocol]: #the-maybepublisher-protocol
-[MaybePublisher Usage]: #maybepublisher-usage
 [AnyMaybePublisher]: #anymaybepublisher
 [`sinkMaybe(receive:)`]: #sinkmaybereceive
 [Building Maybe Publishers]: #building-maybe-publishers
