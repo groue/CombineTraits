@@ -88,7 +88,7 @@ import Foundation
 ///         [1, 2].publisher.uncheckedSingle()
 ///
 ///         // WRONG: does not publish exactly one element, or an error
-///         Just(1).append(Fail(error))
+///         Just(1).append(Fail(error)).uncheckedSingle()
 ///
 ///         // WARNING: may not publish exactly one element, or an error
 ///         someSubject.prefix(1).uncheckedSingle()
@@ -101,10 +101,10 @@ import Foundation
 /// `AnySinglePublisher` comes with factory methods that build basic
 /// single publishers:
 ///
-///         // Immediately publishes one value, and then completes.
+///         // Publishes one value, and then completes.
 ///         AnySinglePublisher.just(value)
 ///
-///         // Immediately fails with the given error.
+///         // Fails with the given error.
 ///         AnySinglePublisher.fail(error)
 ///
 ///         // Never publishes any value, never completes.
@@ -190,7 +190,7 @@ extension Publisher {
     ///     [1, 2].publisher.uncheckedSingle()
     ///
     ///     // WRONG: does not publish exactly one element, or an error
-    ///     Just(1).append(Fail(error))
+    ///     Just(1).append(Fail(error)).uncheckedSingle()
     ///
     ///     // WARNING: may not publish exactly one element, or an error
     ///     someSubject.prefix(1).uncheckedSingle()

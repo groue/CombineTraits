@@ -135,9 +135,67 @@ let cancellable = namePublisher().sink(
 
 ### Building Single Publishers
 
+In order to benefit from the `SinglePublisher` protocol, you need a concrete publisher that conforms to this protocol.
+
+There are a few ways to get such a single publisher:
+
+- **Compiler-checked single publishers** are publishers that conform to the `SinglePublisher` protocol. This is the case of `Just` and `Fail`, for example. Some publishers conditionally conform to `SinglePublisher`, such as `Publishers.Map`, when the upstream publisher is a single publisher.
+    
+    When you define a publisher type that publishes exactly one element, or an error, you can turn it into a single publisher with an extension:
+    
+    ```swift
+    struct MySinglePublisher: Publisher { ... }
+    extension MySinglePublisher: SinglePublisher { }
+    ```
+
+- **Runtime-checked single publishers** are publishers that conform to the `SinglePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly one element, or an error.
+    
+    You build a checked single publisher with one of those methods:
+    
+    - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one element, or an error.
+    
+    - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one element, or an error.
+
+- **Unchecked single publishers**: you should only build such a single publisher when you are sure that the `SinglePublisher` contract is honored by the upstream publisher.
+    
+    For example:
+    
+    ```swift
+    // CORRECT: those publish exactly one element, or an error.
+    [1].publisher.uncheckedSingle()
+    [1, 2].publisher.prefix(1).uncheckedSingle()
+    
+    // WRONG: does not publish any element
+    Empty().uncheckedSingle()
+    
+    // WRONG: publishes more than one element
+    [1, 2].publisher.uncheckedSingle()
+    
+    // WRONG: does not publish exactly one element, or an error
+    Just(1).append(Fail(error)).uncheckedSingle()
+    
+    // WARNING: may not publish exactly one element, or an error
+    someSubject.prefix(1).uncheckedSingle()
+    ```swift
+    
+    The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one element, or an error, are undefined.
+
 See also [TraitPublishers.Single] and [SingleSubscription].
 
 ### Basic Single Publishers
+
+`AnySinglePublisher` comes with factory methods that build basic single publishers:
+
+```swift
+// Publishes one value, and then completes.
+AnySinglePublisher.just(value)
+
+// Fails with the given error.
+AnySinglePublisher.fail(error)
+
+// Never publishes any value, never completes.
+AnySinglePublisher.never()
+```
 
 ## The MaybePublisher Protocol
 
@@ -239,6 +297,47 @@ let cancellable = namePublisher().sink(
 ```
 
 ### Building Maybe Publishers
+
+In order to benefit from the `MaybePublisher` protocol, you need a concrete publisher that conforms to this protocol.
+
+There are a few ways to get such a maybe publisher:
+
+- **Compiler-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol. This is the case of `Empty`, `Just` and `Fail`, for example. Some publishers conditionally conform to `MaybePublisher`, such as `Publishers.Map`, when the upstream publisher is a maybe publisher.
+    
+    When you define a publisher type that publishes exactly zero element, or one element, or an error, you can turn it into a maybe publisher with an extension:
+    
+    ```swift
+    struct MyMaybePublisher: Publisher { ... }
+    extension MyMaybePublisher: MaybePublisher { }
+    ```
+
+- **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero element, or one element, or an error.
+    
+    You build a checked maybe publisher with one of those methods:
+    
+    - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero element, or one element, or an error.
+       
+    - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero element, or one element, or an error.
+
+- **Unchecked maybe publishers**: you should only build such a maybe publisher when you are sure that the `MaybePublisher` contract is honored by the upstream publisher.
+    
+    For example:
+    
+    ```swift
+    // CORRECT: those publish exactly zero element, or one element, or an error.
+    Array<Int>().publisher.uncheckedMaybe()
+    [1].publisher.uncheckedMaybe()
+    [1, 2].publisher.prefix(1).uncheckedMaybe()
+    someSubject.prefix(1).uncheckedMaybe()
+    
+    // WRONG: publishes more than one element
+    [1, 2].publisher.uncheckedMaybe()
+    
+    // WRONG: does not publish exactly zero element, or one element, or an error
+    Just(1).append(Fail(error)).uncheckedMaybe()
+    ```
+    
+    The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero element, or one element, or an error, are undefined.
 
 See also [TraitPublishers.Maybe] and [MaybeSubscription].
 

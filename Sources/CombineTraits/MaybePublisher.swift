@@ -90,7 +90,7 @@ import Foundation
 ///         [1, 2].publisher.uncheckedMaybe()
 ///
 ///         // WRONG: does not publish exactly zero element, or one element, or an error
-///         Just(1).append(Fail(error))
+///         Just(1).append(Fail(error)).uncheckedMaybe()
 ///
 ///   The consequences of using `uncheckedMaybe()` on a publisher that does not
 ///   publish exactly zero element, or one element, or an error, are undefined.
@@ -100,13 +100,13 @@ import Foundation
 /// `AnyMaybePublisher` comes with factory methods that build basic
 /// maybe publishers:
 ///
-///         // Immediately completes.
+///         // Completes without publishing any value.
 ///         AnyMaybePublisher.empty
 ///
-///         // Immediately publishes one value, and then completes.
+///         // Publishes one value, and then completes.
 ///         AnyMaybePublisher.just(value)
 ///
-///         // Immediately fails with the given error.
+///         // Fails with the given error.
 ///         AnyMaybePublisher.fail(error)
 ///
 ///         // Never publishes any value, never completes.
@@ -328,7 +328,7 @@ extension Publisher {
     ///     [1, 2].publisher.uncheckedMaybe()
     ///
     ///     // WRONG: does not publish exactly zero element, or one element, or an error
-    ///     Just(1).append(Fail(error))
+    ///     Just(1).append(Fail(error)).uncheckedMaybe()
     ///
     /// See also `Publisher.assertMaybe()`.
     ///
