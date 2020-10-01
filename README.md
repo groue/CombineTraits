@@ -245,8 +245,6 @@ There are a few ways to get such a single publisher:
     You build a checked single publisher with one of those methods:
     
     - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one element, or an error.
-        
-        `checkSingle` is useful in tests.
     
     - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one element, or an error.
         
@@ -557,9 +555,7 @@ There are a few ways to get such a maybe publisher:
     You build a checked maybe publisher with one of those methods:
     
     - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero element, or one element, or an error.
-       
-        `checkMaybe` is useful in tests.
-        
+    
     - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero element, or one element, or an error.
         
         For example:
