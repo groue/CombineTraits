@@ -7,6 +7,13 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ---
 
+<p align="center">
+    <a href="#usage">Usage</a> &bull;
+    <a href="#documentation">Documentation</a> &bull;
+</p>
+
+---
+
 ## What is this?
 
 CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many elements can be published. It is particularly the case of [AnyPublisher], the publisher type that is the most frequently returned by our frameworks or applications: one must generally assume that it may publish zero, one, or more elements before it completes.
