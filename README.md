@@ -20,7 +20,7 @@ CombineTraits solves a problem with the [Combine] framework: publishers do not t
 
 When we are lucky, we can rely on the context, or the documentation, in order to lift doubts. For example, publishers of a network request are assumed to publish one value, or the eventual network error.
 
-But sometimes we are clueless, or publishers does not honor their implicit contract, due to a misunderstanding, or a bug in their implementation. In the end, we write code that is more complex than necessary, or we neglect to deal with edge cases such as a completion without any value, or several published values.
+But sometimes we are clueless, or publishers do not honor their implicit contract, due to a misunderstanding, or a bug in their implementation. In the end, we write code that is more complex than necessary, or we neglect to deal with edge cases such as a completion without any value, or several published values.
 
 **The compiler does not help us writing code that is guaranteed to be correct.**
 
