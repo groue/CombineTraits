@@ -266,11 +266,13 @@ extension MaybePublisher {
     ///   completes, with zero element, or one element, or an error.
     /// - returns: A cancellable.
     public func sinkMaybe(receive: @escaping (MaybeResult<Output, Failure>) -> Void) -> AnyCancellable {
-        // We assume value and completion are not received concurrently, and
-        // successReceived is thread-safe.
-        var successReceived = false
+        // Assume value and completion can be received concurrently.
+        let lock = NSRecursiveLock()
+        var successReceived = false // protected by lock
         return sink(
             receiveCompletion: { completion in
+                lock.lock()
+                defer { lock.unlock() }
                 switch completion {
                 case let .failure(error):
                     receive(.failure(error))
@@ -281,6 +283,8 @@ extension MaybePublisher {
                 }
             },
             receiveValue: { value in
+                lock.lock()
+                defer { lock.unlock() }
                 successReceived = true
                 receive(.success(value))
             })
