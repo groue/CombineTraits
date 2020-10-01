@@ -245,8 +245,21 @@ There are a few ways to get such a single publisher:
     You build a checked single publisher with one of those methods:
     
     - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one element, or an error.
+        
+        `checkSingle` is useful in tests.
     
     - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one element, or an error.
+        
+        For example:
+        
+        ```swift
+        let nameSubject: CurrentValueSubject<String, Never> = ...
+        
+        func namePublisher() -> AnySinglePublisher<String, Never> {
+            // Safe as long as the subject never finishes:
+            subject.prefix(1).assertSingle().eraseToAnySinglePublisher()
+        }
+        ```
 
 - **Unchecked single publishers**: you should only build such a single publisher when you are sure that the `SinglePublisher` contract is honored by the upstream publisher.
     
@@ -545,7 +558,19 @@ There are a few ways to get such a maybe publisher:
     
     - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero element, or one element, or an error.
        
+        `checkMaybe` is useful in tests.
+        
     - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero element, or one element, or an error.
+        
+        For example:
+        
+        ```swift
+        let nameSubject: CurrentValueSubject<String, Never> = ...
+        
+        func namePublisher() -> AnyMaybePublisher<String, Never> {
+            subject.prefix(1).assertMaybe().eraseToAnyMaybePublisher()
+        }
+        ```
 
 - **Unchecked maybe publishers**: you should only build such a maybe publisher when you are sure that the `MaybePublisher` contract is honored by the upstream publisher.
     
