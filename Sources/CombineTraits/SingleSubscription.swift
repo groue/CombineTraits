@@ -22,7 +22,9 @@ import Foundation
 ///
 ///         private class Subscription<Downstream: Subscriber>:
 ///             SingleSubscription<Downstream, MyContext>
-///         where Downstream.Input == Output, Downstream.Failure == Failure
+///         where
+///             Downstream.Input == Output,
+///             Downstream.Failure == Failure
 ///         {
 ///             override func start(with context: MyContext) {
 ///                 // Subscription was requested a value.

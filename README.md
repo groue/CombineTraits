@@ -381,8 +381,8 @@ struct PhoneNumberPublisher: SinglePublisher {
         SingleSubscription<Downstream, UIViewController>,
         CNContactPickerDelegate
     where
-        Downstream.Input == PhoneNumberPublisher.Output,
-        Downstream.Failure == PhoneNumberPublisher.Failure
+        Downstream.Input == Output,
+        Downstream.Failure == Failure
     {
         override func start(with viewController: UIViewController) {
             let contactPicker = CNContactPickerViewController()
@@ -680,8 +680,8 @@ struct PhoneNumberPublisher: MaybePublisher {
         MaybeSubscription<Downstream, UIViewController>,
         CNContactPickerDelegate
     where
-        Downstream.Input == CNPhoneNumber,
-        Downstream.Failure == Never
+        Downstream.Input == Output,
+        Downstream.Failure == Failure
     {
         override func start(with viewController: UIViewController) {
             let contactPicker = CNContactPickerViewController()

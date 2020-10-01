@@ -26,12 +26,11 @@ class SingleSubscriptionTests: XCTestCase {
             
             private class Subscription<Downstream: Subscriber>:
                 SingleSubscription<Downstream, MyContext>
-            where Downstream.Input == Output, Downstream.Failure == Failure
+            where
+                Downstream.Input == Output,
+                Downstream.Failure == Failure
             {
-                override func start(with context: MyContext) {
-                    receive(.failure(MyFailure()))
-                }
-                
+                override func start(with context: MyContext) { }
                 override func didCancel(with context: MyContext) { }
             }
         }
