@@ -175,7 +175,7 @@ let cancellable = namePublisher().sinkSingle { (result: Result<String, Error>) i
 }
 ```
 
-Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
+Compare with the regular `sink(receiveCompletion:receiveValue:)`, which has so many opportunities for misbehavior:
 
 ```swift
 // 😥 There are a certain amount of cases to handle
@@ -514,7 +514,7 @@ let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error
 }
 ```
 
-Compare with the regular `sink(receiveCompletion:receiveValue:)`, which contains so many opportunities to misbehave:
+Compare with the regular `sink(receiveCompletion:receiveValue:)`, which has so many opportunities for misbehavior:
 
 ```swift
 // 😥 There are a certain amount of cases to handle
