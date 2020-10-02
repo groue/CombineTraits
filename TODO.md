@@ -1,0 +1,2 @@
+- .ifEmpty(switchTo:), .ifEmpty(default:) https://github.com/CombineCommunity/CombineExt/issues/46
+- .compactToMaybe(), filterNil (Single to Maybe)
