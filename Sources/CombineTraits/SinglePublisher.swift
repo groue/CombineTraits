@@ -648,6 +648,14 @@ extension Publishers.ReceiveOn: SinglePublisher
 where Upstream: SinglePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.ReplaceEmpty: SinglePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.ReplaceError: SinglePublisher
+where Upstream: SinglePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Retry: SinglePublisher
 where Upstream: SinglePublisher { }
 

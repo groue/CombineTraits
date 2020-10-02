@@ -731,6 +731,10 @@ extension Publishers.CombineLatest4: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher, D: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.CompactMap: MaybePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Contains: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -741,6 +745,10 @@ extension Publishers.Count: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Delay: MaybePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.Filter: MaybePublisher
 where Upstream: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -784,6 +792,14 @@ extension Publishers.ReceiveOn: MaybePublisher
 where Upstream: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.ReplaceEmpty: MaybePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.ReplaceError: MaybePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Retry: MaybePublisher
 where Upstream: MaybePublisher { }
 
@@ -807,7 +823,15 @@ extension Publishers.TryCatch: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.TryCompactMap: MaybePublisher
+where Upstream: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryContainsWhere: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Publishers.TryFilter: MaybePublisher
+where Upstream: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryMap: MaybePublisher
