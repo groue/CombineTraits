@@ -859,6 +859,10 @@ extension Result.Publisher: MaybePublisher { }
 extension URLSession.DataTaskPublisher: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension AnyPublisher: MaybePublisher
+where Output == Never { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Deferred: MaybePublisher
 where DeferredPublisher: MaybePublisher { }
 
