@@ -837,18 +837,17 @@ where Upstream: MaybePublisher { }
 extension Publishers.TryMap: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Deferred: MaybePublisher
-where DeferredPublisher: MaybePublisher { }
-
+// We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher { }
 
+// We can't declare "OR" conformance (Zip3 is a maybe if A or B or C is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip3: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher { }
 
+// We can't declare "OR" conformance (Zip4 is a maybe if A or B or C or D is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip4: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher, D: MaybePublisher { }
@@ -858,6 +857,10 @@ extension Result.Publisher: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension URLSession.DataTaskPublisher: MaybePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Deferred: MaybePublisher
+where DeferredPublisher: MaybePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Empty: MaybePublisher { }

@@ -685,18 +685,17 @@ extension Publishers.TryContainsWhere: SinglePublisher { }
 extension Publishers.TryMap: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Deferred: SinglePublisher
-where DeferredPublisher: SinglePublisher { }
-
+// We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
 
+// We can't declare "OR" conformance (Zip3 is a maybe if A or B or C is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip3: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher { }
 
+// We can't declare "OR" conformance (Zip4 is a maybe if A or B or C or D is a maybe)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip4: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher, D: SinglePublisher { }
@@ -706,6 +705,10 @@ extension Result.Publisher: SinglePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension URLSession.DataTaskPublisher: SinglePublisher { }
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Deferred: SinglePublisher
+where DeferredPublisher: SinglePublisher { }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Fail: SinglePublisher { }

@@ -471,9 +471,9 @@ class MaybePublisherTests: XCTestCase {
             synchronouslyCompletesWithResult: .failure(TestError()))
     }
     
-    // MARK: - Maybe Publisher Relationships
+    // MARK: - Maybe Publisher Type Relationships
     
-    func test_relationships() {
+    func test_type_relationships() {
         // This test passes if this test compiles
         
         func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) {
@@ -492,14 +492,14 @@ class MaybePublisherTests: XCTestCase {
         }
     }
     
-    // MARK: - Composition
+    // MARK: - Built-in Maybes
     
-    func test_publishers() {
+    func test_built_in_maybes() {
         struct TestError: Error { }
         
         let publisher = [1, 2, 3].publisher
         let failingPublisher = publisher.setFailureType(to: Error.self)
-        let maybe = Just(1)
+        let maybe = Empty<Int, Never>()
         let failingMaybe = maybe.setFailureType(to: Error.self)
 
         XCTAssertFalse(isMaybe(publisher))
@@ -515,6 +515,7 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertTrue(isMaybe(failingMaybe.assertNoFailure()))
         
         // Publishers.Autoconnect
+        // Publishers.MakeConnectable
         XCTAssertFalse(isMaybe(publisher.makeConnectable().autoconnect()))
         XCTAssertTrue(isMaybe(maybe.makeConnectable().autoconnect()))
         
@@ -571,6 +572,161 @@ class MaybePublisherTests: XCTestCase {
         
         // Publishers.ContainsWhere
         XCTAssertTrue(isMaybe(publisher.contains { _ in true }))
+        
+        // Publishers.Count
+        XCTAssertTrue(isMaybe(publisher.count()))
+        
+        // Publishers.Delay
+        XCTAssertFalse(isMaybe(publisher.delay(for: 1, scheduler: DispatchQueue.main)))
+        XCTAssertTrue(isMaybe(maybe.delay(for: 1, scheduler: DispatchQueue.main)))
+        
+        // Publishers.Filter
+        XCTAssertFalse(isMaybe(publisher.filter { _ in true }))
+        XCTAssertTrue(isMaybe(maybe.filter { _ in true }))
+        
+        // Publishers.FlatMap
+        XCTAssertFalse(isMaybe(publisher.flatMap { _ in publisher }))
+        XCTAssertFalse(isMaybe(publisher.flatMap { _ in maybe }))
+        XCTAssertFalse(isMaybe(maybe.flatMap { _ in publisher }))
+        XCTAssertTrue(isMaybe(maybe.flatMap { _ in maybe }))
+        
+        // Publishers.HandleEvents
+        XCTAssertFalse(isMaybe(publisher.handleEvents()))
+        XCTAssertTrue(isMaybe(maybe.handleEvents()))
+        
+        // Publishers.Map
+        XCTAssertFalse(isMaybe(publisher.map { $0 }))
+        XCTAssertTrue(isMaybe(maybe.map { $0 }))
+        
+        // Publishers.MapError
+        XCTAssertFalse(isMaybe(failingPublisher.mapError { $0 }))
+        XCTAssertTrue(isMaybe(failingMaybe.mapError { $0 }))
+        
+        // Publishers.MapKeyPath
+        XCTAssertFalse(isMaybe(publisher.map(\.self)))
+        XCTAssertTrue(isMaybe(maybe.map(\.self)))
+        
+        // Publishers.MapKeyPath2
+        XCTAssertFalse(isMaybe(publisher.map(\.self, \.self)))
+        XCTAssertTrue(isMaybe(maybe.map(\.self, \.self)))
+        
+        // Publishers.MapKeyPath3
+        XCTAssertFalse(isMaybe(publisher.map(\.self, \.self, \.self)))
+        XCTAssertTrue(isMaybe(maybe.map(\.self, \.self, \.self)))
+        
+        // Publishers.Print
+        XCTAssertFalse(isMaybe(publisher.print()))
+        XCTAssertTrue(isMaybe(maybe.print()))
+        
+        // Publishers.ReceiveOn
+        XCTAssertFalse(isMaybe(publisher.receive(on: DispatchQueue.main)))
+        XCTAssertTrue(isMaybe(maybe.receive(on: DispatchQueue.main)))
+        
+        // Publishers.ReplaceEmpty
+        XCTAssertFalse(isMaybe(publisher.replaceEmpty(with: 0)))
+        XCTAssertTrue(isMaybe(maybe.replaceEmpty(with: 0)))
+        
+        // Publishers.ReplaceError
+        XCTAssertFalse(isMaybe(failingPublisher.replaceError(with: 0)))
+        XCTAssertTrue(isMaybe(failingMaybe.replaceError(with: 0)))
+        
+        // Publishers.Retry
+        XCTAssertFalse(isMaybe(failingPublisher.retry(1)))
+        XCTAssertTrue(isMaybe(failingMaybe.retry(1)))
+        
+        // Publishers.SetFailureType
+        XCTAssertFalse(isMaybe(publisher.setFailureType(to: Error.self)))
+        XCTAssertTrue(isMaybe(maybe.setFailureType(to: Error.self)))
+        
+        // Publishers.SubscribeOn
+        XCTAssertFalse(isMaybe(publisher.subscribe(on: DispatchQueue.main)))
+        XCTAssertTrue(isMaybe(maybe.subscribe(on: DispatchQueue.main)))
+        
+        // Publishers.SwitchToLatest
+        XCTAssertFalse(isMaybe([publisher].publisher.switchToLatest()))
+        XCTAssertFalse(isMaybe([maybe].publisher.switchToLatest()))
+        XCTAssertFalse(isMaybe(Just(publisher).switchToLatest()))
+        XCTAssertTrue(isMaybe(Just(maybe).switchToLatest()))
+        
+        // Publishers.TryAllSatisfy
+        XCTAssertTrue(isMaybe(publisher.tryAllSatisfy { _ in true }))
+        
+        // Publishers.TryCatch
+        XCTAssertFalse(isMaybe(failingPublisher.tryCatch { _ in publisher }))
+        XCTAssertFalse(isMaybe(failingPublisher.tryCatch { _ in maybe }))
+        XCTAssertFalse(isMaybe(failingMaybe.tryCatch { _ in publisher }))
+        XCTAssertTrue(isMaybe(failingMaybe.tryCatch { _ in maybe }))
+        
+        // Publishers.TryCompactMap
+        XCTAssertFalse(isMaybe(publisher.tryCompactMap { $0 }))
+        XCTAssertTrue(isMaybe(maybe.tryCompactMap { $0 }))
+        
+        // Publishers.TryContainsWhere
+        XCTAssertTrue(isMaybe(publisher.tryContains { _ in true }))
+        
+        // Publishers.TryFilter
+        XCTAssertFalse(isMaybe(publisher.tryFilter { _ in true }))
+        XCTAssertTrue(isMaybe(maybe.tryFilter { _ in true }))
+        
+        // Publishers.TryMap
+        XCTAssertFalse(isMaybe(publisher.tryMap { $0 }))
+        XCTAssertTrue(isMaybe(maybe.tryMap { $0 }))
+        
+        // Publishers.Zip
+        XCTAssertFalse(isMaybe(publisher.zip(publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher)))
+        XCTAssertTrue(isMaybe(maybe.zip(maybe)))
+        
+        // Publishers.Zip3
+        XCTAssertFalse(isMaybe(publisher.zip(publisher, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(publisher, maybe)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, publisher)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(maybe, publisher)))
+        XCTAssertTrue(isMaybe(maybe.zip(maybe, maybe)))
+
+        // Publishers.Zip4
+        XCTAssertFalse(isMaybe(publisher.zip(publisher, publisher, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(publisher, publisher, maybe)))
+        // XCTAssertTrue(isMaybe(publisher.zip(publisher, maybe, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(publisher, maybe, maybe)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, publisher, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, publisher, maybe)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, maybe, publisher)))
+        // XCTAssertTrue(isMaybe(publisher.zip(maybe, maybe, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, publisher, publisher)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, publisher, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, maybe, publisher)))
+        // XCTAssertTrue(isMaybe(maybe.zip(publisher, maybe, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(maybe, publisher, publisher)))
+        // XCTAssertTrue(isMaybe(maybe.zip(maybe, publisher, maybe)))
+        // XCTAssertTrue(isMaybe(maybe.zip(maybe, maybe, publisher)))
+        XCTAssertTrue(isMaybe(maybe.zip(maybe, maybe, maybe)))
+        
+        // Result.Publisher
+        XCTAssertTrue(isMaybe(Result<Int, Error>.success(1).publisher))
+        
+        // URLSession.DataTaskPublisher
+        XCTAssertTrue(isMaybe(URLSession(configuration: URLSessionConfiguration.default).dataTaskPublisher(for: URL(string: "http://example.org")!)))
+        
+        // Deferred
+        XCTAssertFalse(isMaybe(Deferred { publisher }))
+        XCTAssertTrue(isMaybe(Deferred { maybe }))
+        
+        // Empty
+        XCTAssertTrue(isMaybe(Empty<Int, Error>()))
+        
+        // Fail
+        XCTAssertTrue(isMaybe(Fail<Int, Error>(error: TestError())))
+        
+        // Future
+        XCTAssertTrue(isMaybe(Future<Int, Error> { _ in }))
+        
+        // Just
+        XCTAssertTrue(isMaybe(Just(1)))
     }
 }
 

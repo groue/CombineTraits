@@ -420,9 +420,9 @@ class SinglePublisherTests: XCTestCase {
             synchronouslyCompletesWithResult: .failure(TestError()))
     }
     
-    // MARK: - Single Publisher Relationships
+    // MARK: - Single Publisher Type Relationships
     
-    func test_relationships() {
+    func test_type_relationships() {
         // This test passes if this test compiles
         
         func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) {
@@ -458,4 +458,456 @@ class SinglePublisherTests: XCTestCase {
             acceptSomeSinglePublisher(p.uncheckedSingle())
         }
     }
+    
+    // MARK: - Built-in Maybes
+    
+    func test_built_in_maybes() {
+        struct TestError: Error { }
+        
+        let publisher = [1, 2, 3].publisher
+        let failingPublisher = publisher.setFailureType(to: Error.self)
+        let maybe = Empty<Int, Never>()
+        let failingMaybe = maybe.setFailureType(to: Error.self)
+        let single = Just(1)
+        let failingSingle = single.setFailureType(to: Error.self)
+
+        XCTAssertFalse(isMaybe(publisher))
+        XCTAssertFalse(isMaybe(failingPublisher))
+        XCTAssertTrue(isMaybe(maybe))
+        XCTAssertTrue(isMaybe(failingMaybe))
+        XCTAssertTrue(isMaybe(single))
+        XCTAssertTrue(isMaybe(failingSingle))
+
+        XCTAssertFalse(isSingle(publisher))
+        XCTAssertFalse(isSingle(failingPublisher))
+        XCTAssertFalse(isSingle(maybe))
+        XCTAssertFalse(isSingle(failingMaybe))
+        XCTAssertTrue(isSingle(single))
+        XCTAssertTrue(isSingle(failingSingle))
+
+        // Publishers.AllSatisfy
+        XCTAssertTrue(isSingle(publisher.allSatisfy { _ in true }))
+        
+        // Publishers.AssertNoFailure
+        XCTAssertFalse(isSingle(failingPublisher.assertNoFailure()))
+        XCTAssertFalse(isSingle(failingMaybe.assertNoFailure()))
+        XCTAssertTrue(isSingle(failingSingle.assertNoFailure()))
+        
+        // Publishers.Autoconnect
+        // Publishers.MakeConnectable
+        XCTAssertFalse(isSingle(publisher.makeConnectable().autoconnect()))
+        XCTAssertFalse(isSingle(maybe.makeConnectable().autoconnect()))
+        XCTAssertTrue(isSingle(single.makeConnectable().autoconnect()))
+        
+        // Publishers.Breakpoint
+        XCTAssertFalse(isSingle(publisher.breakpoint()))
+        XCTAssertFalse(isSingle(maybe.breakpoint()))
+        XCTAssertTrue(isSingle(single.breakpoint()))
+        
+        // Publishers.Catch
+        XCTAssertFalse(isSingle(failingPublisher.catch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingPublisher.catch { _ in maybe }))
+        XCTAssertFalse(isSingle(failingPublisher.catch { _ in single }))
+        XCTAssertFalse(isSingle(failingMaybe.catch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingMaybe.catch { _ in maybe }))
+        XCTAssertFalse(isSingle(failingMaybe.catch { _ in single }))
+        XCTAssertFalse(isSingle(failingSingle.catch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingSingle.catch { _ in maybe }))
+        XCTAssertTrue(isSingle(failingSingle.catch { _ in single }))
+        
+        // Publishers.CombineLatest
+        XCTAssertFalse(isSingle(publisher.combineLatest(publisher)))
+        XCTAssertFalse(isSingle(publisher.combineLatest(maybe)))
+        XCTAssertFalse(isSingle(publisher.combineLatest(single)))
+        XCTAssertFalse(isSingle(maybe.combineLatest(publisher)))
+        XCTAssertFalse(isSingle(maybe.combineLatest(maybe)))
+        XCTAssertFalse(isSingle(maybe.combineLatest(single)))
+        XCTAssertFalse(isSingle(single.combineLatest(publisher)))
+        XCTAssertFalse(isSingle(single.combineLatest(maybe)))
+        XCTAssertTrue(isSingle(single.combineLatest(single)))
+        
+        // Publishers.CombineLatest3
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(publisher, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(maybe, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, single, maybe)))
+        XCTAssertTrue(isSingle(Publishers.CombineLatest3(single, single, single)))
+
+        // Publishers.CombineLatest4
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, maybe, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, single, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, publisher, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, maybe, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(maybe, single, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, publisher, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, single, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, maybe, single, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, publisher, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, publisher, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, publisher, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, maybe, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, maybe, maybe)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, maybe, single)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, single, publisher)))
+        XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, single, maybe)))
+        XCTAssertTrue(isSingle(Publishers.CombineLatest4(single, single, single, single)))
+
+        // Publishers.CompactMap
+        XCTAssertFalse(isSingle(publisher.compactMap { $0 }))
+        XCTAssertFalse(isSingle(maybe.compactMap { $0 }))
+        XCTAssertFalse(isSingle(single.compactMap { $0 }))
+        XCTAssertTrue(isMaybe(single.compactMap { $0 }))
+        
+        // Publishers.Contains
+        XCTAssertTrue(isSingle(publisher.contains(1)))
+        
+        // Publishers.ContainsWhere
+        XCTAssertTrue(isSingle(publisher.contains { _ in true }))
+        
+        // Publishers.Count
+        XCTAssertTrue(isSingle(publisher.count()))
+        
+        // Publishers.Delay
+        XCTAssertFalse(isSingle(publisher.delay(for: 1, scheduler: DispatchQueue.main)))
+        XCTAssertFalse(isSingle(maybe.delay(for: 1, scheduler: DispatchQueue.main)))
+        XCTAssertTrue(isSingle(single.delay(for: 1, scheduler: DispatchQueue.main)))
+        
+        // Publishers.Filter
+        XCTAssertFalse(isSingle(publisher.filter { _ in true }))
+        XCTAssertFalse(isSingle(maybe.filter { _ in true }))
+        XCTAssertFalse(isSingle(single.filter { _ in true }))
+        XCTAssertTrue(isMaybe(single.filter { _ in true }))
+        
+        // Publishers.FlatMap
+        XCTAssertFalse(isSingle(publisher.flatMap { _ in publisher }))
+        XCTAssertFalse(isSingle(publisher.flatMap { _ in maybe }))
+        XCTAssertFalse(isSingle(publisher.flatMap { _ in single }))
+        XCTAssertFalse(isSingle(maybe.flatMap { _ in publisher }))
+        XCTAssertFalse(isSingle(maybe.flatMap { _ in maybe }))
+        XCTAssertFalse(isSingle(maybe.flatMap { _ in single }))
+        XCTAssertFalse(isSingle(single.flatMap { _ in publisher }))
+        XCTAssertFalse(isSingle(single.flatMap { _ in maybe }))
+        XCTAssertTrue(isSingle(single.flatMap { _ in single }))
+        
+        // Publishers.HandleEvents
+        XCTAssertFalse(isSingle(publisher.handleEvents()))
+        XCTAssertFalse(isSingle(maybe.handleEvents()))
+        XCTAssertTrue(isSingle(single.handleEvents()))
+        
+        // Publishers.Map
+        XCTAssertFalse(isSingle(publisher.map { $0 }))
+        XCTAssertFalse(isSingle(maybe.map { $0 }))
+        XCTAssertTrue(isSingle(single.map { $0 }))
+        
+        // Publishers.MapError
+        XCTAssertFalse(isSingle(failingPublisher.mapError { $0 }))
+        XCTAssertFalse(isSingle(failingMaybe.mapError { $0 }))
+        XCTAssertTrue(isSingle(failingSingle.mapError { $0 }))
+        
+        // Publishers.MapKeyPath
+        XCTAssertFalse(isSingle(publisher.map(\.self)))
+        XCTAssertFalse(isSingle(maybe.map(\.self)))
+        XCTAssertTrue(isSingle(single.map(\.self)))
+        
+        // Publishers.MapKeyPath2
+        XCTAssertFalse(isSingle(publisher.map(\.self, \.self)))
+        XCTAssertFalse(isSingle(maybe.map(\.self, \.self)))
+        XCTAssertTrue(isSingle(single.map(\.self, \.self)))
+        
+        // Publishers.MapKeyPath3
+        XCTAssertFalse(isSingle(publisher.map(\.self, \.self, \.self)))
+        XCTAssertFalse(isSingle(maybe.map(\.self, \.self, \.self)))
+        XCTAssertTrue(isSingle(single.map(\.self, \.self, \.self)))
+        
+        // Publishers.Print
+        XCTAssertFalse(isSingle(publisher.print()))
+        XCTAssertFalse(isSingle(maybe.print()))
+        XCTAssertTrue(isSingle(single.print()))
+        
+        // Publishers.ReceiveOn
+        XCTAssertFalse(isSingle(publisher.receive(on: DispatchQueue.main)))
+        XCTAssertFalse(isSingle(maybe.receive(on: DispatchQueue.main)))
+        XCTAssertTrue(isSingle(single.receive(on: DispatchQueue.main)))
+        
+        // Publishers.ReplaceEmpty
+        XCTAssertFalse(isSingle(publisher.replaceEmpty(with: 0)))
+        XCTAssertTrue(isSingle(maybe.replaceEmpty(with: 0)))
+        XCTAssertTrue(isSingle(single.replaceEmpty(with: 0)))
+        
+        // Publishers.ReplaceError
+        XCTAssertFalse(isSingle(failingPublisher.replaceError(with: 0)))
+        XCTAssertFalse(isSingle(failingMaybe.replaceError(with: 0)))
+        XCTAssertTrue(isSingle(failingSingle.replaceError(with: 0)))
+        
+        // Publishers.Retry
+        XCTAssertFalse(isSingle(failingPublisher.retry(1)))
+        XCTAssertFalse(isSingle(failingMaybe.retry(1)))
+        XCTAssertTrue(isSingle(failingSingle.retry(1)))
+        
+        // Publishers.SetFailureType
+        XCTAssertFalse(isSingle(publisher.setFailureType(to: Error.self)))
+        XCTAssertFalse(isSingle(maybe.setFailureType(to: Error.self)))
+        XCTAssertTrue(isSingle(single.setFailureType(to: Error.self)))
+        
+        // Publishers.SubscribeOn
+        XCTAssertFalse(isSingle(publisher.subscribe(on: DispatchQueue.main)))
+        XCTAssertFalse(isSingle(maybe.subscribe(on: DispatchQueue.main)))
+        XCTAssertTrue(isSingle(single.subscribe(on: DispatchQueue.main)))
+        
+        // Publishers.SwitchToLatest
+        XCTAssertFalse(isSingle([publisher].publisher.switchToLatest()))
+        XCTAssertFalse(isSingle([maybe].publisher.switchToLatest()))
+        XCTAssertFalse(isSingle([single].publisher.switchToLatest()))
+        XCTAssertFalse(isSingle(Just(publisher).switchToLatest()))
+        XCTAssertFalse(isSingle(Just(maybe).switchToLatest()))
+        XCTAssertTrue(isSingle(Just(single).switchToLatest()))
+        
+        // Publishers.TryAllSatisfy
+        XCTAssertTrue(isSingle(publisher.tryAllSatisfy { _ in true }))
+        
+        // Publishers.TryCatch
+        XCTAssertFalse(isSingle(failingPublisher.tryCatch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingPublisher.tryCatch { _ in maybe }))
+        XCTAssertFalse(isSingle(failingPublisher.tryCatch { _ in single }))
+        XCTAssertFalse(isSingle(failingMaybe.tryCatch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingMaybe.tryCatch { _ in maybe }))
+        XCTAssertFalse(isSingle(failingMaybe.tryCatch { _ in single }))
+        XCTAssertFalse(isSingle(failingSingle.tryCatch { _ in publisher }))
+        XCTAssertFalse(isSingle(failingSingle.tryCatch { _ in maybe }))
+        XCTAssertTrue(isSingle(failingSingle.tryCatch { _ in single }))
+        
+        // Publishers.TryCompactMap
+        XCTAssertFalse(isSingle(publisher.tryCompactMap { $0 }))
+        XCTAssertFalse(isSingle(maybe.tryCompactMap { $0 }))
+        XCTAssertFalse(isSingle(single.tryCompactMap { $0 }))
+        XCTAssertTrue(isMaybe(single.tryCompactMap { $0 }))
+        
+        // Publishers.TryContainsWhere
+        XCTAssertTrue(isSingle(publisher.tryContains { _ in true }))
+        
+        // Publishers.TryFilter
+        XCTAssertFalse(isSingle(publisher.tryFilter { _ in true }))
+        XCTAssertFalse(isSingle(maybe.tryFilter { _ in true }))
+        XCTAssertFalse(isSingle(single.tryFilter { _ in true }))
+        XCTAssertTrue(isMaybe(single.tryFilter { _ in true }))
+        
+        // Publishers.TryMap
+        XCTAssertFalse(isSingle(publisher.tryMap { $0 }))
+        XCTAssertFalse(isSingle(maybe.tryMap { $0 }))
+        XCTAssertTrue(isSingle(single.tryMap { $0 }))
+        
+        // Publishers.Zip
+        XCTAssertFalse(isSingle(publisher.zip(publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(single)))
+        XCTAssertTrue(isSingle(single.zip(single)))
+        
+        // Publishers.Zip3
+        XCTAssertFalse(isSingle(publisher.zip(publisher, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, single)))
+        XCTAssertFalse(isSingle(publisher.zip(single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, single)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, single)))
+        XCTAssertFalse(isSingle(maybe.zip(single, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(single, single)))
+        XCTAssertFalse(isSingle(single.zip(publisher, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, publisher)))
+        XCTAssertFalse(isSingle(single.zip(maybe, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, single)))
+        XCTAssertFalse(isSingle(single.zip(single, maybe)))
+        XCTAssertTrue(isSingle(single.zip(single, single)))
+
+        // Publishers.Zip4
+        XCTAssertFalse(isSingle(publisher.zip(publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, maybe, single)))
+        XCTAssertFalse(isSingle(publisher.zip(publisher, single, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, publisher, single)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, maybe, single)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, single, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, single, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(maybe, single, single)))
+        XCTAssertFalse(isSingle(publisher.zip(single, publisher, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(single, maybe, publisher)))
+        XCTAssertFalse(isSingle(publisher.zip(single, maybe, maybe)))
+        XCTAssertFalse(isSingle(publisher.zip(single, maybe, single)))
+        XCTAssertFalse(isSingle(publisher.zip(single, single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, publisher, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, publisher, single)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, maybe, single)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, single, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(publisher, single, single)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, publisher, single)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, maybe, single)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, single, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(maybe, single, single)))
+        XCTAssertFalse(isSingle(maybe.zip(single, publisher, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(single, publisher, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(single, publisher, single)))
+        XCTAssertFalse(isSingle(maybe.zip(single, maybe, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(single, maybe, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(single, maybe, single)))
+        XCTAssertFalse(isSingle(maybe.zip(single, single, publisher)))
+        XCTAssertFalse(isSingle(maybe.zip(single, single, maybe)))
+        XCTAssertFalse(isSingle(maybe.zip(single, single, single)))
+        XCTAssertFalse(isSingle(single.zip(publisher, publisher, maybe)))
+        XCTAssertFalse(isSingle(single.zip(publisher, maybe, publisher)))
+        XCTAssertFalse(isSingle(single.zip(publisher, maybe, maybe)))
+        XCTAssertFalse(isSingle(single.zip(publisher, maybe, single)))
+        XCTAssertFalse(isSingle(single.zip(publisher, single, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, publisher, publisher)))
+        XCTAssertFalse(isSingle(single.zip(maybe, publisher, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, publisher, single)))
+        XCTAssertFalse(isSingle(single.zip(maybe, maybe, publisher)))
+        XCTAssertFalse(isSingle(single.zip(maybe, maybe, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, maybe, single)))
+        XCTAssertFalse(isSingle(single.zip(maybe, single, publisher)))
+        XCTAssertFalse(isSingle(single.zip(maybe, single, maybe)))
+        XCTAssertFalse(isSingle(single.zip(maybe, single, single)))
+        XCTAssertFalse(isSingle(single.zip(single, publisher, maybe)))
+        XCTAssertFalse(isSingle(single.zip(single, maybe, publisher)))
+        XCTAssertFalse(isSingle(single.zip(single, maybe, maybe)))
+        XCTAssertFalse(isSingle(single.zip(single, maybe, single)))
+        XCTAssertFalse(isSingle(single.zip(single, single, maybe)))
+        XCTAssertTrue(isSingle(single.zip(single, single, single)))
+        
+        // Result.Publisher
+        XCTAssertTrue(isSingle(Result<Int, Error>.success(1).publisher))
+        
+        // URLSession.DataTaskPublisher
+        XCTAssertTrue(isSingle(URLSession(configuration: URLSessionConfiguration.default).dataTaskPublisher(for: URL(string: "http://example.org")!)))
+        
+        // Deferred
+        XCTAssertFalse(isSingle(Deferred { publisher }))
+        XCTAssertFalse(isSingle(Deferred { maybe }))
+        XCTAssertTrue(isSingle(Deferred { single }))
+        
+        // Empty
+        XCTAssertFalse(isSingle(Empty<Int, Error>()))
+        
+        // Fail
+        XCTAssertTrue(isSingle(Fail<Int, Error>(error: TestError())))
+        
+        // Future
+        XCTAssertTrue(isSingle(Future<Int, Error> { _ in }))
+        
+        // Just
+        XCTAssertTrue(isSingle(Just(1)))
+    }
 }
+
+private func isMaybe<P: Publisher>(_ p: P) -> Bool { false }
+private func isMaybe<P: MaybePublisher>(_ p: P) -> Bool { true }
+private func isSingle<P: Publisher>(_ p: P) -> Bool { false }
+private func isSingle<P: SinglePublisher>(_ p: P) -> Bool { true }
