@@ -491,4 +491,88 @@ class MaybePublisherTests: XCTestCase {
             acceptSomeMaybePublisher(p.uncheckedMaybe())
         }
     }
+    
+    // MARK: - Composition
+    
+    func test_publishers() {
+        struct TestError: Error { }
+        
+        let publisher = [1, 2, 3].publisher
+        let failingPublisher = publisher.setFailureType(to: Error.self)
+        let maybe = Just(1)
+        let failingMaybe = maybe.setFailureType(to: Error.self)
+
+        XCTAssertFalse(isMaybe(publisher))
+        XCTAssertFalse(isMaybe(failingPublisher))
+        XCTAssertTrue(isMaybe(maybe))
+        XCTAssertTrue(isMaybe(failingMaybe))
+
+        // Publishers.AllSatisfy
+        XCTAssertTrue(isMaybe(publisher.allSatisfy { _ in true }))
+        
+        // Publishers.AssertNoFailure
+        XCTAssertFalse(isMaybe(failingPublisher.assertNoFailure()))
+        XCTAssertTrue(isMaybe(failingMaybe.assertNoFailure()))
+        
+        // Publishers.Autoconnect
+        XCTAssertFalse(isMaybe(publisher.makeConnectable().autoconnect()))
+        XCTAssertTrue(isMaybe(maybe.makeConnectable().autoconnect()))
+        
+        // Publishers.Breakpoint
+        XCTAssertFalse(isMaybe(publisher.breakpoint()))
+        XCTAssertTrue(isMaybe(maybe.breakpoint()))
+        
+        // Publishers.Catch
+        XCTAssertFalse(isMaybe(failingPublisher.catch { _ in publisher }))
+        XCTAssertFalse(isMaybe(failingPublisher.catch { _ in maybe }))
+        XCTAssertFalse(isMaybe(failingMaybe.catch { _ in publisher }))
+        XCTAssertTrue(isMaybe(failingMaybe.catch { _ in maybe }))
+        
+        // Publishers.CombineLatest
+        XCTAssertFalse(isMaybe(publisher.combineLatest(publisher)))
+        XCTAssertFalse(isMaybe(publisher.combineLatest(maybe)))
+        XCTAssertFalse(isMaybe(maybe.combineLatest(publisher)))
+        XCTAssertTrue(isMaybe(maybe.combineLatest(maybe)))
+        
+        // Publishers.CombineLatest3
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(publisher, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(publisher, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(publisher, maybe, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(publisher, maybe, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(maybe, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(maybe, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest3(maybe, maybe, publisher)))
+        XCTAssertTrue(isMaybe(Publishers.CombineLatest3(maybe, maybe, maybe)))
+        
+        // Publishers.CombineLatest4
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, publisher, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, publisher, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, publisher, maybe, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, publisher, maybe, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, maybe, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, maybe, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, maybe, maybe, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(publisher, maybe, maybe, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, publisher, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, publisher, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, publisher, maybe, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, publisher, maybe, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, maybe, publisher, publisher)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, maybe, publisher, maybe)))
+        XCTAssertFalse(isMaybe(Publishers.CombineLatest4(maybe, maybe, maybe, publisher)))
+        XCTAssertTrue(isMaybe(Publishers.CombineLatest4(maybe, maybe, maybe, maybe)))
+        
+        // Publishers.CompactMap
+        XCTAssertFalse(isMaybe(publisher.compactMap { $0 }))
+        XCTAssertTrue(isMaybe(maybe.compactMap { $0 }))
+        
+        // Publishers.Contains
+        XCTAssertTrue(isMaybe(publisher.contains(1)))
+        
+        // Publishers.ContainsWhere
+        XCTAssertTrue(isMaybe(publisher.contains { _ in true }))
+    }
 }
+
+private func isMaybe<P: Publisher>(_ p: P) -> Bool { false }
+private func isMaybe<P: MaybePublisher>(_ p: P) -> Bool { true }
