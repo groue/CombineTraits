@@ -54,19 +54,8 @@ This library provides both safe *subscription* and *construction* of publishers 
 Your applications and libraries will often replace `AnyPublisher` with `AnySinglePublisher` or `AnyMaybePublisher`...
     
 ```diff
- func downloadPublisher()
--    -> AnyPublisher<APIModel, Error>
-+    -> AnySinglePublisher<APIModel, Error>
- { ... }
-
- func savePublisher(_ model: Model)
--    -> AnyPublisher<Void, Error>
-+    -> AnySinglePublisher<Void, Error>
- { ... }
-
- func refreshPublisher()
--    -> AnyPublisher<Void, Error> 
-+    -> AnySinglePublisher<Void, Error>
+-func refreshPublisher() -> AnyPublisher<Void, Error>
++func refreshPublisher() -> AnySinglePublisher<Void, Error>
  {
      downloadPublisher()
          .map { apiModel in Model(apiModel) }
