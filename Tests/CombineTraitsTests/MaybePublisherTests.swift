@@ -1,5 +1,5 @@
 import Combine
-import CombineTraits
+@testable import CombineTraits
 import XCTest
 
 class MaybePublisherTests: XCTestCase {
@@ -35,7 +35,7 @@ class MaybePublisherTests: XCTestCase {
     }
     
     func test_CheckMaybePublisher_Empty() throws {
-        let publisher = Empty<Int, Never>().checkMaybe()
+        let publisher = Empty<Int, Never>().eraseToAnyPublisher().checkMaybe()
         
         var completion: Subscribers.Completion<MaybeError<Never>>?
         var value: Int?
@@ -64,7 +64,7 @@ class MaybePublisherTests: XCTestCase {
     }
     
     func test_CheckMaybePublisher_EmptyWithoutCompletion() throws {
-        let publisher = Empty<Int, Never>(completeImmediately: false).checkMaybe()
+        let publisher = Empty<Int, Never>(completeImmediately: false).eraseToAnyPublisher().checkMaybe()
         
         var completion: Subscribers.Completion<MaybeError<Never>>?
         var value: Int?

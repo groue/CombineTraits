@@ -61,15 +61,9 @@ import Foundation
 ///   `SinglePublisher` protocol by checking, at runtime, that an upstream
 ///   publisher publishes exactly one element, or an error.
 ///
-///   You build a checked single publisher with one of those methods:
-///
-///     - `Publisher.checkSingle()` returns a single publisher that fails with a
-///       `SingleError` if the upstream publisher does not publish exactly one
-///       element, or an error.
-///
-///     - `Publisher.assertSingle()` returns a single publisher that raises a
-///       fatal error if the upstream publisher does not publish exactly one
-///       element, or an error.
+///     `Publisher.assertSingle()` returns a single publisher that raises a
+///     fatal error if the upstream publisher does not publish exactly one
+///     element, or an error.
 ///
 /// - **Unchecked single publishers**: you should only build such a single
 ///   publisher when you are sure that the `SinglePublisher` contract
@@ -159,14 +153,12 @@ extension Publisher {
     /// and turns contract violations into a `SingleError`.
     ///
     /// See also `Publisher.assertSingle()`.
-    public func checkSingle() -> CheckSinglePublisher<Self> {
+    func checkSingle() -> CheckSinglePublisher<Self> {
         CheckSinglePublisher(upstream: self)
     }
     
     /// Checks that the publisher publishes exactly one element, or an error,
     /// and raises a fatal error if the contract is not honored.
-    ///
-    /// See also `Publisher.checkSingle()`.
     ///
     /// - Parameters:
     ///   - prefix: A string used at the beginning of the fatal error message.

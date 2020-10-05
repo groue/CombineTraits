@@ -1,5 +1,5 @@
 import Combine
-import CombineTraits
+@testable import CombineTraits
 import XCTest
 
 class SinglePublisherTests: XCTestCase {

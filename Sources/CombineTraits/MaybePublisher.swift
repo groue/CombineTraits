@@ -64,15 +64,9 @@ import Foundation
 ///   `MaybePublisher` protocol by checking, at runtime, that an upstream
 ///   publisher publishes exactly zero element, or one element, or an error.
 ///
-///   You build a checked maybe publisher with one of those methods:
-///
-///     - `Publisher.checkMaybe()` returns a maybe publisher that fails with a
-///       `MaybeError` if the upstream publisher does not publish exactly zero
-///        element, or one element, or an error.
-///
-///     - `Publisher.assertMaybe()` returns a maybe publisher that raises a
-///       fatal error if the upstream publisher does not publish exactly zero
-///       element, or one element, or an error.
+///     Publisher.assertMaybe()` returns a maybe publisher that raises a
+///     fatal error if the upstream publisher does not publish exactly zero
+///     element, or one element, or an error.
 ///
 /// - **Unchecked maybe publishers**: you should only build such a maybe
 ///   publisher when you are sure that the `MaybePublisher` contract
@@ -293,15 +287,13 @@ extension Publisher {
     /// element, or an error, and turns contract violations into a `MaybeError`.
     ///
     /// See also `Publisher.assertMaybe()`.
-    public func checkMaybe() -> CheckMaybePublisher<Self> {
+    func checkMaybe() -> CheckMaybePublisher<Self> {
         CheckMaybePublisher(upstream: self)
     }
     
     /// Checks that the publisher publishes exactly zero element, or one
     /// element, or an error, and raises a fatal error if the contract is
     /// not honored.
-    ///
-    /// See also `Publisher.checkMaybe()`.
     ///
     /// - Parameters:
     ///   - prefix: A string used at the beginning of the fatal error message.

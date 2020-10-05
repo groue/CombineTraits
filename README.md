@@ -221,22 +221,18 @@ There are a few ways to get such a single publisher:
 
 - **Runtime-checked single publishers** are publishers that conform to the `SinglePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly one value, or an error.
     
-    You build a checked single publisher with one of those methods:
+    `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one value, or an error.
+        
+    For example:
     
-    - `Publisher.checkSingle()` returns a single publisher that fails with a `SingleError` if the upstream publisher does not publish exactly one value, or an error.
+    ```swift
+    let nameSubject: CurrentValueSubject<String, Never> = ...
     
-    - `Publisher.assertSingle()` returns a single publisher that raises a fatal error if the upstream publisher does not publish exactly one value, or an error.
-        
-        For example:
-        
-        ```swift
-        let nameSubject: CurrentValueSubject<String, Never> = ...
-        
-        func namePublisher() -> AnySinglePublisher<String, Never> {
-            // Safe as long as the subject never finishes:
-            subject.prefix(1).assertSingle().eraseToAnySinglePublisher()
-        }
-        ```
+    func namePublisher() -> AnySinglePublisher<String, Never> {
+        // Safe as long as the subject never finishes:
+        subject.prefix(1).assertSingle().eraseToAnySinglePublisher()
+    }
+    ```
 
 - **Unchecked single publishers**: you should only build such a single publisher when you are sure that the `SinglePublisher` contract is honored by the upstream publisher.
     
@@ -538,21 +534,17 @@ There are a few ways to get such a maybe publisher:
 
 - **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero value, or one value, or an error.
     
-    You build a checked maybe publisher with one of those methods:
+    `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero value, or one value, or an error.
+        
+    For example:
     
-    - `Publisher.checkMaybe()` returns a maybe publisher that fails with a `MaybeError` if the upstream publisher does not publish exactly zero value, or one value, or an error.
+    ```swift
+    let nameSubject: CurrentValueSubject<String, Never> = ...
     
-    - `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero value, or one value, or an error.
-        
-        For example:
-        
-        ```swift
-        let nameSubject: CurrentValueSubject<String, Never> = ...
-        
-        func namePublisher() -> AnyMaybePublisher<String, Never> {
-            subject.prefix(1).assertMaybe().eraseToAnyMaybePublisher()
-        }
-        ```
+    func namePublisher() -> AnyMaybePublisher<String, Never> {
+        subject.prefix(1).assertMaybe().eraseToAnyMaybePublisher()
+    }
+    ```
 
 - **Unchecked maybe publishers**: you should only build such a maybe publisher when you are sure that the `MaybePublisher` contract is honored by the upstream publisher.
     
@@ -751,33 +743,6 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
         .prefix(1)
         .assertSingle()
         .eraseToAnySinglePublisher()
-}
-```
-
-#### `checkSingle()`, `checkMaybe()`
-
-Use these operators when you want to make sure that a publisher follows the rule of to a specific traits.
-
-The failure type of the returned publisher is `SingleError` or `MaybeError`. Those errors are published whenever the upstream publisher fails to follow the rules.
-
-```swift
-let singlePublisher = publisher.checkSingle()
-let cancellable = singlePublisher.sinkSingle { result in
-    switch result {
-    case let .success(value):
-        // Success
-    case let .failure(error):
-        switch error {
-        case .missingElement:
-            // Upstream publisher did not publish any value.
-        case .tooManyElements:
-            // Upstream publisher did not publish more than one value.
-        case .bothElementAndError:
-            // Upstream publisher did not publish both a value and an error.
-        case let .upstream(error):
-            // Upstream publisher did fail with its own error.
-        }
-    }
 }
 ```
 
