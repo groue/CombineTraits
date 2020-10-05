@@ -16,15 +16,15 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-CombineTraits solves a problem with the [Combine] framework: publishers do not tell how many values can be published. One must generally assume that publishers may publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
+One must generally assume that [Combine] publishers may publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-When we are lucky, we can rely on the context, or the documentation, in order to lift doubts. For example, publishers of a network request are assumed to publish one value, or the eventual network error.
+When we deal with publishers that are expected to publish no more than one value, such as network requests for example, we often neglect to deal with edge cases such as a completion without any value, or several published values.
 
-But sometimes we are clueless, or publishers do not honor their implicit contract, due to a misunderstanding, or a bug in their implementation. In the end, we write code that is more complex than necessary, or we neglect to deal with edge cases such as a completion without any value, or several published values.
+The trouble is that the guarantees about the number of published vales are implicit, subject to interpretation, misunderstandings, wrong documentation, and buggy implementations.
 
 **The compiler does not help us writing code that is guaranteed to be correct.**
 
-This library provides both safe  *subscription* and *construction* of publishers that explicitly conform to specific traits:
+This library provides both safe *subscription* and *construction* of publishers that explicitly conform to specific traits:
         
 - **[Single Publishers]** are guaranteed to publish exactly one value, or an error.
     
@@ -51,52 +51,36 @@ This library provides both safe  *subscription* and *construction* of publishers
 
 **CombineTraits carefully preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
-Your applications and libraries will quickly benefit from CombineTraits in three steps:
-
-1. Watch for `AnyPublisher` results that would benefit from traits.
-
-2. Replace `AnyPublisher` with `AnySinglePublisher` or `AnyMaybePublisher`:
+Your applications and libraries will often replace `AnyPublisher` with `AnySinglePublisher` or `AnyMaybePublisher`...
     
-    ```diff
-    -func refreshPublisher() -> AnyPublisher<Void, Error> {
-    +func refreshPublisher() -> AnySinglePublisher<Void, Error> {
-         downloadPublisher()
-             .map { apiModel in Model(apiModel) }
-             .flatMap { model in savePublisher(model) }
-    -        .eraseToAnyPublisher()
-    +        .eraseToAnySinglePublisher()
-     }
-     
-    -func nextNamePublisher() -> AnyPublisher<String, Error> {
-    +func nextNamePublisher() -> AnyMaybePublisher<String, Error> {
-         nameSubject
-             .prefix(1)
-    -        .eraseToAnyPublisher()
-    +        .assertMaybe()
-    +        .eraseToAnyMaybePublisher()
-     }
-    ```
-     
-3. Replace `sink` with `sinkSingle` or `sinkMaybe`:
+```diff
+-func downloadPublisher() -> AnyPublisher<APIModel, Error> { ... }
++func downloadPublisher() -> AnySinglePublisher<APIModel, Error>  { ... }
+
+-func savePublisher(_ model: Model) -> AnyPublisher<Void, Error> { ... }
++func savePublisher(_ model: Model) -> AnySinglePublisher<Void, Error> { ... }
+
+-func refreshPublisher() -> AnyPublisher<Void, Error> {
++func refreshPublisher() -> AnySinglePublisher<Void, Error> {
+     downloadPublisher()
+         .map { apiModel in Model(apiModel) }
+         .flatMap { model in savePublisher(model) }
+-        .eraseToAnyPublisher()
++        .eraseToAnySinglePublisher()
+ }
+```
+
+... and replace `sink` with `sinkSingle` or `sinkMaybe`:
     
-    ```diff
-    -let cancellable = refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
-    +let cancellable = refreshPublisher().sinkSingle { result in
-    +    switch result {
-    +    case .success: ...
-    +    case let .failure(error): ...
-    +    }
-    +}
-     
-    -let cancellable = nextNamePublisher().sink(receiveCompletion:..., receiveValue: ...)
-    +let cancellable = nextNamePublisher().sinkMaybe { result in
-    +    switch result {
-    +    case .empty: ...
-    +    case let .success(name): ...
-    +    case let .failure(error): ...
-    +    }
-    +}
-    ```
+```diff
+-let cancellable = refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
++let cancellable = refreshPublisher().sinkSingle { result in
++    switch result {
++    case .success: ...
++    case let .failure(error): ...
++    }
++}
+```
 
 # Documentation
 
