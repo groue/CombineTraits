@@ -218,6 +218,45 @@ class MaybePublisherTests: XCTestCase {
         }
     }
     
+    func test_CheckMaybePublisher_usage() {
+        // The test passes if the test compiles
+        
+        do {
+            let nameSubject = PassthroughSubject<String, Error>()
+            let publisher = nameSubject.prefix(1)
+            let maybePublisher = publisher.checkMaybe()
+            _ = maybePublisher.sinkMaybe { result in
+                switch result {
+                case .empty: break
+                case .success: break
+                case let .failure(error):
+                    switch error {
+                    case .tooManyElements: break
+                    case .bothElementAndError: break
+                    case .upstream: break
+                    }
+                }
+            }
+        }
+        
+        do {
+            let nameSubject = PassthroughSubject<String, Never>()
+            let publisher = nameSubject.prefix(1)
+            let maybePublisher = publisher.checkMaybe()
+            _ = maybePublisher.sinkMaybe { result in
+                switch result {
+                case .empty: break
+                case .success: break
+                case let .failure(error):
+                    switch error {
+                    case .tooManyElements: break
+                    case .bothElementAndError: break
+                    }
+                }
+            }
+        }
+    }
+    
     // MARK: - AssertNoMaybeFailurePublisher
     
     func test_AssertNoMaybeFailurePublisher_Just() throws {

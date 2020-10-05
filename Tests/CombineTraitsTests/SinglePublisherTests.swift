@@ -223,6 +223,45 @@ class SinglePublisherTests: XCTestCase {
         }
     }
     
+    func test_CheckSinglePublisher_usage() {
+        // The test passes if the test compiles
+        
+        do {
+            let nameSubject = PassthroughSubject<String, Error>()
+            let publisher = nameSubject.prefix(1)
+            let singlePublisher = publisher.checkSingle()
+            _ = singlePublisher.sinkSingle { result in
+                switch result {
+                case .success: break
+                case let .failure(error):
+                    switch error {
+                    case .missingElement: break
+                    case .tooManyElements: break
+                    case .bothElementAndError: break
+                    case .upstream: break
+                    }
+                }
+            }
+        }
+        
+        do {
+            let nameSubject = PassthroughSubject<String, Never>()
+            let publisher = nameSubject.prefix(1)
+            let singlePublisher = publisher.checkSingle()
+            _ = singlePublisher.sinkSingle { result in
+                switch result {
+                case .success: break
+                case let .failure(error):
+                    switch error {
+                    case .missingElement: break
+                    case .tooManyElements: break
+                    case .bothElementAndError: break
+                    }
+                }
+            }
+        }
+    }
+    
     // MARK: - AssertNoSingleFailurePublisher
     
     func test_AssertNoSingleFailurePublisher_Just() throws {
