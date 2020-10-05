@@ -167,8 +167,14 @@ extension Publisher {
     /// and raises a fatal error if the contract is not honored.
     ///
     /// See also `Publisher.checkSingle()`.
-    public func assertSingle() -> AssertSinglePublisher<Self> {
-        checkSingle().assertNoSingleFailure()
+    ///
+    /// - Parameters:
+    ///   - prefix: A string used at the beginning of the fatal error message.
+    ///   - file: A filename used in the error message. This defaults to `#file`.
+    ///   - line: A line number used in the error message. This defaults to `#line`.
+    /// - Returns: A publisher that raises a fatal error when its upstream publisher fails.
+    public func assertSingle(_ prefix: String = "", file: StaticString = #file, line: UInt = #line) -> AssertSinglePublisher<Self> {
+        checkSingle().assertNoSingleFailure(prefix, file: file, line: line)
     }
     
     /// Turns a publisher into a single publisher, assuming that it publishes
@@ -213,8 +219,8 @@ extension SinglePublisher {
     
     /// :nodoc:
     @available(*, deprecated, message: "Publisher is already a single publisher")
-    public func assertSingle() -> AssertSinglePublisher<Self> {
-        checkSingle().assertNoSingleFailure()
+    public func assertSingle(_ prefix: String = "", file: StaticString = #file, line: UInt = #line) -> AssertSinglePublisher<Self> {
+        checkSingle().assertNoSingleFailure(prefix, file: file, line: line)
     }
     
     /// :nodoc:
@@ -244,29 +250,29 @@ extension SinglePublisher where Failure: _SingleError {
     /// Raises a fatal error when the upstream publisher fails with a violation
     /// of the `SinglePublisher` contract, and otherwise republishes all
     /// received input.
-    func assertNoSingleFailure(file: StaticString = #file, line: UInt = #line)
+    fileprivate func assertNoSingleFailure(_ prefix: String, file: StaticString, line: UInt)
     -> Publishers.MapError<Self, Failure.UpstreamFailure>
     {
         mapError { error in
-            error.assertUpstreamFailure(file: file, line: line)
+            error.assertUpstreamFailure(prefix, file: file, line: line)
         }
     }
 }
 
 protocol _SingleError {
     associatedtype UpstreamFailure: Error
-    func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
 }
 
 extension SingleError: _SingleError {
-    func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure {
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
         switch self {
         case .missingElement:
-            fatalError("Single violation: missing element at \(file):\(line)")
+            fatalError([prefix, "Single violation: missing element at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case .tooManyElements:
-            fatalError("Single violation: too many elements at \(file):\(line)")
+            fatalError([prefix, "Single violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case .bothElementAndError:
-            fatalError("Single violation: error completion after one element was published \(file):\(line)")
+            fatalError([prefix, "Single violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case let .upstream(error):
             return error
         }

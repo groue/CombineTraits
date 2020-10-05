@@ -302,8 +302,14 @@ extension Publisher {
     /// not honored.
     ///
     /// See also `Publisher.checkMaybe()`.
-    public func assertMaybe() -> AssertMaybePublisher<Self> {
-        checkMaybe().assertNoMaybeFailure()
+    ///
+    /// - Parameters:
+    ///   - prefix: A string used at the beginning of the fatal error message.
+    ///   - file: A filename used in the error message. This defaults to `#file`.
+    ///   - line: A line number used in the error message. This defaults to `#line`.
+    /// - Returns: A publisher that raises a fatal error when its upstream publisher fails.
+    public func assertMaybe(_ prefix: String = "", file: StaticString = #file, line: UInt = #line) -> AssertMaybePublisher<Self> {
+        checkMaybe().assertNoMaybeFailure(prefix, file: file, line: line)
     }
     
     /// Turns a publisher into a maybe publisher, assuming that it publishes
@@ -344,8 +350,8 @@ extension MaybePublisher {
     
     /// :nodoc:
     @available(*, deprecated, message: "Publisher is already a maybe publisher")
-    public func assertMaybe() -> AssertMaybePublisher<Self> {
-        checkMaybe().assertNoMaybeFailure()
+    public func assertMaybe(_ prefix: String = "", file: StaticString = #file, line: UInt = #line) -> AssertMaybePublisher<Self> {
+        checkMaybe().assertNoMaybeFailure(prefix, file: file, line: line)
     }
     
     /// :nodoc:
@@ -372,27 +378,27 @@ extension MaybePublisher where Failure: _MaybeError {
     /// Raises a fatal error when the upstream publisher fails with a violation
     /// of the `MaybePublisher` contract, and otherwise republishes all
     /// received input.
-    func assertNoMaybeFailure(file: StaticString = #file, line: UInt = #line)
+    fileprivate func assertNoMaybeFailure(_ prefix: String, file: StaticString, line: UInt)
     -> Publishers.MapError<Self, Failure.UpstreamFailure>
     {
         mapError { error in
-            error.assertUpstreamFailure(file: file, line: line)
+            error.assertUpstreamFailure(prefix, file: file, line: line)
         }
     }
 }
 
 protocol _MaybeError {
     associatedtype UpstreamFailure: Error
-    func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
 }
 
 extension MaybeError: _MaybeError {
-    func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure {
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
         switch self {
         case .tooManyElements:
-            fatalError("Maybe violation: too many elements at \(file):\(line)")
+            fatalError([prefix, "Maybe violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case .bothElementAndError:
-            fatalError("Maybe violation: error completion after one element was published \(file):\(line)")
+            fatalError([prefix, "Maybe violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case let .upstream(error):
             return error
         }
