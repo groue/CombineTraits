@@ -109,10 +109,8 @@ import Foundation
 ///
 ///         // Never publishes any value, never completes.
 ///         AnySinglePublisher.never()
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol SinglePublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SinglePublisher {
     /// Wraps this single publisher with a type eraser.
     ///
@@ -156,7 +154,6 @@ extension SinglePublisher {
 
 // MARK: - Checked & Unchecked Single Publishers
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publisher {
     /// Checks that the publisher publishes exactly one element, or an error,
     /// and turns contract violations into a `SingleError`.
@@ -204,11 +201,9 @@ extension Publisher {
 }
 
 /// The type of publishers returned by `Publisher.assertSingle()`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias AssertSinglePublisher<Upstream: Publisher>
     = Publishers.MapError<CheckSinglePublisher<Upstream>, Upstream.Failure>
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SinglePublisher {
     /// :nodoc:
     @available(*, deprecated, message: "Publisher is already a single publisher")
@@ -231,7 +226,6 @@ extension SinglePublisher {
 
 /// The error for checked single publishers returned
 /// from `Publisher.eraseToAnySinglePublisher()`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public enum SingleError<UpstreamFailure: Error>: Error {
     /// Upstream publisher did complete without publishing any element
     case missingElement
@@ -246,7 +240,6 @@ public enum SingleError<UpstreamFailure: Error>: Error {
     case upstream(UpstreamFailure)
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SinglePublisher where Failure: _SingleError {
     /// Raises a fatal error when the upstream publisher fails with a violation
     /// of the `SinglePublisher` contract, and otherwise republishes all
@@ -260,13 +253,11 @@ extension SinglePublisher where Failure: _SingleError {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 protocol _SingleError {
     associatedtype UpstreamFailure: Error
     func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension SingleError: _SingleError {
     func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure {
         switch self {
@@ -295,7 +286,6 @@ extension SingleError: _SingleError {
 ///
 /// You can use `eraseToAnySinglePublisher()` operator to wrap a publisher
 /// with `AnySinglePublisher`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct AnySinglePublisher<Output, Failure: Error>: SinglePublisher {
     public typealias Failure = Failure
     fileprivate let upstream: AnyPublisher<Output, Failure>
@@ -337,7 +327,6 @@ public struct AnySinglePublisher<Output, Failure: Error>: SinglePublisher {
 
 // MARK: - Canonical Single Publishers
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnySinglePublisher where Failure == Never {
     /// Creates an `AnySinglePublisher` which emits one value, and
     /// then finishes.
@@ -346,7 +335,6 @@ extension AnySinglePublisher where Failure == Never {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnySinglePublisher {
     /// Creates an `AnySinglePublisher` which emits one value, and
     /// then finishes.
@@ -395,7 +383,6 @@ extension AnySinglePublisher {
 ///   then an error.
 ///
 /// - `.upstream(error)`: Upstream publisher did complete with an error.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct CheckSinglePublisher<Upstream: Publisher>: SinglePublisher {
     public typealias Output = Upstream.Output
     public typealias Failure = SingleError<Upstream.Failure>
@@ -412,7 +399,6 @@ public struct CheckSinglePublisher<Upstream: Publisher>: SinglePublisher {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private class CheckSingleSubscription<Upstream: Publisher, Downstream: Subscriber>: Subscription, Subscriber
 where
     Downstream.Input == Upstream.Output,
@@ -563,158 +549,117 @@ where
 
 // MARK: - Support
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.AllSatisfy: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.AssertNoFailure: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Autoconnect: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Breakpoint: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Catch: SinglePublisher
 where Upstream: SinglePublisher, NewPublisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest3: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest4: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher, D: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Contains: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ContainsWhere: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Count: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Delay: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.FlatMap: SinglePublisher
 where Upstream: SinglePublisher, NewPublisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.HandleEvents: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MakeConnectable: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Map: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapError: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath2: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath3: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Print: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReceiveOn: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReplaceEmpty: SinglePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReplaceError: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Retry: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SetFailureType: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SubscribeOn: SinglePublisher
 where Upstream: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SwitchToLatest: SinglePublisher
 where Upstream: SinglePublisher, P: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryAllSatisfy: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryCatch: SinglePublisher
 where Upstream: SinglePublisher, NewPublisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryContainsWhere: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryMap: SinglePublisher
 where Upstream: SinglePublisher { }
 
 // We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
 
 // We can't declare "OR" conformance (Zip3 is a maybe if A or B or C is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip3: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher { }
 
 // We can't declare "OR" conformance (Zip4 is a maybe if A or B or C or D is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip4: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher, D: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Result.Publisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension URLSession.DataTaskPublisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Deferred: SinglePublisher
 where DeferredPublisher: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Fail: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Future: SinglePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Just: SinglePublisher { }

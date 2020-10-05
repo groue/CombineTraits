@@ -111,11 +111,9 @@ import Foundation
 ///
 ///         // Never publishes any value, never completes.
 ///         AnyMaybePublisher.never()
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol MaybePublisher: Publisher { }
 
 /// The result of a maybe publisher.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public enum MaybeResult<Success, Failure: Error> {
     /// Completion without any element.
     case empty
@@ -127,7 +125,6 @@ public enum MaybeResult<Success, Failure: Error> {
     case failure(Failure)
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybeResult {
     /// Returns a new `MaybeResult`, mapping any success value using the given
     /// transformation.
@@ -234,13 +231,10 @@ extension MaybeResult {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybeResult: Equatable where Success: Equatable, Failure: Equatable { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybeResult: Hashable where Success: Hashable, Failure: Hashable { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybePublisher {
     /// Wraps this maybe publisher with a type eraser.
     ///
@@ -294,7 +288,6 @@ extension MaybePublisher {
 
 // MARK: - Checked & Unchecked Maybe Publishers
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publisher {
     /// Checks that the publisher publishes exactly zero element, or one
     /// element, or an error, and turns contract violations into a `MaybeError`.
@@ -339,11 +332,9 @@ extension Publisher {
 }
 
 /// The type of publishers returned by `Publisher.assertMaybe()`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias AssertMaybePublisher<Upstream: Publisher>
     = Publishers.MapError<CheckMaybePublisher<Upstream>, Upstream.Failure>
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybePublisher {
     /// :nodoc:
     @available(*, deprecated, message: "Publisher is already a maybe publisher")
@@ -366,7 +357,6 @@ extension MaybePublisher {
 
 /// The error for checked maybe publishers returned
 /// from `Publisher.eraseToAnyMaybePublisher()`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public enum MaybeError<UpstreamFailure: Error>: Error {
     /// Upstream publisher did publish more than one element
     case tooManyElements
@@ -378,7 +368,6 @@ public enum MaybeError<UpstreamFailure: Error>: Error {
     case upstream(UpstreamFailure)
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybePublisher where Failure: _MaybeError {
     /// Raises a fatal error when the upstream publisher fails with a violation
     /// of the `MaybePublisher` contract, and otherwise republishes all
@@ -392,13 +381,11 @@ extension MaybePublisher where Failure: _MaybeError {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 protocol _MaybeError {
     associatedtype UpstreamFailure: Error
     func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension MaybeError: _MaybeError {
     func assertUpstreamFailure(file: StaticString, line: UInt) -> UpstreamFailure {
         switch self {
@@ -425,7 +412,6 @@ extension MaybeError: _MaybeError {
 ///
 /// You can use `eraseToAnyMaybePublisher()` operator to wrap a publisher
 /// with `AnyMaybePublisher`.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct AnyMaybePublisher<Output, Failure: Error>: MaybePublisher {
     public typealias Failure = Failure
     fileprivate let upstream: AnyPublisher<Output, Failure>
@@ -467,7 +453,6 @@ public struct AnyMaybePublisher<Output, Failure: Error>: MaybePublisher {
 
 // MARK: - Canonical Maybe Publishers
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnyMaybePublisher where Failure == Never {
     /// Creates an `AnyMaybePublisher` which emits one value, and
     /// then finishes.
@@ -476,7 +461,6 @@ extension AnyMaybePublisher where Failure == Never {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnyMaybePublisher {
     /// Creates an `AnyMaybePublisher` which immediately completes.
     ///
@@ -537,7 +521,6 @@ extension AnyMaybePublisher {
 ///   then an error.
 ///
 /// - `.upstream(error)`: Upstream publisher did complete with an error.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct CheckMaybePublisher<Upstream: Publisher>: MaybePublisher {
     public typealias Output = Upstream.Output
     public typealias Failure = MaybeError<Upstream.Failure>
@@ -554,7 +537,6 @@ public struct CheckMaybePublisher<Upstream: Publisher>: MaybePublisher {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private class CheckMaybeSubscription<Upstream: Publisher, Downstream: Subscriber>: Subscription, Subscriber
 where
     Downstream.Input == Upstream.Output,
@@ -699,181 +681,134 @@ where
 
 // MARK: - Support
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.AllSatisfy: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.AssertNoFailure: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Autoconnect: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Breakpoint: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Catch: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest3: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CombineLatest4: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher, D: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.CompactMap: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Contains: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ContainsWhere: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Count: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Delay: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Filter: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.FlatMap: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.HandleEvents: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MakeConnectable: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Map: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapError: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath2: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.MapKeyPath3: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Print: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReceiveOn: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReplaceEmpty: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.ReplaceError: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Retry: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SetFailureType: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SubscribeOn: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.SwitchToLatest: MaybePublisher
 where Upstream: MaybePublisher, P: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryAllSatisfy: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryCatch: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryCompactMap: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryContainsWhere: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryFilter: MaybePublisher
 where Upstream: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.TryMap: MaybePublisher
 where Upstream: MaybePublisher { }
 
 // We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher { }
 
 // We can't declare "OR" conformance (Zip3 is a maybe if A or B or C is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip3: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher { }
 
 // We can't declare "OR" conformance (Zip4 is a maybe if A or B or C or D is a maybe)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Publishers.Zip4: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher, D: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Result.Publisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension URLSession.DataTaskPublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension AnyPublisher: MaybePublisher
 where Output == Never { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Deferred: MaybePublisher
 where DeferredPublisher: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Empty: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Fail: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Future: MaybePublisher { }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Just: MaybePublisher { }

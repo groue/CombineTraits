@@ -1,6 +1,5 @@
 import Combine
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension PublisherTraits {
     // TODO: doc
     public struct Maybe<Output, Failure: Error>: MaybePublisher {
