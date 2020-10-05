@@ -55,18 +55,18 @@ Your applications and libraries will often replace `AnyPublisher` with `AnySingl
     
 ```diff
  func downloadPublisher()
---> AnyPublisher<APIModel, Error>
-+-> AnySinglePublisher<APIModel, Error>
+-    -> AnyPublisher<APIModel, Error>
++    -> AnySinglePublisher<APIModel, Error>
  { ... }
 
  func savePublisher(_ model: Model)
---> AnyPublisher<Void, Error>
-+-> AnySinglePublisher<Void, Error>
+-    -> AnyPublisher<Void, Error>
++    -> AnySinglePublisher<Void, Error>
  { ... }
 
  func refreshPublisher()
---> AnyPublisher<Void, Error> 
-+-> AnySinglePublisher<Void, Error>
+-    -> AnyPublisher<Void, Error> 
++    -> AnySinglePublisher<Void, Error>
  {
      downloadPublisher()
          .map { apiModel in Model(apiModel) }
