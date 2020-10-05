@@ -81,6 +81,7 @@ Your applications and libraries will often replace `AnyPublisher` with `AnySingl
 
 - [Single Publishers]
 - [Maybe Publishers]
+- [Operators]
 
 ## Single Publishers
 
@@ -735,6 +736,92 @@ class MyViewController: UIViewController {
 }
 ```
 
+## Operators
+
+#### `assertSingle()`, `assertMaybe()`
+
+Use these operators for internal sanity checks, when you want to make sure that a publisher follows the rule of to a specific traits.
+
+The returned publisher raises a fatal error, in both development/testing and shipping versions of code, whenever the upstream publisher fails to follow the rules.
+
+```swift
+/// Publishes exactly one name
+func namePublisher() -> AnySinglePublisher<String, Error> {
+    nameSubject
+        .prefix(1)
+        .assertSingle()
+        .eraseToAnySinglePublisher()
+}
+```
+
+#### `checkSingle()`, `checkMaybe()`
+
+Use these operators when you want to make sure that a publisher follows the rule of to a specific traits.
+
+The failure type of the returned publisher is `SingleError` or `MaybeError`. Those errors are published whenever the upstream publisher fails to follow the rules.
+
+```swift
+let singlePublisher = publisher.checkSingle()
+let cancellable = singlePublisher.sinkSingle { result in
+    switch result {
+    case let .success(value):
+        // Success
+    case let .failure(error):
+        switch error {
+        case .missingElement:
+            // Upstream publisher did not publish any value.
+        case .tooManyElements:
+            // Upstream publisher did not publish more than one value.
+        case .bothElementAndError:
+            // Upstream publisher did not publish both a value and an error.
+        case let .upstream(error):
+            // Upstream publisher did fail with its own error.
+        }
+    }
+}
+```
+
+#### `eraseToAnySinglePublisher()`, `eraseToAnyMaybePublisher()`
+
+Use these operators instead of `eraseToAnyPublisher()` when you want to expose a single or maybe guarantee:
+
+```swift
+/// Publishes exactly one name
+func namePublisher() -> AnySinglePublisher<String, Error> {
+    /* some single publisher */.eraseToAnySinglePublisher()
+}
+
+/// Maybe publishes a name
+func namePublisher() -> AnyMaybePublisher<String, Error>
+    /* some maybe publisher */.eraseToAnyMaybePublisher()
+}
+```
+
+#### `uncheckedSingle()`, `uncheckedMaybe()`
+
+Use these operators when you are sure that a publisher follows the rule of to a specific traits.
+
+For example:
+
+```swift
+// CORRECT: those publish exactly one value, or an error.
+[1].publisher.uncheckedSingle()
+[1, 2].publisher.prefix(1).uncheckedSingle()
+
+// WRONG: does not publish any value
+Empty().uncheckedSingle()
+
+// WRONG: publishes more than one value
+[1, 2].publisher.uncheckedSingle()
+
+// WRONG: does not publish exactly one value, or an error
+Just(1).append(Fail(error)).uncheckedSingle()
+
+// WARNING: may not publish exactly one value, or an error
+someSubject.prefix(1).uncheckedSingle()
+```
+
+The consequences of using those operators on publishers that do not follow the rules are undefined.
 
 [AnyPublisher]: https://developer.apple.com/documentation/combine/anypublisher
 [Combine]: https://developer.apple.com/documentation/combine
@@ -755,3 +842,4 @@ class MyViewController: UIViewController {
 [PublisherTraits.Maybe]: #publishertraitsmaybe
 [SingleSubscription]: #singlesubscription
 [MaybeSubscription]: #maybesubscription
+[Operators]: #operators
