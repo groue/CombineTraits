@@ -44,7 +44,7 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 }
 ```
 
-Don't miss [Basic Maybe Publishers] for some handy shortcuts:
+Don't miss [Basic Maybe Publishers] for some handy shortcuts. The above publisher can be written as:
 
 ```swift
 func namePublisher() -> AnyMaybePublisher<String, Error> {
