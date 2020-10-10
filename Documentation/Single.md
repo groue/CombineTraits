@@ -12,7 +12,7 @@ protocol SinglePublisher: MaybePublisher { }
 
 All single publishers are also [maybe](Maybe.md) publishers.
 
-When you import CombineTraits, many Combine publishers are extended with conformance to this protocol, such as `Just`, `Future` and `URLSession.DataTaskPublisher`. Other publishers are conditionally extended, such as `Publishers.Map` or `Publishers.FlatMap`.
+When you import CombineTraits, many Combine publishers are extended with conformance to `SinglePublisher`, such as `Just`, `Future` and `URLSession.DataTaskPublisher`. Other publishers are conditionally extended, such as `Publishers.Map` or `Publishers.FlatMap`.
 
 Conversely, some publishers such as `Publishers.Sequence` are not extended with `SinglePublisher`, because not all sequences contain a single value.
 
