@@ -228,6 +228,7 @@ open class Maybe<Downstream: Subscriber, Context>: NSObject, Subscription {
     /// subscription was cancelled.
     open func didCancel(with context: Context) { }
     
+    /// Completes the subscription with the publisher result.
     public func receive(_ result: MaybeResult<Downstream.Input, Downstream.Failure>)
 }
 ```

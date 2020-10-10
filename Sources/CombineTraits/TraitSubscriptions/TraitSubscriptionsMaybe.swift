@@ -79,6 +79,7 @@ extension TraitSubscriptions {
         /// subscription was cancelled.
         open func didCancel(with context: Context) { }
         
+        /// Completes the subscription with the publisher result.
         public func receive(_ result: MaybeResult<Downstream.Input, Downstream.Failure>) {
             synchronized {
                 switch state {
