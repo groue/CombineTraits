@@ -112,7 +112,7 @@ There are a few ways to get such a maybe publisher:
     extension MyMaybePublisher: MaybePublisher { }
     
     let maybePublisher = MyMaybePublisher().eraseToAnyMaybePublisher()
-    let cancellable = MyMaybePublisher().singMaybe { result in ... }
+    let cancellable = MyMaybePublisher().sinkMaybe { result in ... }
     ```
 
 - **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero value, or one value, or an error.
