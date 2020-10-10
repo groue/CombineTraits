@@ -3,11 +3,14 @@ Single Publishers
 
 **`SinglePublisher` is the protocol for publishers that publish exactly one value, or an error.**
 
+```swift
+/// --------> A single publisher can never publish anything.
+/// -----x--> A single publisher can fail before publishing any value.
+/// --o--|--> A single publisher can publish one value and complete.
+protocol SinglePublisher: MaybePublisher { }
 ```
---------> A single publisher can never publish anything.
------x--> A single publisher can fail before publishing any value.
---o--|--> A single publisher can publish one value and complete.
-```
+
+All single publishers are also [maybe](Maybe.md) publishers.
 
 When you import CombineTraits, many Combine publishers are extended with conformance to this protocol, such as `Just`, `Future` and `URLSession.DataTaskPublisher`. Other publishers are conditionally extended, such as `Publishers.Map` or `Publishers.FlatMap`.
 

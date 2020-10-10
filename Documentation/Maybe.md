@@ -3,11 +3,12 @@ Maybe Publishers
 
 **`MaybePublisher` is the protocol for publishers that publish exactly zero value, or one value, or an error.**
 
-```
---------> A maybe publisher can never publish anything.
------x--> A maybe publisher can fail before publishing any value.
------|--> A maybe publisher can complete without publishing any value.
---o--|--> A maybe publisher can publish one value and complete.
+```swift
+/// --------> A maybe publisher can never publish anything.
+/// -----x--> A maybe publisher can fail before publishing any value.
+/// -----|--> A maybe publisher can complete without publishing any value.
+/// --o--|--> A maybe publisher can publish one value and complete.
+protocol MaybePublisher: Publisher { }
 ```
 
 When you import CombineTraits, many Combine publishers are extended with conformance to this protocol, such as `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher`. Other publishers are conditionally extended, such as `Publishers.Map` or `Publishers.FlatMap`.
