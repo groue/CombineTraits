@@ -54,8 +54,7 @@ This library provides both safe *subscription* and *construction* of publishers 
 `AnyPublisher` can be replaced with `AnySinglePublisher` or `AnyMaybePublisher`, in order to express which trait a publisher conforms to:
     
 ```swift
-func refreshPublisher() -> AnySinglePublisher<Void, Error>
-{
+func refreshPublisher() -> AnySinglePublisher<Void, Error> {
     downloadPublisher()
         .map { apiModel in Model(apiModel) }
         .flatMap { model in savePublisher(model) }
