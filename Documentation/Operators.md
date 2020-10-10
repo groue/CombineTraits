@@ -63,5 +63,5 @@ someSubject.prefix(1).uncheckedSingle()
 
 The consequences of using those operators on a publisher that does not follow the rules are undefined.
 
-[single]: Documentation/Single.md
-[maybe]: Documentation/Maybe.md
+[single]: Single.md
+[maybe]: Maybe.md
