@@ -206,7 +206,7 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 
 `TraitPublishers.Single` is a ready-made Combine [Publisher] which which allows you to dynamically send success or failure events.
 
-It lets you easily create custom single publishers to wrap any non-publisher asynchronous work.
+It lets you easily create custom single publishers to wrap most non-publisher asynchronous work.
 
 You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
 
