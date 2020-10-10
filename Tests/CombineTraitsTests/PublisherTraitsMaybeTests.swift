@@ -3,18 +3,18 @@ import CombineTraits
 import XCTest
 
 #warning("TODO: test multiple promise fulfilments? What should happen?")
-class PublisherTraitsMaybeTests: XCTestCase {
-    func test_PublisherTraitsMaybe_is_a_MaybePublisher() {
+class TraitPublishersMaybeTests: XCTestCase {
+    func test_TraitPublishersMaybe_is_a_MaybePublisher() {
         // This test passes if this test compiles
         func acceptSomeMaybePublisher<P: MaybePublisher>(_ p: P) { }
-        func f<Output, Failure>(_ p: PublisherTraits.Maybe<Output, Failure>) {
+        func f<Output, Failure>(_ p: TraitPublishers.Maybe<Output, Failure>) {
             acceptSomeMaybePublisher(p)
         }
     }
     
-    func test_PublisherTraitsMaybe_is_deferred() {
+    func test_TraitPublishersMaybe_is_deferred() {
         var subscribed = false
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             subscribed = true
             return AnyCancellable({ })
         }
@@ -24,9 +24,9 @@ class PublisherTraitsMaybeTests: XCTestCase {
         XCTAssertTrue(subscribed)
     }
     
-    func test_PublisherTraitsMaybe_is_not_shared() {
+    func test_TraitPublishersMaybe_is_not_shared() {
         var subscriptionCount = 0
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             subscriptionCount += 1
             return AnyCancellable({ })
         }
@@ -38,8 +38,8 @@ class PublisherTraitsMaybeTests: XCTestCase {
         XCTAssertEqual(subscriptionCount, 2)
     }
     
-    func test_PublisherTraitsMaybe_as_never() {
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+    func test_TraitPublishersMaybe_as_never() {
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             return AnyCancellable({ })
         }
         
@@ -64,8 +64,8 @@ class PublisherTraitsMaybeTests: XCTestCase {
         }
     }
     
-    func test_PublisherTraitsMaybe_as_just() {
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+    func test_TraitPublishersMaybe_as_just() {
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             promise(.success(1))
             return AnyCancellable({ })
         }
@@ -80,8 +80,8 @@ class PublisherTraitsMaybeTests: XCTestCase {
         XCTAssertEqual(completion, .finished)
     }
     
-    func test_PublisherTraitsMaybe_as_empty() {
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+    func test_TraitPublishersMaybe_as_empty() {
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             promise(.empty)
             return AnyCancellable({ })
         }
@@ -96,9 +96,9 @@ class PublisherTraitsMaybeTests: XCTestCase {
         XCTAssertEqual(completion, .finished)
     }
     
-    func test_PublisherTraitsMaybe_as_fail() {
+    func test_TraitPublishersMaybe_as_fail() {
         struct TestError: Error { }
-        let publisher = PublisherTraits.Maybe<Int, Error> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Error> { promise in
             promise(.failure(TestError()))
             return AnyCancellable({ })
         }
@@ -118,8 +118,8 @@ class PublisherTraitsMaybeTests: XCTestCase {
         }
     }
     
-    func test_PublisherTraitsMaybe_as_delayed_just() {
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+    func test_TraitPublishersMaybe_as_delayed_just() {
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
                 promise(.success(1))
             }
@@ -146,8 +146,8 @@ class PublisherTraitsMaybeTests: XCTestCase {
         }
     }
     
-    func test_PublisherTraitsMaybe_as_delayed_empty() {
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+    func test_TraitPublishersMaybe_as_delayed_empty() {
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
                 promise(.empty)
             }
@@ -174,9 +174,9 @@ class PublisherTraitsMaybeTests: XCTestCase {
         }
     }
     
-    func test_PublisherTraitsMaybe_as_delayed_fail() {
+    func test_TraitPublishersMaybe_as_delayed_fail() {
         struct TestError: Error { }
-        let publisher = PublisherTraits.Maybe<Int, Error> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Error> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
                 promise(.failure(TestError()))
             }
@@ -210,7 +210,7 @@ class PublisherTraitsMaybeTests: XCTestCase {
     
     func test_cancellation_after_completion() {
         var disposed = false
-        let publisher = PublisherTraits.Maybe<Int, Error> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Error> { promise in
             promise(.success(1))
             return AnyCancellable({ disposed = true })
         }
@@ -224,7 +224,7 @@ class PublisherTraitsMaybeTests: XCTestCase {
     
     func test_cancellation_before_completion() {
         var disposed = false
-        let publisher = PublisherTraits.Maybe<Int, Error> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Error> { promise in
             return AnyCancellable({ disposed = true })
         }
         
@@ -239,7 +239,7 @@ class PublisherTraitsMaybeTests: XCTestCase {
     
     func test_forwarding() {
         let upstream = Just(1)
-        let publisher = PublisherTraits.Maybe<Int, Never> { promise in
+        let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             return upstream.sinkMaybe(receive: promise)
         }
         

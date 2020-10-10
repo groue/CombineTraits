@@ -1,6 +1,6 @@
 import Combine
 
-extension PublisherTraits {
+extension TraitPublishers {
     // TODO: doc
     public struct Maybe<Output, Failure: Error>: MaybePublisher {
         public typealias Promise = (MaybeResult<Output, Failure>) -> Void
@@ -19,8 +19,11 @@ extension PublisherTraits {
             subscriber.receive(subscription: subscription)
         }
         
-        private class Subscription<Downstream: Subscriber>: MaybeSubscription<Downstream, Start>
-        where Downstream.Input == Output, Downstream.Failure == Failure
+        private class Subscription<Downstream: Subscriber>:
+            TraitSubscriptions.Maybe<Downstream, Start>
+        where
+            Downstream.Input == Output,
+            Downstream.Failure == Failure
         {
             var cancellable: AnyCancellable?
             

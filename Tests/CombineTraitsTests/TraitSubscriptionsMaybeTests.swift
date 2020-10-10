@@ -2,7 +2,7 @@ import Combine
 import CombineTraits
 import XCTest
 
-class MaybeSubscriptionTests: XCTestCase {
+class TraitSubscriptionsMaybeTests: XCTestCase {
     func test_canonical_subclass_compiles() {
         // Here we just test that the documented way to subclass compiles
         typealias MyOutput = Int
@@ -25,7 +25,7 @@ class MaybeSubscriptionTests: XCTestCase {
             }
             
             private class Subscription<Downstream: Subscriber>:
-                MaybeSubscription<Downstream, MyContext>
+                TraitSubscriptions.Maybe<Downstream, MyContext>
             where
                 Downstream.Input == Output,
                 Downstream.Failure == Failure

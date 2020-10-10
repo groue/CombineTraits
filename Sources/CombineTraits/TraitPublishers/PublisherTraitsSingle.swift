@@ -1,6 +1,6 @@
 import Combine
 
-extension PublisherTraits {
+extension TraitPublishers {
     public struct Single<Output, Failure: Error>: SinglePublisher {
         public typealias Promise = (Result<Output, Failure>) -> Void
         typealias Start = (@escaping Promise) -> AnyCancellable
@@ -18,8 +18,11 @@ extension PublisherTraits {
             subscriber.receive(subscription: subscription)
         }
         
-        private class Subscription<Downstream: Subscriber>: SingleSubscription<Downstream, Start>
-        where Downstream.Input == Output, Downstream.Failure == Failure
+        private class Subscription<Downstream: Subscriber>:
+            TraitSubscriptions.Single<Downstream, Start>
+        where
+            Downstream.Input == Output,
+            Downstream.Failure == Failure
         {
             var cancellable: AnyCancellable?
             
