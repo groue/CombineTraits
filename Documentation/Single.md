@@ -14,7 +14,7 @@ When you import CombineTraits, many Combine publishers are extended with conform
 Conversely, some publishers such as `Publishers.Sequence` are not extended with `SinglePublisher`, because not all sequences contain a single value.
 
 - [AnySinglePublisher]: a replacement for `AnyPublisher`
-- [`sinkSingle(receive:)`]: easy consumption of maybe publishers
+- [`sinkSingle(receive:)`]: easy consumption of single publishers
 - [Composing Single Publishers]
 - [Building Single Publishers]
 
