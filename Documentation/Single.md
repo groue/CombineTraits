@@ -4,9 +4,9 @@ Single Publishers
 **`SinglePublisher` is the protocol for publishers that publish exactly one value, or an error.**
 
 ```swift
-/// --------> A single publisher can never publish anything.
-/// -----x--> A single publisher can fail before publishing any value.
-/// --o--|--> A single publisher can publish one value and complete.
+/// --------> can never publish anything.
+/// -----x--> can fail before publishing any value.
+/// --o--|--> can publish one value and complete.
 protocol SinglePublisher: MaybePublisher { }
 ```
 
