@@ -54,27 +54,24 @@ This library provides both safe *subscription* and *construction* of publishers 
 `AnyPublisher` can be replaced with `AnySinglePublisher` or `AnyMaybePublisher`, in order to express which trait a publisher conforms to:
     
 ```diff
--func refreshPublisher() -> AnyPublisher<Void, Error>
-+func refreshPublisher() -> AnySinglePublisher<Void, Error>
- {
-     downloadPublisher()
-         .map { apiModel in Model(apiModel) }
-         .flatMap { model in savePublisher(model) }
--        .eraseToAnyPublisher()
-+        .eraseToAnySinglePublisher()
- }
+func refreshPublisher() -> AnySinglePublisher<Void, Error>
+{
+    downloadPublisher()
+        .map { apiModel in Model(apiModel) }
+        .flatMap { model in savePublisher(model) }
+        .eraseToAnySinglePublisher()
+}
 ```
 
 On the consumption side, `sink` can be replaced with `sinkSingle` or `sinkMaybe`, for easier handling of a given publisher trait:
     
-```diff
--let cancellable = refreshPublisher().sink(receiveCompletion:..., receiveValue: ...)
-+let cancellable = refreshPublisher().sinkSingle { result in
-+    switch result {
-+    case .success: ...
-+    case let .failure(error): ...
-+    }
-+}
+```swift
+let cancellable = refreshPublisher().sinkSingle { result in
+    switch result {
+    case .success: ...
+    case let .failure(error): ...
+    }
+}
 ```
 
 [AnyPublisher]: https://developer.apple.com/documentation/combine/anypublisher
