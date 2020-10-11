@@ -714,6 +714,9 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertFalse(isMaybe(publisher.tryMap { $0 }))
         XCTAssertTrue(isMaybe(maybe.tryMap { $0 }))
         
+        // Publishers.TryReduce
+        XCTAssertTrue(isMaybe(publisher.tryReduce(0) { $0 + $1 }))
+        
         // Publishers.Zip
         XCTAssertFalse(isMaybe(publisher.zip(publisher)))
         // XCTAssertTrue(isMaybe(publisher.zip(maybe)))

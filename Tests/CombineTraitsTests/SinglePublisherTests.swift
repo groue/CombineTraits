@@ -824,6 +824,9 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(maybe.tryMap { $0 }))
         XCTAssertTrue(isSingle(single.tryMap { $0 }))
         
+        // Publishers.TryReduce
+        XCTAssertTrue(isSingle(publisher.tryReduce(0) { $0 + $1 }))
+        
         // Publishers.Zip
         XCTAssertFalse(isSingle(publisher.zip(publisher)))
         XCTAssertFalse(isSingle(publisher.zip(maybe)))

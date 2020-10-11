@@ -658,6 +658,8 @@ where Upstream: MaybePublisher { }
 extension Publishers.TryMap: MaybePublisher
 where Upstream: MaybePublisher { }
 
+extension Publishers.TryReduce: MaybePublisher { }
+
 // We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
 extension Publishers.Zip: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher { }

@@ -636,6 +636,8 @@ extension Publishers.TryContainsWhere: SinglePublisher { }
 extension Publishers.TryMap: SinglePublisher
 where Upstream: SinglePublisher { }
 
+extension Publishers.TryReduce: SinglePublisher { }
+
 // We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
 extension Publishers.Zip: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
