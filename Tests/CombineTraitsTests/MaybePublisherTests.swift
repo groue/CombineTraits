@@ -808,7 +808,7 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertTrue(isMaybe(URLSession(configuration: URLSessionConfiguration.default).dataTaskPublisher(for: URL(string: "http://example.org")!)))
         
         // AnyPublisher where Output == Never
-        XCTAssertTrue(isMaybe(Empty<Never, Never>().eraseToAnyPublisher()))
+        XCTAssertTrue(isMaybe(Empty<Never, Error>().eraseToAnyPublisher()))
         
         // Deferred
         XCTAssertFalse(isMaybe(Deferred { publisher }))
