@@ -107,128 +107,6 @@ import Foundation
 ///         AnyMaybePublisher.never()
 public protocol MaybePublisher: Publisher { }
 
-/// The result of a maybe publisher.
-public enum MaybeResult<Success, Failure: Error> {
-    /// Completion without any element.
-    case empty
-    
-    /// Completion with one element.
-    case success(Success)
-    
-    /// Failure completion.
-    case failure(Failure)
-}
-
-extension MaybeResult {
-    /// Returns a new `MaybeResult`, mapping any success value using the given
-    /// transformation.
-    ///
-    /// - Parameter transform: A closure that takes the success value of this
-    ///   instance.
-    /// - Returns: A `MaybeResult` instance with the result of evaluating
-    ///   `transform` as the new success value if this instance represents
-    ///   a success.
-    @inlinable
-    public func map<NewSuccess>(_ transform: (Success) -> NewSuccess)
-    -> MaybeResult<NewSuccess, Failure>
-    {
-        switch self {
-        case .empty:
-            return .empty
-        case let .success(success):
-            return .success(transform(success))
-        case let .failure(failure):
-            return .failure(failure)
-        }
-    }
-    
-    /// Returns a new `MaybeResult`, mapping any failure value using the given
-    /// transformation.
-    ///
-    /// - Parameter transform: A closure that takes the failure value of the
-    ///   instance.
-    /// - Returns: A `MaybeResult` instance with the result of evaluating
-    ///   `transform` as the new failure value if this instance represents
-    ///   a failure.
-    @inlinable
-    public func mapError<NewFailure>(_ transform: (Failure) -> NewFailure)
-    -> MaybeResult<Success, NewFailure>
-    {
-        switch self {
-        case .empty:
-            return .empty
-        case let .success(success):
-            return .success(success)
-        case let .failure(failure):
-            return .failure(transform(failure))
-        }
-    }
-    
-    /// Returns a new `MaybeResult`, mapping any success value using the given
-    /// transformation and unwrapping the produced result.
-    ///
-    /// - Parameter transform: A closure that takes the success value of the
-    ///   instance.
-    /// - Returns: A `MaybeResult` instance with the result of evaluating
-    ///   `transform` as the new failure value if this instance represents
-    ///   a success.
-    @inlinable
-    public func flatMap<NewSuccess>(_ transform: (Success) -> MaybeResult<NewSuccess, Failure>)
-    -> MaybeResult<NewSuccess, Failure>
-    {
-        switch self {
-        case .empty:
-            return .empty
-        case let .success(success):
-            return transform(success)
-        case let .failure(failure):
-            return .failure(failure)
-        }
-    }
-    
-    /// Returns a new `MaybeResult`, mapping any failure value using the given
-    /// transformation and unwrapping the produced result.
-    ///
-    /// - Parameter transform: A closure that takes the failure value of the
-    ///   instance.
-    /// - Returns: A `MaybeResult` instance, either from the closure or the
-    ///   previous `.success`.
-    @inlinable
-    public func flatMapError<NewFailure>(
-        _ transform: (Failure) -> MaybeResult<Success, NewFailure>
-    ) -> MaybeResult<Success, NewFailure> {
-        switch self {
-        case .empty:
-            return .empty
-        case let .success(success):
-            return .success(success)
-        case let .failure(failure):
-            return transform(failure)
-        }
-    }
-    
-    /// Returns the success value, if any, as a throwing expression.
-    ///
-    /// - Returns: The success value, if the instance represents a success, or
-    ///   nil if the instance is empty.
-    /// - Throws: The failure value, if the instance represents a failure.
-    @inlinable
-    public func get() throws -> Success? {
-        switch self {
-        case .empty:
-            return nil
-        case let .success(success):
-            return success
-        case let .failure(failure):
-            throw failure
-        }
-    }
-}
-
-extension MaybeResult: Equatable where Success: Equatable, Failure: Equatable { }
-
-extension MaybeResult: Hashable where Success: Hashable, Failure: Hashable { }
-
 extension MaybePublisher {
     /// Wraps this maybe publisher with a type eraser.
     ///
@@ -353,9 +231,13 @@ extension MaybePublisher {
     }
 }
 
-/// The error for checked maybe publishers returned
-/// from `Publisher.eraseToAnyMaybePublisher()`.
-public enum MaybeError<UpstreamFailure: Error>: Error {
+protocol _MaybeError {
+    associatedtype UpstreamFailure: Error
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
+}
+
+/// The error for checked maybe publishers.
+public enum MaybeError<UpstreamFailure: Error>: Error, _MaybeError {
     /// Upstream publisher did publish more than one element
     case tooManyElements
     
@@ -364,6 +246,17 @@ public enum MaybeError<UpstreamFailure: Error>: Error {
     
     /// Upstream publisher did complete with an error
     case upstream(UpstreamFailure)
+    
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
+        switch self {
+        case .tooManyElements:
+            fatalError([prefix, "Maybe violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+        case .bothElementAndError:
+            fatalError([prefix, "Maybe violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+        case let .upstream(error):
+            return error
+        }
+    }
 }
 
 extension MaybePublisher where Failure: _MaybeError {
@@ -375,24 +268,6 @@ extension MaybePublisher where Failure: _MaybeError {
     {
         mapError { error in
             error.assertUpstreamFailure(prefix, file: file, line: line)
-        }
-    }
-}
-
-protocol _MaybeError {
-    associatedtype UpstreamFailure: Error
-    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
-}
-
-extension MaybeError: _MaybeError {
-    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
-        switch self {
-        case .tooManyElements:
-            fatalError([prefix, "Maybe violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
-        case .bothElementAndError:
-            fatalError([prefix, "Maybe violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
-        case let .upstream(error):
-            return error
         }
     }
 }

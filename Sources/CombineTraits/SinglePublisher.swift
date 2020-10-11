@@ -222,9 +222,13 @@ extension SinglePublisher {
     }
 }
 
-/// The error for checked single publishers returned
-/// from `Publisher.eraseToAnySinglePublisher()`.
-public enum SingleError<UpstreamFailure: Error>: Error {
+protocol _SingleError {
+    associatedtype UpstreamFailure: Error
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
+}
+
+/// The error for checked single publishers.
+public enum SingleError<UpstreamFailure: Error>: Error, _SingleError {
     /// Upstream publisher did complete without publishing any element
     case missingElement
     
@@ -236,6 +240,19 @@ public enum SingleError<UpstreamFailure: Error>: Error {
     
     /// Upstream publisher did complete with an error
     case upstream(UpstreamFailure)
+    
+    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
+        switch self {
+        case .missingElement:
+            fatalError([prefix, "Single violation: missing element at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+        case .tooManyElements:
+            fatalError([prefix, "Single violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+        case .bothElementAndError:
+            fatalError([prefix, "Single violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+        case let .upstream(error):
+            return error
+        }
+    }
 }
 
 extension SinglePublisher where Failure: _SingleError {
@@ -247,26 +264,6 @@ extension SinglePublisher where Failure: _SingleError {
     {
         mapError { error in
             error.assertUpstreamFailure(prefix, file: file, line: line)
-        }
-    }
-}
-
-protocol _SingleError {
-    associatedtype UpstreamFailure: Error
-    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure
-}
-
-extension SingleError: _SingleError {
-    func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
-        switch self {
-        case .missingElement:
-            fatalError([prefix, "Single violation: missing element at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
-        case .tooManyElements:
-            fatalError([prefix, "Single violation: too many elements at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
-        case .bothElementAndError:
-            fatalError([prefix, "Single violation: error completion after one element was published \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
-        case let .upstream(error):
-            return error
         }
     }
 }
