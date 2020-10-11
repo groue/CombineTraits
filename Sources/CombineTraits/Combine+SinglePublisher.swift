@@ -108,15 +108,12 @@ where Upstream: SinglePublisher { }
 
 extension Publishers.TryReduce: SinglePublisher { }
 
-// We can't declare "OR" conformance (Zip is a maybe if A or B is a maybe)
 extension Publishers.Zip: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
 
-// We can't declare "OR" conformance (Zip3 is a maybe if A or B or C is a maybe)
 extension Publishers.Zip3: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher { }
 
-// We can't declare "OR" conformance (Zip4 is a maybe if A or B or C or D is a maybe)
 extension Publishers.Zip4: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher, D: SinglePublisher { }
 
