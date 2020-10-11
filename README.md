@@ -9,17 +9,13 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-One must generally assume that [Combine] publishers may publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
+Generally speaking, [Combine] publishers can publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-When we deal with publishers that are expected to publish no more than one value, such as network requests for example, we often neglect to deal with edge cases such as a completion without any value, or several published values.
+When we deal with publishers that are expected to publish a certain amount of values, it is easy to neglect edge cases such as a completion without any value, or too many published values. Such publishers are subject to interpretation, imprecise documentation, or buggy implementations.
 
-The trouble is that the number of published vales are subject to interpretation, misunderstandings, missing documentation, or buggy implementations.
-
-**The compiler does not help us writing code that is guaranteed to be correct.**
-
-This library provides both safe *subscription* and *construction* of publishers that explicitly conform to specific traits:
+This library provides tools that guarantee compiler-checked definition, and subscription, to publishers that conform to specific *traits*:
         
-- **[Single Publishers]** are guaranteed to publish exactly one value, or an error.
+- **[Single Publishers]** publish exactly one value, or an error.
     
     The Combine `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
@@ -29,7 +25,7 @@ This library provides both safe *subscription* and *construction* of publishers 
     --o--|--> can publish one value and complete.
     ```
     
-- **[Maybe Publishers]** are guaranteed to publish exactly zero value, or one value, or an error:
+- **[Maybe Publishers]** publish exactly zero value, or one value, or an error:
     
     The Combine `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
