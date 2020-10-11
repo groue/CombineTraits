@@ -1,5 +1,4 @@
 import Combine
-import Foundation
 
 extension Publishers.AllSatisfy: MaybePublisher { }
 
@@ -148,8 +147,6 @@ extension Publishers.Zip4: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher, C: MaybePublisher, D: MaybePublisher { }
 
 extension Result.Publisher: MaybePublisher { }
-
-extension URLSession.DataTaskPublisher: MaybePublisher { }
 
 extension AnyPublisher: MaybePublisher
 where Output == Never { }

@@ -1,5 +1,4 @@
 import Combine
-import Foundation
 
 extension Publishers.AllSatisfy: SinglePublisher { }
 
@@ -122,8 +121,6 @@ extension Publishers.Zip4: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher, C: SinglePublisher, D: SinglePublisher { }
 
 extension Result.Publisher: SinglePublisher { }
-
-extension URLSession.DataTaskPublisher: SinglePublisher { }
 
 extension Deferred: SinglePublisher
 where DeferredPublisher: SinglePublisher { }
