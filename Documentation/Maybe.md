@@ -61,7 +61,7 @@ The `sinkMaybe(receive:)` method simplifies handling of maybe publisher results:
 // 👍 There are only three cases to handle
 let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
     switch result {
-    case let .empty:
+    case .empty:
         handleNoName()
     case let .success(name):
         handle(name)
