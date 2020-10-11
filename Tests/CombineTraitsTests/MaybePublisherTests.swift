@@ -689,9 +689,6 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertFalse(isMaybe(publisher.map(\.self, \.self, \.self)))
         XCTAssertTrue(isMaybe(maybe.map(\.self, \.self, \.self)))
         
-        // Publishers.Output
-        XCTAssertTrue(isMaybe(publisher.output(at: 1)))
-        
         // Publishers.Print
         XCTAssertFalse(isMaybe(publisher.print()))
         XCTAssertTrue(isMaybe(maybe.print()))
