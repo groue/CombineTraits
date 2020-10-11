@@ -568,6 +568,8 @@ where Upstream: MaybePublisher { }
 extension Publishers.Catch: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
+extension Publishers.Collect: MaybePublisher { }
+
 extension Publishers.CombineLatest: MaybePublisher
 where A: MaybePublisher, B: MaybePublisher { }
 
@@ -586,17 +588,33 @@ extension Publishers.ContainsWhere: MaybePublisher { }
 
 extension Publishers.Count: MaybePublisher { }
 
+extension Publishers.Decode: MaybePublisher
+where Upstream: MaybePublisher { }
+
 extension Publishers.Delay: MaybePublisher
+where Upstream: MaybePublisher { }
+
+extension Publishers.Encode: MaybePublisher
 where Upstream: MaybePublisher { }
 
 extension Publishers.Filter: MaybePublisher
 where Upstream: MaybePublisher { }
+
+extension Publishers.First: MaybePublisher { }
+
+extension Publishers.FirstWhere: MaybePublisher { }
 
 extension Publishers.FlatMap: MaybePublisher
 where Upstream: MaybePublisher, NewPublisher: MaybePublisher { }
 
 extension Publishers.HandleEvents: MaybePublisher
 where Upstream: MaybePublisher { }
+
+extension Publishers.IgnoreOutput: MaybePublisher { }
+
+extension Publishers.Last: MaybePublisher { }
+
+extension Publishers.LastWhere: MaybePublisher { }
 
 extension Publishers.MakeConnectable: MaybePublisher
 where Upstream: MaybePublisher { }
@@ -615,6 +633,8 @@ where Upstream: MaybePublisher { }
 
 extension Publishers.MapKeyPath3: MaybePublisher
 where Upstream: MaybePublisher { }
+
+extension Publishers.Output: MaybePublisher { }
 
 extension Publishers.Print: MaybePublisher
 where Upstream: MaybePublisher { }
@@ -636,11 +656,17 @@ where Upstream: MaybePublisher { }
 extension Publishers.SetFailureType: MaybePublisher
 where Upstream: MaybePublisher { }
 
+extension Publishers.Share: MaybePublisher
+where Upstream: MaybePublisher { }
+
 extension Publishers.SubscribeOn: MaybePublisher
 where Upstream: MaybePublisher { }
 
 extension Publishers.SwitchToLatest: MaybePublisher
 where Upstream: MaybePublisher, P: MaybePublisher { }
+
+extension Publishers.Timeout: MaybePublisher
+where Upstream: MaybePublisher { }
 
 extension Publishers.TryAllSatisfy: MaybePublisher { }
 
@@ -654,6 +680,10 @@ extension Publishers.TryContainsWhere: MaybePublisher { }
 
 extension Publishers.TryFilter: MaybePublisher
 where Upstream: MaybePublisher { }
+
+extension Publishers.TryFirstWhere: MaybePublisher { }
+
+extension Publishers.TryLastWhere: MaybePublisher { }
 
 extension Publishers.TryMap: MaybePublisher
 where Upstream: MaybePublisher { }

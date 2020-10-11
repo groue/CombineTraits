@@ -558,6 +558,8 @@ where Upstream: SinglePublisher { }
 extension Publishers.Catch: SinglePublisher
 where Upstream: SinglePublisher, NewPublisher: SinglePublisher { }
 
+extension Publishers.Collect: SinglePublisher { }
+
 extension Publishers.CombineLatest: SinglePublisher
 where A: SinglePublisher, B: SinglePublisher { }
 
@@ -573,7 +575,13 @@ extension Publishers.ContainsWhere: SinglePublisher { }
 
 extension Publishers.Count: SinglePublisher { }
 
+extension Publishers.Decode: SinglePublisher
+where Upstream: SinglePublisher { }
+
 extension Publishers.Delay: SinglePublisher
+where Upstream: SinglePublisher { }
+
+extension Publishers.Encode: SinglePublisher
 where Upstream: SinglePublisher { }
 
 extension Publishers.FlatMap: SinglePublisher
@@ -620,11 +628,17 @@ where Upstream: SinglePublisher { }
 extension Publishers.SetFailureType: SinglePublisher
 where Upstream: SinglePublisher { }
 
+extension Publishers.Share: SinglePublisher
+where Upstream: SinglePublisher { }
+
 extension Publishers.SubscribeOn: SinglePublisher
 where Upstream: SinglePublisher { }
 
 extension Publishers.SwitchToLatest: SinglePublisher
 where Upstream: SinglePublisher, P: SinglePublisher { }
+
+extension Publishers.Timeout: SinglePublisher
+where Upstream: SinglePublisher { }
 
 extension Publishers.TryAllSatisfy: SinglePublisher { }
 

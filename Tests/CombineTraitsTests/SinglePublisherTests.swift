@@ -509,21 +509,21 @@ class SinglePublisherTests: XCTestCase {
         let failingMaybe = maybe.setFailureType(to: Error.self).eraseToAnyMaybePublisher()
         let single = Just(1).eraseToAnySinglePublisher()
         let failingSingle = single.setFailureType(to: Error.self).eraseToAnySinglePublisher()
-
+        
         XCTAssertFalse(isMaybe(publisher))
         XCTAssertFalse(isMaybe(failingPublisher))
         XCTAssertTrue(isMaybe(maybe))
         XCTAssertTrue(isMaybe(failingMaybe))
         XCTAssertTrue(isMaybe(single))
         XCTAssertTrue(isMaybe(failingSingle))
-
+        
         XCTAssertFalse(isSingle(publisher))
         XCTAssertFalse(isSingle(failingPublisher))
         XCTAssertFalse(isSingle(maybe))
         XCTAssertFalse(isSingle(failingMaybe))
         XCTAssertTrue(isSingle(single))
         XCTAssertTrue(isSingle(failingSingle))
-
+        
         // Publishers.AllSatisfy
         XCTAssertTrue(isSingle(publisher.allSatisfy { _ in true }))
         
@@ -553,6 +553,9 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(failingSingle.catch { _ in publisher }))
         XCTAssertFalse(isSingle(failingSingle.catch { _ in maybe }))
         XCTAssertTrue(isSingle(failingSingle.catch { _ in single }))
+        
+        // Publishers.Collect
+        XCTAssertTrue(isSingle(publisher.collect()))
         
         // Publishers.CombineLatest
         XCTAssertFalse(isSingle(publisher.combineLatest(publisher)))
@@ -593,7 +596,7 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, single, publisher)))
         XCTAssertFalse(isSingle(Publishers.CombineLatest3(single, single, maybe)))
         XCTAssertTrue(isSingle(Publishers.CombineLatest3(single, single, single)))
-
+        
         // Publishers.CombineLatest4
         XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, publisher, publisher)))
         XCTAssertFalse(isSingle(Publishers.CombineLatest4(publisher, publisher, publisher, maybe)))
@@ -676,7 +679,7 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, single, publisher)))
         XCTAssertFalse(isSingle(Publishers.CombineLatest4(single, single, single, maybe)))
         XCTAssertTrue(isSingle(Publishers.CombineLatest4(single, single, single, single)))
-
+        
         // Publishers.CompactMap
         XCTAssertFalse(isSingle(publisher.compactMap { $0 }))
         XCTAssertFalse(isSingle(maybe.compactMap { $0 }))
@@ -692,10 +695,26 @@ class SinglePublisherTests: XCTestCase {
         // Publishers.Count
         XCTAssertTrue(isSingle(publisher.count()))
         
+        // Publishers.Decode
+        struct Decoder<Input>: TopLevelDecoder {
+            func decode<T>(_ type: T.Type, from: Input) throws -> T where T: Decodable { fatalError() }
+        }
+        XCTAssertFalse(isSingle(publisher.decode(type: String.self, decoder: Decoder())))
+        XCTAssertFalse(isSingle(maybe.decode(type: String.self, decoder: Decoder())))
+        XCTAssertTrue(isSingle(single.decode(type: String.self, decoder: Decoder())))
+        
         // Publishers.Delay
         XCTAssertFalse(isSingle(publisher.delay(for: 1, scheduler: DispatchQueue.main)))
         XCTAssertFalse(isSingle(maybe.delay(for: 1, scheduler: DispatchQueue.main)))
         XCTAssertTrue(isSingle(single.delay(for: 1, scheduler: DispatchQueue.main)))
+        
+        // Publishers.Encode
+        struct Encoder: TopLevelEncoder {
+            func encode<T>(_ value: T) throws -> Void where T : Encodable { }
+        }
+        XCTAssertFalse(isSingle(publisher.encode(encoder: Encoder())))
+        XCTAssertFalse(isSingle(maybe.encode(encoder: Encoder())))
+        XCTAssertTrue(isSingle(single.encode(encoder: Encoder())))
         
         // Publishers.Filter
         XCTAssertFalse(isSingle(publisher.filter { _ in true }))
@@ -718,6 +737,11 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(publisher.handleEvents()))
         XCTAssertFalse(isSingle(maybe.handleEvents()))
         XCTAssertTrue(isSingle(single.handleEvents()))
+        
+        // Publishers.MakeConnectable
+        XCTAssertFalse(isSingle(publisher.makeConnectable()))
+        XCTAssertFalse(isSingle(maybe.makeConnectable()))
+        XCTAssertTrue(isSingle(single.makeConnectable()))
         
         // Publishers.Map
         XCTAssertFalse(isSingle(publisher.map { $0 }))
@@ -777,6 +801,11 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(maybe.setFailureType(to: Error.self)))
         XCTAssertTrue(isSingle(single.setFailureType(to: Error.self)))
         
+        // Publishers.Share
+        XCTAssertFalse(isSingle(publisher.share()))
+        XCTAssertFalse(isSingle(maybe.share()))
+        XCTAssertTrue(isSingle(single.share()))
+        
         // Publishers.SubscribeOn
         XCTAssertFalse(isSingle(publisher.subscribe(on: DispatchQueue.main)))
         XCTAssertFalse(isSingle(maybe.subscribe(on: DispatchQueue.main)))
@@ -789,6 +818,11 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(Just(publisher).switchToLatest()))
         XCTAssertFalse(isSingle(Just(maybe).switchToLatest()))
         XCTAssertTrue(isSingle(Just(single).switchToLatest()))
+        
+        // Publishers.Timeout
+        XCTAssertFalse(isSingle(publisher.timeout(1, scheduler: DispatchQueue.main)))
+        XCTAssertFalse(isSingle(maybe.timeout(1, scheduler: DispatchQueue.main)))
+        XCTAssertTrue(isSingle(single.timeout(1, scheduler: DispatchQueue.main)))
         
         // Publishers.TryAllSatisfy
         XCTAssertTrue(isSingle(publisher.tryAllSatisfy { _ in true }))
@@ -857,7 +891,7 @@ class SinglePublisherTests: XCTestCase {
         XCTAssertFalse(isSingle(single.zip(maybe, single)))
         XCTAssertFalse(isSingle(single.zip(single, maybe)))
         XCTAssertTrue(isSingle(single.zip(single, single)))
-
+        
         // Publishers.Zip4
         XCTAssertFalse(isSingle(publisher.zip(publisher, publisher, publisher)))
         XCTAssertFalse(isSingle(publisher.zip(publisher, publisher, maybe)))

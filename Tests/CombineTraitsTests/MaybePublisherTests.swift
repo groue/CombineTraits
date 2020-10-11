@@ -540,12 +540,12 @@ class MaybePublisherTests: XCTestCase {
         let failingPublisher = publisher.setFailureType(to: Error.self).eraseToAnyPublisher()
         let maybe = Empty<Int, Never>().eraseToAnyMaybePublisher()
         let failingMaybe = maybe.setFailureType(to: Error.self).eraseToAnyMaybePublisher()
-
+        
         XCTAssertFalse(isMaybe(publisher))
         XCTAssertFalse(isMaybe(failingPublisher))
         XCTAssertTrue(isMaybe(maybe))
         XCTAssertTrue(isMaybe(failingMaybe))
-
+        
         // Publishers.AllSatisfy
         XCTAssertTrue(isMaybe(publisher.allSatisfy { _ in true }))
         
@@ -567,6 +567,9 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertFalse(isMaybe(failingPublisher.catch { _ in maybe }))
         XCTAssertFalse(isMaybe(failingMaybe.catch { _ in publisher }))
         XCTAssertTrue(isMaybe(failingMaybe.catch { _ in maybe }))
+        
+        // Publishers.Collect
+        XCTAssertTrue(isMaybe(publisher.collect()))
         
         // Publishers.CombineLatest
         XCTAssertFalse(isMaybe(publisher.combineLatest(publisher)))
@@ -615,13 +618,33 @@ class MaybePublisherTests: XCTestCase {
         // Publishers.Count
         XCTAssertTrue(isMaybe(publisher.count()))
         
+        // Publishers.Decode
+        struct Decoder<Input>: TopLevelDecoder {
+            func decode<T>(_ type: T.Type, from: Input) throws -> T where T: Decodable { fatalError() }
+        }
+        XCTAssertFalse(isMaybe(publisher.decode(type: String.self, decoder: Decoder())))
+        XCTAssertTrue(isMaybe(maybe.decode(type: String.self, decoder: Decoder())))
+        
         // Publishers.Delay
         XCTAssertFalse(isMaybe(publisher.delay(for: 1, scheduler: DispatchQueue.main)))
         XCTAssertTrue(isMaybe(maybe.delay(for: 1, scheduler: DispatchQueue.main)))
         
+        // Publishers.Encode
+        struct Encoder: TopLevelEncoder {
+            func encode<T>(_ value: T) throws -> Void where T : Encodable { }
+        }
+        XCTAssertFalse(isMaybe(publisher.encode(encoder: Encoder())))
+        XCTAssertTrue(isMaybe(maybe.encode(encoder: Encoder())))
+        
         // Publishers.Filter
         XCTAssertFalse(isMaybe(publisher.filter { _ in true }))
         XCTAssertTrue(isMaybe(maybe.filter { _ in true }))
+        
+        // Publishers.First
+        XCTAssertTrue(isMaybe(publisher.first()))
+        
+        // Publishers.FirstWhere
+        XCTAssertTrue(isMaybe(publisher.first { _ in true }))
         
         // Publishers.FlatMap
         XCTAssertFalse(isMaybe(publisher.flatMap { _ in publisher }))
@@ -632,6 +655,19 @@ class MaybePublisherTests: XCTestCase {
         // Publishers.HandleEvents
         XCTAssertFalse(isMaybe(publisher.handleEvents()))
         XCTAssertTrue(isMaybe(maybe.handleEvents()))
+        
+        // Publishers.IgnoreOutput
+        XCTAssertTrue(isMaybe(publisher.ignoreOutput()))
+        
+        // Publishers.Last
+        XCTAssertTrue(isMaybe(publisher.last()))
+        
+        // Publishers.LastWhere
+        XCTAssertTrue(isMaybe(publisher.last { _ in true }))
+        
+        // Publishers.MakeConnectable
+        XCTAssertFalse(isMaybe(publisher.makeConnectable()))
+        XCTAssertTrue(isMaybe(maybe.makeConnectable()))
         
         // Publishers.Map
         XCTAssertFalse(isMaybe(publisher.map { $0 }))
@@ -652,6 +688,9 @@ class MaybePublisherTests: XCTestCase {
         // Publishers.MapKeyPath3
         XCTAssertFalse(isMaybe(publisher.map(\.self, \.self, \.self)))
         XCTAssertTrue(isMaybe(maybe.map(\.self, \.self, \.self)))
+        
+        // Publishers.Output
+        XCTAssertTrue(isMaybe(publisher.output(at: 1)))
         
         // Publishers.Print
         XCTAssertFalse(isMaybe(publisher.print()))
@@ -680,6 +719,10 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertFalse(isMaybe(publisher.setFailureType(to: Error.self)))
         XCTAssertTrue(isMaybe(maybe.setFailureType(to: Error.self)))
         
+        // Publishers.Share
+        XCTAssertFalse(isMaybe(publisher.share()))
+        XCTAssertTrue(isMaybe(maybe.share()))
+        
         // Publishers.SubscribeOn
         XCTAssertFalse(isMaybe(publisher.subscribe(on: DispatchQueue.main)))
         XCTAssertTrue(isMaybe(maybe.subscribe(on: DispatchQueue.main)))
@@ -689,6 +732,10 @@ class MaybePublisherTests: XCTestCase {
         XCTAssertFalse(isMaybe([maybe].publisher.switchToLatest()))
         XCTAssertFalse(isMaybe(Just(publisher).switchToLatest()))
         XCTAssertTrue(isMaybe(Just(maybe).switchToLatest()))
+        
+        // Publishers.Timeout
+        XCTAssertFalse(isMaybe(publisher.timeout(1, scheduler: DispatchQueue.main)))
+        XCTAssertTrue(isMaybe(maybe.timeout(1, scheduler: DispatchQueue.main)))
         
         // Publishers.TryAllSatisfy
         XCTAssertTrue(isMaybe(publisher.tryAllSatisfy { _ in true }))
@@ -709,6 +756,12 @@ class MaybePublisherTests: XCTestCase {
         // Publishers.TryFilter
         XCTAssertFalse(isMaybe(publisher.tryFilter { _ in true }))
         XCTAssertTrue(isMaybe(maybe.tryFilter { _ in true }))
+        
+        // Publishers.TryFirstWhere
+        XCTAssertTrue(isMaybe(publisher.tryFirst { _ in true }))
+        
+        // Publishers.TryLastWhere
+        XCTAssertTrue(isMaybe(publisher.tryLast { _ in true }))
         
         // Publishers.TryMap
         XCTAssertFalse(isMaybe(publisher.tryMap { $0 }))
@@ -732,7 +785,7 @@ class MaybePublisherTests: XCTestCase {
         // XCTAssertTrue(isMaybe(maybe.zip(publisher, maybe)))
         // XCTAssertTrue(isMaybe(maybe.zip(maybe, publisher)))
         XCTAssertTrue(isMaybe(maybe.zip(maybe, maybe)))
-
+        
         // Publishers.Zip4
         XCTAssertFalse(isMaybe(publisher.zip(publisher, publisher, publisher)))
         // XCTAssertTrue(isMaybe(publisher.zip(publisher, publisher, maybe)))
