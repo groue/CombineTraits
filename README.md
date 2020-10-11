@@ -13,7 +13,7 @@ One must generally assume that [Combine] publishers may publish zero, one, or mo
 
 When we deal with publishers that are expected to publish no more than one value, such as network requests for example, we often neglect to deal with edge cases such as a completion without any value, or several published values.
 
-The trouble is that the guarantees about the number of published vales are implicit, subject to interpretation, misunderstandings, wrong documentation, and buggy implementations.
+The trouble is that the number of published vales are subject to interpretation, misunderstandings, missing documentation, or buggy implementations.
 
 **The compiler does not help us writing code that is guaranteed to be correct.**
 
@@ -24,9 +24,9 @@ This library provides both safe *subscription* and *construction* of publishers 
     The Combine `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
-    --------> A single publisher can never publish anything.
-    -----x--> A single publisher can fail before publishing any value.
-    --o--|--> A single publisher can publish one value and complete.
+    --------> can never publish anything.
+    -----x--> can fail before publishing any value.
+    --o--|--> can publish one value and complete.
     ```
     
 - **[Maybe Publishers]** are guaranteed to publish exactly zero value, or one value, or an error:
@@ -34,10 +34,10 @@ This library provides both safe *subscription* and *construction* of publishers 
     The Combine `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
-    --------> A maybe publisher can never publish anything.
-    -----x--> A maybe publisher can fail before publishing any value.
-    -----|--> A maybe publisher can complete without publishing any value.
-    --o--|--> A maybe publisher can publish one value and complete.
+    --------> can never publish anything.
+    -----x--> can fail before publishing any value.
+    -----|--> can complete without publishing any value.
+    --o--|--> can publish one value and complete.
     ```
 
 # Documentation
@@ -49,7 +49,7 @@ This library provides both safe *subscription* and *construction* of publishers 
 
 ## Usage
 
-**CombineTraits carefully preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
+**CombineTraits preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
 `AnyPublisher` can be replaced with `AnySinglePublisher` or `AnyMaybePublisher`, in order to express which trait a publisher conforms to:
     
