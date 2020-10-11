@@ -606,6 +606,8 @@ where Upstream: SinglePublisher { }
 extension Publishers.ReceiveOn: SinglePublisher
 where Upstream: SinglePublisher { }
 
+extension Publishers.Reduce: SinglePublisher { }
+
 extension Publishers.ReplaceEmpty: SinglePublisher
 where Upstream: MaybePublisher { }
 

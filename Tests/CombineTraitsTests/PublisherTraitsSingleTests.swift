@@ -2,7 +2,6 @@ import Combine
 import CombineTraits
 import XCTest
 
-#warning("TODO: test multiple promise fulfilments? What should happen?")
 class TraitPublishersSingleTests: XCTestCase {
     func test_TraitPublishersSingle_is_a_SinglePublisher() {
         // This test passes if this test compiles

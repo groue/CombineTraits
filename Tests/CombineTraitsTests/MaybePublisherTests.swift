@@ -536,10 +536,10 @@ class MaybePublisherTests: XCTestCase {
     func test_built_in_maybes() {
         struct TestError: Error { }
         
-        let publisher = [1, 2, 3].publisher
-        let failingPublisher = publisher.setFailureType(to: Error.self)
-        let maybe = Empty<Int, Never>()
-        let failingMaybe = maybe.setFailureType(to: Error.self)
+        let publisher = [1, 2, 3].publisher.eraseToAnyPublisher()
+        let failingPublisher = publisher.setFailureType(to: Error.self).eraseToAnyPublisher()
+        let maybe = Empty<Int, Never>().eraseToAnyMaybePublisher()
+        let failingMaybe = maybe.setFailureType(to: Error.self).eraseToAnyMaybePublisher()
 
         XCTAssertFalse(isMaybe(publisher))
         XCTAssertFalse(isMaybe(failingPublisher))
@@ -660,6 +660,9 @@ class MaybePublisherTests: XCTestCase {
         // Publishers.ReceiveOn
         XCTAssertFalse(isMaybe(publisher.receive(on: DispatchQueue.main)))
         XCTAssertTrue(isMaybe(maybe.receive(on: DispatchQueue.main)))
+        
+        // Publishers.Reduce
+        XCTAssertTrue(isMaybe(publisher.reduce(0) { $0 + $1 }))
         
         // Publishers.ReplaceEmpty
         XCTAssertFalse(isMaybe(publisher.replaceEmpty(with: 0)))

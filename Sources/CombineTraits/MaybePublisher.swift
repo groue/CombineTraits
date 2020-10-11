@@ -622,6 +622,8 @@ where Upstream: MaybePublisher { }
 extension Publishers.ReceiveOn: MaybePublisher
 where Upstream: MaybePublisher { }
 
+extension Publishers.Reduce: MaybePublisher { }
+
 extension Publishers.ReplaceEmpty: MaybePublisher
 where Upstream: MaybePublisher { }
 
