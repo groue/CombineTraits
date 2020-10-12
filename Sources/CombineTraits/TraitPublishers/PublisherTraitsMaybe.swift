@@ -14,7 +14,7 @@ extension TraitPublishers {
     ///
     ///     let publisher = TraitPublishers.Maybe<String, MyError> { promise in
     ///         // Eventually send completion event, now or in the future:
-    ///         promise(.empty)
+    ///         promise(.finished)
     ///         // OR
     ///         promise(.success("Alice"))
     ///         // OR

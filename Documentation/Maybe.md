@@ -61,7 +61,7 @@ The `sinkMaybe(receive:)` method simplifies handling of maybe publisher results:
 // 👍 There are only three cases to handle
 let cancellable = namePublisher().sinkMaybe { (result: MaybeResult<String, Error>) in
     switch result {
-    case .empty:
+    case .finished:
         handleNoName()
     case let .success(name):
         handle(name)
@@ -189,7 +189,7 @@ You create this publisher by providing a closure. This closure runs when the pub
 ```swift
 let publisher = TraitPublishers.Maybe<String, MyError> { promise in
     // Eventually send completion event, now or in the future:
-    promise(.empty)
+    promise(.finished)
     // OR
     promise(.success("Alice"))
     // OR
@@ -288,7 +288,7 @@ struct PhoneNumberPublisher: MaybePublisher {
         
         // CNContactPickerDelegate
         func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-            receive(.empty)
+            receive(.finished)
         }
         
         // CNContactPickerDelegate

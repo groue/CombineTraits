@@ -34,7 +34,7 @@ import Foundation
 ///
 ///         namePublisher().sinkMaybe { result in
 ///             switch result {
-///                 case .empty: print("no name")
+///                 case .finished: print("no name")
 ///                 case let .success(name): print(name)
 ///                 case let .failure(error): print(error)
 ///             }
@@ -145,7 +145,7 @@ extension MaybePublisher {
                     receive(.failure(error))
                 case .finished:
                     if !successReceived {
-                        receive(.empty)
+                        receive(.finished)
                     }
                 }
             },

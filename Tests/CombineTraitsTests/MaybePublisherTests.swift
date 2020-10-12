@@ -227,7 +227,7 @@ class MaybePublisherTests: XCTestCase {
             let maybePublisher = publisher.checkMaybe()
             _ = maybePublisher.sinkMaybe { result in
                 switch result {
-                case .empty: break
+                case .finished: break
                 case .success: break
                 case let .failure(error):
                     switch error {
@@ -245,7 +245,7 @@ class MaybePublisherTests: XCTestCase {
             let maybePublisher = publisher.checkMaybe()
             _ = maybePublisher.sinkMaybe { result in
                 switch result {
-                case .empty: break
+                case .finished: break
                 case .success: break
                 case let .failure(error):
                     switch error {
@@ -503,7 +503,7 @@ class MaybePublisherTests: XCTestCase {
         
         test(
             publisher: Empty(outputType: Int.self, failureType: Never.self),
-            synchronouslyCompletesWithResult: .empty)
+            synchronouslyCompletesWithResult: .finished)
         
         test(
             publisher: Fail(outputType: Int.self, failure: TestError()),

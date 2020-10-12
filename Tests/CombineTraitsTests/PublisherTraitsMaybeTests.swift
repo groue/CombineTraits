@@ -82,7 +82,7 @@ class TraitPublishersMaybeTests: XCTestCase {
     
     func test_TraitPublishersMaybe_as_empty() {
         let publisher = TraitPublishers.Maybe<Int, Never> { promise in
-            promise(.empty)
+            promise(.finished)
             return AnyCancellable({ })
         }
         
@@ -149,7 +149,7 @@ class TraitPublishersMaybeTests: XCTestCase {
     func test_TraitPublishersMaybe_as_delayed_empty() {
         let publisher = TraitPublishers.Maybe<Int, Never> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                promise(.empty)
+                promise(.finished)
             }
             return AnyCancellable({ })
         }

@@ -1,12 +1,12 @@
 /// The result of a maybe publisher.
 public enum MaybeResult<Success, Failure: Error> {
-    /// Successful completion without any element.
-    case empty
+    /// The publisher finished normally without publishing any element.
+    case finished
     
-    /// Successful completion with one element.
+    /// The publisher published an element and finished normally.
     case success(Success)
     
-    /// Failure completion.
+    /// The publisher stopped publishing due to the indicated error.
     case failure(Failure)
 }
 
@@ -24,8 +24,8 @@ extension MaybeResult {
     -> MaybeResult<NewSuccess, Failure>
     {
         switch self {
-        case .empty:
-            return .empty
+        case .finished:
+            return .finished
         case let .success(success):
             return .success(transform(success))
         case let .failure(failure):
@@ -46,8 +46,8 @@ extension MaybeResult {
     -> MaybeResult<Success, NewFailure>
     {
         switch self {
-        case .empty:
-            return .empty
+        case .finished:
+            return .finished
         case let .success(success):
             return .success(success)
         case let .failure(failure):
@@ -68,8 +68,8 @@ extension MaybeResult {
     -> MaybeResult<NewSuccess, Failure>
     {
         switch self {
-        case .empty:
-            return .empty
+        case .finished:
+            return .finished
         case let .success(success):
             return transform(success)
         case let .failure(failure):
@@ -89,8 +89,8 @@ extension MaybeResult {
         _ transform: (Failure) -> MaybeResult<Success, NewFailure>
     ) -> MaybeResult<Success, NewFailure> {
         switch self {
-        case .empty:
-            return .empty
+        case .finished:
+            return .finished
         case let .success(success):
             return .success(success)
         case let .failure(failure):
@@ -101,12 +101,12 @@ extension MaybeResult {
     /// Returns the success value, if any, as a throwing expression.
     ///
     /// - Returns: The success value, if the instance represents a success, or
-    ///   nil if the instance is empty.
+    ///   nil if the instance is finished.
     /// - Throws: The failure value, if the instance represents a failure.
     @inlinable
     public func get() throws -> Success? {
         switch self {
-        case .empty:
+        case .finished:
             return nil
         case let .success(success):
             return success

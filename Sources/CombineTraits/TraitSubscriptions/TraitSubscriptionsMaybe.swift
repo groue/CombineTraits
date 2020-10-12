@@ -86,7 +86,7 @@ extension TraitSubscriptions {
                 case let .waitingForFulfillment(downstream: downstream, context: _):
                     state = .finished
                     switch result {
-                    case .empty:
+                    case .finished:
                         downstream.receive(completion: .finished)
                     case let .success(value):
                         _ = downstream.receive(value)
