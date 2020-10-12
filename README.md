@@ -1,7 +1,7 @@
 CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?style=flat)](https://developer.apple.com/swift/)
 =============
 
-### Guarantees on the number of values published by Combine publishers
+### Combine Publishers with Guarantees
 
 **Requirements**: iOS 13.0+ / OSX 10.15+ / tvOS 13.0+ / watchOS 6.0+ &bull; Swift 5.3+ / Xcode 12.0+
 
@@ -9,18 +9,18 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-Generally speaking, [Combine] publishers can publish zero, one, or more values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
+[Combine] publishers can publish any number of values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-When we deal with publishers that are expected to publish a certain amount of values, it is easy to neglect edge cases such as a completion without any value, or too many published values. Such publishers are subject to interpretation, imprecise documentation, or buggy implementations.
+When we deal with publishers that are expected to publish a certain amount of values, no more, no less, it is easy to neglect edge cases such as an early completion, or too many published values. And quite often, the behavior of such publishers is subject to interpretation, imprecise documentation, buggy implementations.
 
-This library provides tools that guarantee compiler-checked definition, and subscription, to publishers that conform to specific *traits*:
+This library provides compiler-checked definition, and subscription, to publishers that conform to specific *traits*:
         
 - **[Single Publishers]** publish exactly one value, or an error.
     
     The Combine `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
-    --------> can never publish anything.
+    --------> can never publish anything, never complete.
     -----x--> can fail before publishing any value.
     --o--|--> can publish one value and complete.
     ```
@@ -30,7 +30,7 @@ This library provides tools that guarantee compiler-checked definition, and subs
     The Combine `Empty`, `Just`, `Future` and `URLSession.DataTaskPublisher` are examples of such publishers.
     
     ```
-    --------> can never publish anything.
+    --------> can never publish anything, never complete.
     -----x--> can fail before publishing any value.
     -----|--> can complete without publishing any value.
     --o--|--> can publish one value and complete.

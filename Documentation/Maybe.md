@@ -4,7 +4,7 @@ Maybe Publishers
 **`MaybePublisher` is the protocol for publishers that publish exactly zero value, or one value, or an error.**
 
 ```swift
-/// --------> can never publish anything.
+/// --------> can never publish anything, never complete.
 /// -----x--> can fail before publishing any value.
 /// -----|--> can complete without publishing any value.
 /// --o--|--> can publish one value and complete.
