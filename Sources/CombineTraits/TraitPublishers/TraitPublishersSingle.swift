@@ -1,7 +1,7 @@
 import Combine
 
 extension TraitPublishers {
-    /// `TraitPublishers.Single` is a ready-made Combine [Publisher] which which
+    /// `TraitPublishers.Single` is a ready-made Combine Publisher which which
     /// allows you to dynamically send success or failure events.
     ///
     /// It lets you easily create custom single publishers to wrap most

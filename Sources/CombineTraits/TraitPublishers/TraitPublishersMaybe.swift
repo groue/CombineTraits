@@ -1,7 +1,7 @@
 import Combine
 
 extension TraitPublishers {
-    /// `TraitPublishers.Maybe` is a ready-made Combine [Publisher] which allows
+    /// `TraitPublishers.Maybe` is a ready-made Combine Publisher which allows
     /// you to dynamically send success or failure events.
     ///
     /// It lets you easily create custom maybe publishers to wrap most
