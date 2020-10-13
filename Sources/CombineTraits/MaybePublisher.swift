@@ -111,12 +111,12 @@ extension MaybePublisher {
     /// Wraps this maybe publisher with a type eraser.
     ///
     /// Use `eraseToAnyMaybePublisher()` to expose an instance of
-    /// AnyMaybePublisher to the downstream subscriber, rather than this
+    /// `AnyMaybePublisher` to the downstream subscriber, rather than this
     /// publisher’s actual type.
     ///
     /// This form of type erasure preserves abstraction across API boundaries,
     /// such as different modules. When you expose your publishers as the
-    /// AnyMaybePublisher type, you can change the underlying implementation
+    /// `AnyMaybePublisher` type, you can change the underlying implementation
     /// over time without affecting existing clients.
     ///
     /// - returns: An `AnyMaybePublisher` wrapping this maybe publisher.

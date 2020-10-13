@@ -109,12 +109,12 @@ extension SinglePublisher {
     /// Wraps this single publisher with a type eraser.
     ///
     /// Use `eraseToAnySinglePublisher()` to expose an instance of
-    /// AnySinglePublisher to the downstream subscriber, rather than this
+    /// `AnySinglePublisher` to the downstream subscriber, rather than this
     /// publisher’s actual type.
     ///
     /// This form of type erasure preserves abstraction across API boundaries,
     /// such as different modules. When you expose your publishers as the
-    /// AnySinglePublisher type, you can change the underlying implementation
+    /// `AnySinglePublisher` type, you can change the underlying implementation
     /// over time without affecting existing clients.
     ///
     /// - returns: An `AnySinglePublisher` wrapping this single publisher.
