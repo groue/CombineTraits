@@ -221,7 +221,7 @@ class TraitSubscriptionsMaybeTests: XCTestCase {
         switch try XCTUnwrap(completion) {
         case .finished:
             XCTFail("Unexpected success")
-        case let .failure(error):
+        case .failure:
             break
         }
         
