@@ -57,18 +57,19 @@ extension TraitSubscriptions {
         }
         
         public func request(_ demand: Subscribers.Demand) {
-            synchronized {
-                switch state {
-                case let .waitingForDemand(downstream: downstream, context: context):
-                    guard demand > 0 else {
-                        return
-                    }
-                    state = .waitingForFulfillment(downstream: downstream, context: context)
-                    start(with: context)
-                    
-                case .waitingForFulfillment, .finished:
-                    break
+            lock.lock()
+            switch state {
+            case let .waitingForDemand(downstream: downstream, context: context):
+                guard demand > 0 else {
+                    lock.unlock()
+                    return
                 }
+                state = .waitingForFulfillment(downstream: downstream, context: context)
+                lock.unlock()
+                start(with: context)
+                
+            case .waitingForFulfillment, .finished:
+                lock.unlock()
             }
         }
         
@@ -77,44 +78,52 @@ extension TraitSubscriptions {
         
         /// Subclasses can override and perform eventual cleanup after the
         /// subscription was cancelled.
+        ///
+        /// The default implementation does nothing.
         open func didCancel(with context: Context) { }
         
+        /// Subclasses can override and perform eventual cleanup after the
+        /// subscription was completed.
+        ///
+        /// The default implementation does nothing.
+        open func didComplete(with context: Context) { }
+        
         /// Completes the subscription with the publisher result.
+        ///
+        /// You can not override this method. Override
+        /// `didComplete(with:)` instead.
         public func receive(_ result: Result<Downstream.Input, Downstream.Failure>) {
-            synchronized {
-                switch state {
-                case let .waitingForFulfillment(downstream: downstream, context: _):
-                    state = .finished
-                    switch result {
-                    case let .success(value):
-                        _ = downstream.receive(value)
-                        downstream.receive(completion: .finished)
-                    case let .failure(error):
-                        downstream.receive(completion: .failure(error))
-                    }
-                    
-                case .waitingForDemand, .finished:
-                    break
+            lock.lock()
+            switch state {
+            case let .waitingForFulfillment(downstream: downstream, context: context):
+                state = .finished
+                lock.unlock()
+                didComplete(with: context)
+                
+                switch result {
+                case let .success(value):
+                    _ = downstream.receive(value)
+                    downstream.receive(completion: .finished)
+                case let .failure(error):
+                    downstream.receive(completion: .failure(error))
                 }
+                
+            case .waitingForDemand, .finished:
+                lock.unlock()
             }
         }
         
         public func cancel() {
-            synchronized {
-                switch state {
-                case let .waitingForFulfillment(downstream: _, context: context):
-                    state = .finished
-                    didCancel(with: context)
-                case .waitingForDemand, .finished:
-                    state = .finished
-                }
-            }
-        }
-        
-        private func synchronized<T>(_ block: () throws -> T) rethrows -> T {
-            defer { lock.unlock() }
             lock.lock()
-            return try block()
+            switch state {
+            case let .waitingForFulfillment(downstream: _, context: context):
+                state = .finished
+                lock.unlock()
+                didCancel(with: context)
+            case .waitingForDemand, .finished:
+                state = .finished
+                lock.unlock()
+            }
         }
     }
 }

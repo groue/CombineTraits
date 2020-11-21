@@ -249,7 +249,15 @@ open class Single<Downstream: Subscriber, Context>: NSObject, Subscription {
     
     /// Subclasses can override and perform eventual cleanup after the
     /// subscription was cancelled.
+    ///
+    /// The default implementation does nothing.
     open func didCancel(with context: Context) { }
+    
+    /// Subclasses can override and perform eventual cleanup after the
+    /// subscription was completed.
+    ///
+    /// The default implementation does nothing.
+    open func didComplete(with context: Context) { }
     
     /// Completes the subscription with the publisher result.
     public func receive(_ result: Result<Downstream.Input, Downstream.Failure>)
