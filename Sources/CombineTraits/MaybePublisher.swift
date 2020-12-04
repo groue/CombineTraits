@@ -124,6 +124,28 @@ extension MaybePublisher {
         AnyMaybePublisher(self)
     }
     
+    /// Replaces an empty stream with the provided error.
+    ///
+    /// Use `replaceEmpty(withError:)` to provide a replacement failure if the
+    /// upstream publisher finishes without producing any elements.
+    ///
+    /// - parameter error: An error to emit when the upstream publisher finishes
+    ///   without emitting any elements.
+    /// - returns: A single publisher that replaces an empty stream with the
+    ///   provided error.
+    public func replaceEmpty(withError error: Failure) -> AnySinglePublisher<Output, Failure> {
+        map { Optional.some($0) }
+            .replaceEmpty(with: nil)
+            .flatMap { output -> AnySinglePublisher<Output, Failure> in
+                if let output = output {
+                    return .just(output)
+                } else {
+                    return .fail(error)
+                }
+            }
+            .eraseToAnySinglePublisher()
+    }
+    
     /// Attaches a subscriber with closure-based behavior.
     ///
     /// This method creates the subscriber and immediately requests an unlimited

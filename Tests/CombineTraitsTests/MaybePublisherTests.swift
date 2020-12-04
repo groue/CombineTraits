@@ -484,6 +484,59 @@ class MaybePublisherTests: XCTestCase {
         accept2(.fail(TestError()))
     }
     
+    // MARK: - replaceEmpty(withError:)
+    
+    func test_replaceEmpty_withError() throws {
+        struct TestError: Error { }
+        
+        do {
+            let publisher = AnyMaybePublisher<Int, TestError>
+                .just(1)
+                .replaceEmpty(withError: TestError())
+                .eraseToAnySinglePublisher()
+            
+            var result: Result<Int, TestError>?
+            _ = publisher.sinkSingle { result = $0 }
+            
+            do {
+                _ = try XCTUnwrap(result).get()
+            } catch {
+                XCTFail("Unexpected error \(error)")
+            }
+        }
+        
+        do {
+            let publisher = AnyMaybePublisher<Int?, TestError>
+                .just(nil)
+                .replaceEmpty(withError: TestError())
+                .eraseToAnySinglePublisher()
+            
+            var result: Result<Int?, TestError>?
+            _ = publisher.sinkSingle { result = $0 }
+            
+            do {
+                _ = try XCTUnwrap(result).get()
+            } catch {
+                XCTFail("Unexpected error \(error)")
+            }
+        }
+        
+        do {
+            let publisher = AnyMaybePublisher<Int, TestError>
+                .empty()
+                .replaceEmpty(withError: TestError())
+                .eraseToAnySinglePublisher()
+            
+            var result: Result<Int, TestError>?
+            _ = publisher.sinkSingle { result = $0 }
+            
+            do {
+                _ = try XCTUnwrap(result).get()
+                XCTFail("Expected error")
+            } catch { }
+        }
+    }
+    
     // MARK: - sinkMaybe
     
     func test_sinkMaybe() {

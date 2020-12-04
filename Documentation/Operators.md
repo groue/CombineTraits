@@ -32,8 +32,24 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 
 /// Maybe publishes a name
-func namePublisher() -> AnyMaybePublisher<String, Error>
+func namePublisher() -> AnyMaybePublisher<String, Error> {
     /* some maybe publisher */.eraseToAnyMaybePublisher()
+}
+```
+
+#### `replaceEmpty(withError:)`
+
+Use this operator in order to turn a [maybe] publisher into a [single] publisher that fails when the upstream maybe is empty.
+
+```swift
+/// Maybe publishes a name
+func nameMaybePublisher() -> AnyMaybePublisher<String, Never> { ... }
+
+/// Publishes exactly one name, or an error
+func nameSinglePublisher() -> AnySinglePublisher<String, Error> {
+    nameMaybePublisher()
+        .setFailureType(to: Error.self)
+        .replaceEmpty(withError: MissingNameError())
 }
 ```
 
