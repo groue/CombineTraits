@@ -9,9 +9,9 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-[Combine] publishers can publish any number of values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
+[Combine] publishers can publish any number of values, at any time, before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-When we deal with publishers that are expected to publish a certain amount of values, no more, no less, it is easy to neglect edge cases such as an early completion, or too many published values. And quite often, the behavior of such publishers is subject to interpretation, imprecise documentation, buggy implementations.
+When we deal with publishers that are expected to publish their values according to a specific pattern, it is easy to neglect edge cases such as late publishing, early completion, too many published values, etc. And quite often, the behavior of such publishers is subject to interpretation, imprecise documentation, or buggy implementations.
 
 This library provides compiler-checked definition, and subscription, to publishers that conform to specific *traits*:
         
@@ -35,12 +35,23 @@ This library provides compiler-checked definition, and subscription, to publishe
     -----|--> can complete without publishing any value.
     --o--|--> can publish one value and complete.
     ```
+    
+- **[Immediate Publishers]** publish a value, or complete right on subscription, synchronously, without any delay:
+    
+    The Combine `Just`, `CurrentValueSubject` and `Publishers.Sequence` are examples of such publishers.
+    
+    ```
+    |-------> can complete immediately.
+    x-------> can fail immediately.
+    o-o---o-> must publish their first value immediately.
+    ```
 
 # Documentation
 
 - [Usage]
 - [Single Publishers]
 - [Maybe Publishers]
+- [Immediate Publishers]
 - [Trait Operators]
 
 ## Usage
