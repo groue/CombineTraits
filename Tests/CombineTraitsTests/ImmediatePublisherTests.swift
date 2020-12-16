@@ -266,7 +266,9 @@ class ImmediatePublisherTests: XCTestCase {
     func test_AssertNoImmediateFailurePublisher_ElementWithoutCompletion() throws {
         struct TestError: Error { }
         let subject = CurrentValueSubject<Int, TestError>(1)
-        let publisher = subject.assertImmediate()
+        let publisher = subject
+            .eraseToAnyPublisher()
+            .assertImmediate()
         
         var completion: Subscribers.Completion<TestError>?
         var value: Int?
