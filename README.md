@@ -36,14 +36,14 @@ This library provides compiler-checked definition, and subscription, to publishe
     --o--|--> can publish one value and complete.
     ```
     
-- **[Immediate Publishers]** publish a value, or fail right on subscription, synchronously, without any delay:
+- **[Immediate Publishers]** publish a value or fail, right on subscription:
     
-    The Combine `Just`, and `CurrentValueSubject` are examples of such publishers.
+    The Combine `Just`, `Fail` and `CurrentValueSubject` are examples of such publishers.
     
     ```
     x-------> can fail immediately.
-    o - - - > can publish one value immediately (and then publish any number of values,
-              at any time, until the eventual completion).
+    o - - - > can publish one value immediately (and then publish any number
+              of values, at any time, until the eventual completion).
     ```
 
 # Documentation
@@ -86,4 +86,5 @@ let cancellable = refreshPublisher().sinkSingle { result in
 [Usage]: #usage
 [Single Publishers]: Documentation/Single.md
 [Maybe Publishers]: Documentation/Maybe.md
+[Immediate]: Documentation/Immediate.md
 [Trait Operators]: Documentation/Operators.md
