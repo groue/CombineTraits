@@ -82,6 +82,12 @@ where A: ImmediatePublisher, B: ImmediatePublisher, C: ImmediatePublisher, D: Im
 extension Publishers.MergeMany: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
+extension Publishers.PrefixUntilOutput: ImmediatePublisher
+where Upstream: ImmediatePublisher { }
+
+extension Publishers.PrefixWhile: ImmediatePublisher
+where Upstream: ImmediatePublisher { }
+
 extension Publishers.Print: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
@@ -114,6 +120,9 @@ where Upstream: ImmediatePublisher, NewPublisher: ImmediatePublisher { }
 extension Publishers.TryMap: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
+extension Publishers.TryPrefixWhile: ImmediatePublisher
+where Upstream: ImmediatePublisher { }
+
 extension Publishers.TryRemoveDuplicates: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
@@ -130,6 +139,8 @@ extension Publishers.Zip4: ImmediatePublisher
 where A: ImmediatePublisher, B: ImmediatePublisher, C: ImmediatePublisher, D: ImmediatePublisher { }
 
 extension Result.Publisher: ImmediatePublisher { }
+
+extension CurrentValueSubject: ImmediatePublisher { }
 
 extension Deferred: ImmediatePublisher
 where DeferredPublisher: ImmediatePublisher { }

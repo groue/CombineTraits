@@ -4,8 +4,9 @@ import Foundation
 /// `ImmediatePublisher` is the protocol for publishers that publish an element
 /// or complete right on subscription, synchronously, without any delay.
 ///
-/// In the Combine framework, the built-in `Just` and `Publishers.Sequence` are
-/// examples of publishers that conform to `ImmediatePublisher`.
+/// In the Combine framework, the built-in `Just`, `CurrentValueSubject` and
+/// `Publishers.Sequence` are examples of publishers that conform
+/// to `ImmediatePublisher`.
 ///
 /// Conversely, `URLSession.DataTaskPublisher` is not an immediate publisher,
 /// because it is asynchronous.

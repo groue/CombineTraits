@@ -575,6 +575,16 @@ class ImmediatePublisherTests: XCTestCase {
         XCTAssertFalse(isImmediate(Publishers.MergeMany(publisher, publisher)))
         XCTAssertTrue(isImmediate(Publishers.MergeMany(immediate, immediate)))
         
+        // Publishers.PrefixUntilOutput
+        XCTAssertFalse(isImmediate(publisher.prefix(untilOutputFrom: publisher)))
+        XCTAssertFalse(isImmediate(publisher.prefix(untilOutputFrom: immediate)))
+        XCTAssertTrue(isImmediate(immediate.prefix(untilOutputFrom: publisher)))
+        XCTAssertTrue(isImmediate(immediate.prefix(untilOutputFrom: immediate)))
+        
+        // Publishers.PrefixWhile
+        XCTAssertFalse(isImmediate(publisher.prefix(while: { _ in true })))
+        XCTAssertTrue(isImmediate(immediate.prefix(while: { _ in true })))
+        
         // Publishers.Print
         XCTAssertFalse(isImmediate(publisher.print()))
         XCTAssertTrue(isImmediate(immediate.print()))
@@ -621,7 +631,11 @@ class ImmediatePublisherTests: XCTestCase {
         // Publishers.TryMap
         XCTAssertFalse(isImmediate(publisher.tryMap { $0 }))
         XCTAssertTrue(isImmediate(immediate.tryMap { $0 }))
-
+        
+        // Publishers.TryPrefixWhile
+        XCTAssertFalse(isImmediate(publisher.tryPrefix(while: { _ in true })))
+        XCTAssertTrue(isImmediate(immediate.tryPrefix(while: { _ in true })))
+        
         // Publishers.TryRemoveDuplicates
         XCTAssertFalse(isImmediate(publisher.tryRemoveDuplicates(by: <)))
         XCTAssertTrue(isImmediate(immediate.tryRemoveDuplicates(by: <)))
@@ -629,7 +643,7 @@ class ImmediatePublisherTests: XCTestCase {
         // Publishers.TryScan
         XCTAssertFalse(isImmediate(publisher.tryScan(()) { _, _ in }))
         XCTAssertTrue(isImmediate(immediate.tryScan(()) { _, _ in }))
-
+        
         // Publishers.Zip
         XCTAssertFalse(isImmediate(publisher.zip(publisher)))
         XCTAssertFalse(isImmediate(publisher.zip(immediate)))
@@ -663,20 +677,23 @@ class ImmediatePublisherTests: XCTestCase {
         XCTAssertFalse(isImmediate(immediate.zip(immediate, publisher, immediate)))
         XCTAssertFalse(isImmediate(immediate.zip(immediate, immediate, publisher)))
         XCTAssertTrue(isImmediate(immediate.zip(immediate, immediate, immediate)))
-
+        
         // Result.Publisher
         XCTAssertTrue(isImmediate(Result<Int, Error>.success(1).publisher))
-
+        
         // Deferred
         XCTAssertFalse(isImmediate(Deferred { publisher }))
         XCTAssertTrue(isImmediate(Deferred { immediate }))
-
+        
+        // CurrentValueSubject
+        XCTAssertTrue(isImmediate(CurrentValueSubject<Int, Error>(1)))
+        
         // Fail
         XCTAssertTrue(isImmediate(Fail<Int, Error>(error: TestError())))
-
+        
         // Just
         XCTAssertTrue(isImmediate(Just(1)))
-
+        
         // Record
         XCTAssertTrue(isImmediate(Record(output: [1], completion: .failure(TestError()))))
     }
