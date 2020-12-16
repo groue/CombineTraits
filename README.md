@@ -58,7 +58,7 @@ This library provides compiler-checked definition, and subscription, to publishe
 
 **CombineTraits preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
-`AnyPublisher` can be replaced with `AnySinglePublisher` or `AnyMaybePublisher`, in order to express which trait a publisher conforms to:
+`AnyPublisher` can be replaced with `AnySinglePublisher`, `AnyMaybePublisher`, or `AnyImmediatePublisher`, in order to express which trait a publisher conforms to:
     
 ```swift
 func refreshPublisher() -> AnySinglePublisher<Void, Error> {
