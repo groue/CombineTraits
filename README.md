@@ -9,9 +9,9 @@ CombineTraits [![Swift 5.3](https://img.shields.io/badge/swift-5.3-orange.svg?st
 
 ## What is this?
 
-[Combine] publishers can publish any number of values before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
+[Combine] publishers can publish any number of values, at any time, before they complete. It is particularly the case of [AnyPublisher], frequently returned by our frameworks or applications.
 
-When we deal with publishers that are expected to publish a certain amount of values, no more, no less, it is easy to neglect edge cases such as an early completion, or too many published values. And quite often, the behavior of such publishers is subject to interpretation, imprecise documentation, buggy implementations.
+When we deal with publishers that are expected to publish their values according to a specific pattern, it is easy to neglect edge cases such as late publishing, early completion, too many published values, etc. And quite often, the behavior of such publishers is subject to interpretation, imprecise documentation, or buggy implementations.
 
 This library provides compiler-checked definition, and subscription, to publishers that conform to specific *traits*:
         
@@ -35,19 +35,30 @@ This library provides compiler-checked definition, and subscription, to publishe
     -----|--> can complete without publishing any value.
     --o--|--> can publish one value and complete.
     ```
+    
+- **[Immediate Publishers]** publish a value or fail, right on subscription:
+    
+    The Combine `Just`, `Fail` and `CurrentValueSubject` are examples of such publishers.
+    
+    ```
+    x-------> can fail immediately.
+    o - - - > can publish one value immediately (and then publish any number
+              of values, at any time, until the eventual completion).
+    ```
 
 # Documentation
 
 - [Usage]
 - [Single Publishers]
 - [Maybe Publishers]
+- [Immediate Publishers]
 - [Trait Operators]
 
 ## Usage
 
 **CombineTraits preserves the general ergonomics of Combine.** Your application still deals with regular Combine publishers and operators.
 
-`AnyPublisher` can be replaced with `AnySinglePublisher` or `AnyMaybePublisher`, in order to express which trait a publisher conforms to:
+`AnyPublisher` can be replaced with `AnySinglePublisher`, `AnyMaybePublisher`, or `AnyImmediatePublisher`, in order to express which trait a publisher conforms to:
     
 ```swift
 func refreshPublisher() -> AnySinglePublisher<Void, Error> {
@@ -75,4 +86,5 @@ let cancellable = refreshPublisher().sinkSingle { result in
 [Usage]: #usage
 [Single Publishers]: Documentation/Single.md
 [Maybe Publishers]: Documentation/Maybe.md
+[Immediate Publishers]: Documentation/Immediate.md
 [Trait Operators]: Documentation/Operators.md

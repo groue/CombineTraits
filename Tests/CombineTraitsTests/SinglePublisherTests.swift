@@ -498,9 +498,9 @@ class SinglePublisherTests: XCTestCase {
         }
     }
     
-    // MARK: - Built-in Maybes
+    // MARK: - Built-in Single Publishers
     
-    func test_built_in_maybes() {
+    func test_built_in_single_publishers() {
         struct TestError: Error { }
         
         let publisher = [1, 2, 3].publisher.eraseToAnyPublisher()
@@ -540,8 +540,11 @@ class SinglePublisherTests: XCTestCase {
         
         // Publishers.Breakpoint
         XCTAssertFalse(isSingle(publisher.breakpoint()))
+        XCTAssertFalse(isSingle(publisher.breakpointOnError()))
         XCTAssertFalse(isSingle(maybe.breakpoint()))
+        XCTAssertFalse(isSingle(maybe.breakpointOnError()))
         XCTAssertTrue(isSingle(single.breakpoint()))
+        XCTAssertTrue(isSingle(single.breakpointOnError()))
         
         // Publishers.Catch
         XCTAssertFalse(isSingle(failingPublisher.catch { _ in publisher }))

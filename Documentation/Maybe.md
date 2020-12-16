@@ -21,7 +21,7 @@ Conversely, some publishers such as `Publishers.Sequence` are not extended with 
 
 ## AnyMaybePublisher
 
-`AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
+`AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it certainly publishes exactly zero or one `String`, no more, no less:
     
 ```swift
 /// 👍 Maybe publishes a name
@@ -118,7 +118,7 @@ There are a few ways to get such a maybe publisher:
 
 - **Runtime-checked maybe publishers** are publishers that conform to the `MaybePublisher` protocol by checking, at runtime, that an upstream publisher publishes exactly zero value, or one value, or an error.
     
-    `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not publish exactly zero value, or one value, or an error.
+    `Publisher.assertMaybe()` returns a maybe publisher that raises a fatal error if the upstream publisher does not honor the contract.
         
     For example:
     
