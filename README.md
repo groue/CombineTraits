@@ -86,5 +86,5 @@ let cancellable = refreshPublisher().sinkSingle { result in
 [Usage]: #usage
 [Single Publishers]: Documentation/Single.md
 [Maybe Publishers]: Documentation/Maybe.md
-[Immediate]: Documentation/Immediate.md
+[Immediate Publishers]: Documentation/Immediate.md
 [Trait Operators]: Documentation/Operators.md
