@@ -19,7 +19,7 @@ extension Publishers.CombineLatest4: ImmediatePublisher
 where A: ImmediatePublisher, B: ImmediatePublisher, C: ImmediatePublisher, D: ImmediatePublisher { }
 
 extension Publishers.Concatenate: ImmediatePublisher
-where Prefix: ImmediatePublisher, Suffix: ImmediatePublisher { }
+where Prefix: ImmediatePublisher { }
 
 extension Publishers.Decode: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
@@ -82,12 +82,6 @@ where A: ImmediatePublisher, B: ImmediatePublisher, C: ImmediatePublisher, D: Im
 extension Publishers.MergeMany: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
-extension Publishers.PrefixUntilOutput: ImmediatePublisher
-where Upstream: ImmediatePublisher { }
-
-extension Publishers.PrefixWhile: ImmediatePublisher
-where Upstream: ImmediatePublisher { }
-
 extension Publishers.Print: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
@@ -106,8 +100,6 @@ where Upstream: ImmediatePublisher { }
 extension Publishers.Scan: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
-extension Publishers.Sequence: ImmediatePublisher { }
-
 extension Publishers.SetFailureType: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
@@ -118,9 +110,6 @@ extension Publishers.TryCatch: ImmediatePublisher
 where Upstream: ImmediatePublisher, NewPublisher: ImmediatePublisher { }
 
 extension Publishers.TryMap: ImmediatePublisher
-where Upstream: ImmediatePublisher { }
-
-extension Publishers.TryPrefixWhile: ImmediatePublisher
 where Upstream: ImmediatePublisher { }
 
 extension Publishers.TryRemoveDuplicates: ImmediatePublisher

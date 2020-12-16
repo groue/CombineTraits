@@ -56,9 +56,14 @@ class ImmediatePublisherTests: XCTestCase {
             
             switch try XCTUnwrap(completion) {
             case .finished:
-                break
+                XCTFail("Expected error")
             case let .failure(error):
-                XCTFail("Unexpected error \(error)")
+                switch error {
+                case .notImmediate:
+                    break
+                default:
+                    XCTFail("Unexpected error \(error)")
+                }
             }
         }
     }
@@ -172,7 +177,9 @@ class ImmediatePublisherTests: XCTestCase {
     func test_CheckImmediatePublisher_ElementWithoutCompletion() throws {
         struct TestError: Error { }
         let subject = CurrentValueSubject<Int, TestError>(1)
-        let publisher = subject.checkImmediate()
+        let publisher = subject
+            .eraseToAnyPublisher()
+            .checkImmediate()
         
         var completion: Subscribers.Completion<ImmediateError<TestError>>?
         var value: Int?
@@ -284,8 +291,8 @@ class ImmediatePublisherTests: XCTestCase {
     
     // MARK: - Canonical Immediate Publishers
     
-    func test_AnyImmediatePublisher_empty() throws {
-        let publisher = AnyImmediatePublisher<Int, Never>.empty()
+    func test_AnyImmediatePublisher_just() throws {
+        let publisher = AnyImmediatePublisher<Int, Never>.just(1)
         
         var completion: Subscribers.Completion<Never>?
         var value: Int?
@@ -302,7 +309,7 @@ class ImmediatePublisherTests: XCTestCase {
         try withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.5, handler: nil)
             
-            XCTAssertNil(value)
+            XCTAssertEqual(value, 1)
             
             switch try XCTUnwrap(completion) {
             case .finished:
@@ -311,29 +318,6 @@ class ImmediatePublisherTests: XCTestCase {
                 XCTFail("Unexpected error \(error)")
             }
         }
-    }
-    
-    func test_canonical_empty_types() {
-        // The test passes if the test compiles
-        
-        func accept1(_ p: AnyImmediatePublisher<Int, Never>) { }
-        func accept2(_ p: AnyImmediatePublisher<Int, Error>) { }
-        func accept3(_ p: AnyImmediatePublisher<Never, Never>) { }
-        func accept4(_ p: AnyImmediatePublisher<Never, Error>) { }
-        
-        // The various ways to build a publisher...
-        let p1 = AnyImmediatePublisher.empty(outputType: Int.self, failureType: Error.self)
-        let p2 = AnyImmediatePublisher<Int, Error>.empty()
-        
-        // ... build the expected types.
-        accept2(p1)
-        accept2(p2)
-        
-        // Shorthand notation thanks to type inference
-        accept1(.empty())
-        accept2(.empty())
-        accept3(.empty())
-        accept4(.empty())
     }
     
     func test_canonical_just_types() {
@@ -405,7 +389,7 @@ class ImmediatePublisherTests: XCTestCase {
         
         let publisher = Just(1).eraseToAnyPublisher()
         let failingPublisher = publisher.setFailureType(to: Error.self).eraseToAnyPublisher()
-        let immediate = AnyImmediatePublisher<Int, Never>.empty()
+        let immediate = AnyImmediatePublisher<Int, Never>.just(1)
         let failingImmediate = immediate.setFailureType(to: Error.self).eraseToAnyImmediatePublisher()
         
         XCTAssertFalse(isImmediate(publisher))
@@ -466,12 +450,16 @@ class ImmediatePublisherTests: XCTestCase {
         // Publishers.Concatenate
         XCTAssertFalse(isImmediate(publisher.append(publisher)))
         XCTAssertFalse(isImmediate(publisher.append(immediate)))
-        XCTAssertFalse(isImmediate(immediate.append(publisher)))
+        XCTAssertTrue(isImmediate(immediate.append(publisher)))
         XCTAssertTrue(isImmediate(immediate.append(immediate)))
         // XCTAssertTrue(isImmediate(publisher.prepend(1)))
         XCTAssertFalse(isImmediate(publisher.prepend([])))
-        XCTAssertTrue(isImmediate(immediate.prepend(1)))
-        XCTAssertTrue(isImmediate(immediate.prepend([])))
+        // XCTAssertTrue(isImmediate(immediate.prepend(1)))
+        // XCTAssertTrue(isImmediate(immediate.prepend([])))
+        XCTAssertFalse(isImmediate(publisher.prepend(publisher)))
+        XCTAssertTrue(isImmediate(publisher.prepend(immediate)))
+        XCTAssertFalse(isImmediate(immediate.prepend(publisher)))
+        XCTAssertTrue(isImmediate(immediate.prepend(immediate)))
         
         // Publishers.Decode
         struct Decoder<Input>: TopLevelDecoder {
@@ -575,16 +563,6 @@ class ImmediatePublisherTests: XCTestCase {
         XCTAssertFalse(isImmediate(Publishers.MergeMany(publisher, publisher)))
         XCTAssertTrue(isImmediate(Publishers.MergeMany(immediate, immediate)))
         
-        // Publishers.PrefixUntilOutput
-        XCTAssertFalse(isImmediate(publisher.prefix(untilOutputFrom: publisher)))
-        XCTAssertFalse(isImmediate(publisher.prefix(untilOutputFrom: immediate)))
-        XCTAssertTrue(isImmediate(immediate.prefix(untilOutputFrom: publisher)))
-        XCTAssertTrue(isImmediate(immediate.prefix(untilOutputFrom: immediate)))
-        
-        // Publishers.PrefixWhile
-        XCTAssertFalse(isImmediate(publisher.prefix(while: { _ in true })))
-        XCTAssertTrue(isImmediate(immediate.prefix(while: { _ in true })))
-        
         // Publishers.Print
         XCTAssertFalse(isImmediate(publisher.print()))
         XCTAssertTrue(isImmediate(immediate.print()))
@@ -609,9 +587,6 @@ class ImmediatePublisherTests: XCTestCase {
         XCTAssertFalse(isImmediate(publisher.scan(()) { _, _ in }))
         XCTAssertTrue(isImmediate(immediate.scan(()) { _, _ in }))
         
-        // Publishers.Sequence
-        XCTAssertTrue(isImmediate([1].publisher))
-        
         // Publishers.SetFailureType
         XCTAssertFalse(isImmediate(publisher.setFailureType(to: Error.self)))
         XCTAssertTrue(isImmediate(immediate.setFailureType(to: Error.self)))
@@ -631,10 +606,6 @@ class ImmediatePublisherTests: XCTestCase {
         // Publishers.TryMap
         XCTAssertFalse(isImmediate(publisher.tryMap { $0 }))
         XCTAssertTrue(isImmediate(immediate.tryMap { $0 }))
-        
-        // Publishers.TryPrefixWhile
-        XCTAssertFalse(isImmediate(publisher.tryPrefix(while: { _ in true })))
-        XCTAssertTrue(isImmediate(immediate.tryPrefix(while: { _ in true })))
         
         // Publishers.TryRemoveDuplicates
         XCTAssertFalse(isImmediate(publisher.tryRemoveDuplicates(by: <)))

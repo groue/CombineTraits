@@ -36,14 +36,14 @@ This library provides compiler-checked definition, and subscription, to publishe
     --o--|--> can publish one value and complete.
     ```
     
-- **[Immediate Publishers]** publish a value, or complete right on subscription, synchronously, without any delay:
+- **[Immediate Publishers]** publish a value, or fail right on subscription, synchronously, without any delay:
     
-    The Combine `Just`, `CurrentValueSubject` and `Publishers.Sequence` are examples of such publishers.
+    The Combine `Just`, and `CurrentValueSubject` are examples of such publishers.
     
     ```
-    |-------> can complete immediately.
     x-------> can fail immediately.
-    o-o---o-> must publish their first value immediately.
+    o - - - > can publish one value immediately (and then publish any number of values,
+              at any time, until the eventual completion).
     ```
 
 # Documentation

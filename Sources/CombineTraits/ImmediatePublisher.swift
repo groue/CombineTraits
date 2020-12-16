@@ -2,11 +2,10 @@ import Combine
 import Foundation
 
 /// `ImmediatePublisher` is the protocol for publishers that publish an element
-/// or complete right on subscription, synchronously, without any delay.
+/// or fail right on subscription, synchronously, without any delay.
 ///
-/// In the Combine framework, the built-in `Just`, `CurrentValueSubject` and
-/// `Publishers.Sequence` are examples of publishers that conform
-/// to `ImmediatePublisher`.
+/// In the Combine framework, the built-in `Just` and `CurrentValueSubject` are
+/// examples of publishers that conform to `ImmediatePublisher`.
 ///
 /// Conversely, `URLSession.DataTaskPublisher` is not an immediate publisher,
 /// because it is asynchronous.
@@ -18,7 +17,7 @@ import Foundation
 ///
 /// - An `AnyImmediatePublisher` type that hides details you don’t want to
 ///   expose across API boundaries. For example, the user of the publisher below
-///   knows that it publishes its first `String` immediately:
+///   knows that it publishes a first `String` immediately:
 ///
 ///         func namePublisher() -> AnyImmediatePublisher<String, Never>
 ///
@@ -40,8 +39,8 @@ import Foundation
 ///   such as `Publishers.Map`, when the upstream publisher is an
 ///   immediate publisher.
 ///
-///   When you define a publisher type that publishes an element or completes
-///   right on subscription, you can turn it into an immediate publisher with
+///   When you define a publisher type that publishes an element or fails right
+///   on subscription, you can turn it into an immediate publisher with
 ///   an extension:
 ///
 ///         struct MyImmediatePublisher: Publisher { ... }
@@ -49,12 +48,11 @@ import Foundation
 ///
 /// - **Runtime-checked immediate publishers** are publishers that conform to
 ///   the `ImmediatePublisher` protocol by checking, at runtime, that an
-///   upstream publisher publishes an element or completes right
-///   on subscription.
+///   upstream publisher publishes an element or fails right on subscription.
 ///
 ///     `Publisher.assertImmediate()` returns an immediate publisher that raises
 ///     a fatal error if the upstream publisher does not publish an element or
-///     completes right on subscription.
+///     fail right on subscription.
 ///
 /// - **Unchecked immediate publishers**: you should only build such an
 ///   immediate publisher when you are sure that the `ImmediatePublisher`
@@ -64,21 +62,18 @@ import Foundation
 ///
 ///         // CORRECT
 ///         Just(1).uncheckedImmediate()
-///         Empty().uncheckedImmediate()
 ///
 ///         // WRONG
+///         Empty().uncheckedImmediate()
 ///         Just(1).delay(...).uncheckedImmediate()
 ///
 ///   The consequences of using `uncheckedImmediate()` on a publisher that does
-///   not publish an element or completes right on subscription.
+///   not publish an element or fails right on subscription are undefined.
 ///
 /// # Basic Immediate Publishers
 ///
 /// `AnyImmediatePublisher` comes with factory methods that build basic
 /// immediatee publishers:
-///
-///         // Completes without publishing any value.
-///         AnyImmediatePublisher.empty()
 ///
 ///         // Publishes one value, and then completes.
 ///         AnyImmediatePublisher.just(value)
@@ -108,7 +103,7 @@ extension ImmediatePublisher {
 // MARK: - Checked & Unchecked Immediate Publishers
 
 extension Publisher {
-    /// Checks that the publisher publishes an element or completes right on
+    /// Checks that the publisher publishes an element or fails right on
     /// subscription, and turns contract violations into a `ImmediateError`.
     ///
     /// See also `Publisher.assertImmediate()`.
@@ -116,7 +111,7 @@ extension Publisher {
         CheckImmediatePublisher(upstream: self)
     }
     
-    /// Checks that the publisher publishes an element or completes right on
+    /// Checks that the publisher publishes an element or fails right on
     /// subscription, and raises a fatal error if the contract is not honored.
     ///
     /// - Parameters:
@@ -129,15 +124,15 @@ extension Publisher {
     }
     
     /// Turns a publisher into an immediate publisher, assuming that it
-    /// publishes an element or completes right on subscription.
+    /// publishes an element or fails right on subscription.
     ///
     /// For example:
     ///
     ///     // CORRECT
     ///     Just(1).uncheckedImmediate()
-    ///     Empty().uncheckedImmediate()
     ///
     ///     // WRONG
+    ///     Empty().uncheckedImmediate()
     ///     Just(1).delay(...).uncheckedImmediate()
     ///
     /// See also `Publisher.assertImmediate()`.
@@ -180,7 +175,7 @@ protocol _ImmediateError {
 
 /// The error for checked immediate publishers.
 public enum ImmediateError<UpstreamFailure: Error>: Error, _ImmediateError {
-    /// Upstream publisher did not publish an element or complete right
+    /// Upstream publisher did not publish an element or fail right
     /// on subscription
     case notImmediate
     
@@ -190,7 +185,7 @@ public enum ImmediateError<UpstreamFailure: Error>: Error, _ImmediateError {
     func assertUpstreamFailure(_ prefix: String, file: StaticString, line: UInt) -> UpstreamFailure {
         switch self {
         case .notImmediate:
-            fatalError([prefix, "Immediate violation: did not publish an element or complete right on subscription, at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
+            fatalError([prefix, "Immediate violation: did not publish an element or fail right on subscription, at \(file):\(line)"].filter { !$0.isEmpty }.joined(separator: " "))
         case let .upstream(error):
             return error
         }
@@ -277,16 +272,6 @@ extension AnyImmediatePublisher where Failure == Never {
 }
 
 extension AnyImmediatePublisher {
-    /// Creates an `AnyImmediatePublisher` which immediately completes.
-    public static func empty() -> Self {
-        Empty().uncheckedImmediate()
-    }
-    
-    /// Creates an `AnyImmediatePublisher` which immediately completes.
-    public static func empty(outputType: Output.Type, failureType: Failure.Type) -> Self {
-        Empty(outputType: outputType, failureType: failureType).uncheckedImmediate()
-    }
-    
     /// Creates an `AnyImmediatePublisher` which emits one value, and
     /// then finishes.
     public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
@@ -311,11 +296,11 @@ extension AnyImmediatePublisher {
 // MARK: - CheckImmediatePublisher
 
 /// An immediate publisher that checks that another publisher publishes an
-/// element or completes right on subscription.
+/// element or fails right on subscription.
 ///
 /// `CheckImmediatePublisher` can fail with a `ImmediateError`:
 ///
-/// - `.notImmediate`: Upstream publisher did not publish an element or complete
+/// - `.notImmediate`: Upstream publisher did not publish an element or fail
 ///   right on subscription
 ///
 /// - `.upstream(error)`: Upstream publisher did complete with an error.
@@ -343,7 +328,7 @@ where
     private enum State {
         case waitingForRequest(Upstream, Downstream)
         case waitingForSubscription(Subscribers.Demand, Downstream)
-        case waitingForImmediate(Subscription, Downstream)
+        case waitingForElementOrFailure(Subscription, Downstream)
         case subscribed(Subscription, Downstream)
         case finished
     }
@@ -367,7 +352,7 @@ where
                 state = .waitingForSubscription(demand, downstream)
                 upstream.receive(subscriber: self)
                 switch state {
-                case let .waitingForImmediate(subscription, downstream):
+                case let .waitingForElementOrFailure(subscription, downstream):
                     state = .finished
                     subscription.cancel()
                     downstream.receive(completion: .failure(.notImmediate))
@@ -378,7 +363,7 @@ where
             case let .waitingForSubscription(currentDemand, downstream):
                 state = .waitingForSubscription(demand + currentDemand, downstream)
                 
-            case let .waitingForImmediate(subscription, _),
+            case let .waitingForElementOrFailure(subscription, _),
                  let .subscribed(subscription, _):
                 subscription.request(demand)
                 
@@ -394,7 +379,7 @@ where
             case .waitingForRequest, .waitingForSubscription:
                 state = .finished
                 
-            case let .waitingForImmediate(subscription, _),
+            case let .waitingForElementOrFailure(subscription, _),
                  let .subscribed(subscription, _):
                 subscription.cancel()
                 state = .finished
@@ -411,10 +396,10 @@ where
         synchronized {
             switch state {
             case let .waitingForSubscription(currentDemand, downstream):
-                state = .waitingForImmediate(subscription, downstream)
+                state = .waitingForElementOrFailure(subscription, downstream)
                 subscription.request(currentDemand)
                 
-            case .waitingForRequest, .waitingForImmediate, .subscribed, .finished:
+            case .waitingForRequest, .waitingForElementOrFailure, .subscribed, .finished:
                 break
             }
         }
@@ -428,7 +413,7 @@ where
                  let .subscribed(_, downstream):
                 return downstream.receive(input)
                 
-            case let .waitingForImmediate(subscription, downstream):
+            case let .waitingForElementOrFailure(subscription, downstream):
                 state = .subscribed(subscription, downstream)
                 return downstream.receive(input)
                 
@@ -443,12 +428,20 @@ where
             switch state {
             case let .waitingForRequest(_, downstream),
                  let .waitingForSubscription(_, downstream),
-                 let .waitingForImmediate(_, downstream),
                  let .subscribed(_, downstream):
                 state = .finished
                 switch completion {
                 case .finished:
                     downstream.receive(completion: .finished)
+                case let .failure(error):
+                    downstream.receive(completion: .failure(.upstream(error)))
+                }
+                
+            case let .waitingForElementOrFailure(_, downstream):
+                state = .finished
+                switch completion {
+                case .finished:
+                    downstream.receive(completion: .failure(.notImmediate))
                 case let .failure(error):
                     downstream.receive(completion: .failure(.upstream(error)))
                 }
