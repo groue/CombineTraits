@@ -23,7 +23,7 @@ Conversely, some publishers such as `Publishers.Sequence` are not extended with 
 
 ## AnySinglePublisher
 
-`AnySinglePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
+`AnySinglePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it certainly publishes exactly one `String`, no more, no less:
     
 ```swift
 /// 👍 Publishes exactly one name

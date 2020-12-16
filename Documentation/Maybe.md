@@ -21,7 +21,7 @@ Conversely, some publishers such as `Publishers.Sequence` are not extended with 
 
 ## AnyMaybePublisher
 
-`AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly zero or one `String`, no more, no less:
+`AnyMaybePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it certainly publishes exactly zero or one `String`, no more, no less:
     
 ```swift
 /// 👍 Maybe publishes a name

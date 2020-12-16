@@ -19,7 +19,7 @@ Conversely, some publishers such as `Publishers.Sequence` are not extended with 
 
 ## AnyImmediatePublisher
 
-`AnyImmediatePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it publishes exactly one `String`, no more, no less:
+`AnyImmediatePublisher` is a publisher type that hides details you don’t want to expose across API boundaries. For example, the user of the publisher below knows that it certainly publishes one `String` right on subscription:
     
 ```swift
 /// 👍 Publishes one name right on subscription
