@@ -129,8 +129,6 @@ where A: ImmediatePublisher, B: ImmediatePublisher, C: ImmediatePublisher, D: Im
 
 extension Result.Publisher: ImmediatePublisher { }
 
-extension CurrentValueSubject: ImmediatePublisher { }
-
 extension Deferred: ImmediatePublisher
 where DeferredPublisher: ImmediatePublisher { }
 

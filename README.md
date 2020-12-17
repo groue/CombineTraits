@@ -38,7 +38,7 @@ This library provides compiler-checked definition, and subscription, to publishe
     
 - **[Immediate Publishers]** publish a value or fail, right on subscription:
     
-    The Combine `Just`, `Fail` and `CurrentValueSubject` are examples of such publishers.
+    The Combine `Just` and `Fail` are examples of such publishers.
     
     ```
     x-------> can fail immediately.

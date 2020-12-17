@@ -177,9 +177,7 @@ class ImmediatePublisherTests: XCTestCase {
     func test_CheckImmediatePublisher_ElementWithoutCompletion() throws {
         struct TestError: Error { }
         let subject = CurrentValueSubject<Int, TestError>(1)
-        let publisher = subject
-            .eraseToAnyPublisher()
-            .checkImmediate()
+        let publisher = subject.checkImmediate()
         
         var completion: Subscribers.Completion<ImmediateError<TestError>>?
         var value: Int?
@@ -266,9 +264,7 @@ class ImmediatePublisherTests: XCTestCase {
     func test_AssertNoImmediateFailurePublisher_ElementWithoutCompletion() throws {
         struct TestError: Error { }
         let subject = CurrentValueSubject<Int, TestError>(1)
-        let publisher = subject
-            .eraseToAnyPublisher()
-            .assertImmediate()
+        let publisher = subject.assertImmediate()
         
         var completion: Subscribers.Completion<TestError>?
         var value: Int?
@@ -657,9 +653,6 @@ class ImmediatePublisherTests: XCTestCase {
         // Deferred
         XCTAssertFalse(isImmediate(Deferred { publisher }))
         XCTAssertTrue(isImmediate(Deferred { immediate }))
-        
-        // CurrentValueSubject
-        XCTAssertTrue(isImmediate(CurrentValueSubject<Int, Error>(1)))
         
         // Fail
         XCTAssertTrue(isImmediate(Fail<Int, Error>(error: TestError())))

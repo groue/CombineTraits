@@ -4,12 +4,12 @@ import Foundation
 /// `ImmediatePublisher` is the protocol for publishers that publish an element
 /// or fail right on subscription, synchronously, without any delay.
 ///
-/// In the Combine framework, the built-in `Just`, `Fail` and
-/// `CurrentValueSubject` are examples of publishers that conform
-/// to `ImmediatePublisher`.
+/// In the Combine framework, the built-in `Just` and `Fail` are examples of
+/// publishers that conform to `ImmediatePublisher`.
 ///
-/// Conversely, `URLSession.DataTaskPublisher` is not an immediate publisher,
-/// because it is asynchronous.
+/// Conversely, `Publishers.Sequence` is not an immediate publisher, because not
+/// all sequences contain at least one element. `URLSession.DataTaskPublisher`
+/// is not an immediate publisher, because it is asynchronous.
 ///
 /// # ImmediatePublisher Benefits
 ///
