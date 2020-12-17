@@ -12,7 +12,7 @@ protocol ImmediatePublisher: Publisher { }
 
 When you import CombineTraits, many Combine publishers are extended with conformance to `ImmediatePublisher`, such as `Just` and `Fail`. Other publishers are conditionally extended, such as `Publishers.Map` or `Publishers.FlatMap`.
 
-Conversely, some publishers such as `Publishers.Sequence` are not extended with `ImmediatePublisher`, because not all sequences contain at least one element. And `Future` or `URLSession.DataTaskPublisher` are not immediate publisher, because they are asynchronous.
+Conversely, some publishers such as `Publishers.Sequence` are not extended with `ImmediatePublisher`, because not all sequences contain at least one element. And `Future` or `URLSession.DataTaskPublisher` are not immediate publishers, because they are asynchronous.
 
 - [AnyImmediatePublisher]: a replacement for `AnyPublisher`
 - [Building Immediate Publishers]
