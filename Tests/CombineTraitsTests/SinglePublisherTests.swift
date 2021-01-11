@@ -437,6 +437,94 @@ class SinglePublisherTests: XCTestCase {
         accept2(.fail(TestError()))
     }
     
+    // MARK: - preventCancellation
+    
+    func test_preventCancellation() {
+        // Returns a cancellable publisher
+        func makePublisher() -> AnySinglePublisher<Date, Never> {
+            Timer
+            .publish(every: 0.01, on: .main, in: .common)
+            .autoconnect()
+            .first()
+            .assertSingle()
+            .eraseToAnySinglePublisher()
+        }
+        
+        // Test that we can receive a value
+        do {
+            let expectation = self.expectation(description: "value received")
+            let cancellable = makePublisher()
+                .sinkSingle(receive: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                })
+            withExtendedLifetime(cancellable) {
+                wait(for: [expectation], timeout: 1)
+            }
+        }
+        
+        // Test that value is not produced when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "value not produced")
+            expectation.isInverted = true
+            let cancellable = makePublisher()
+                .map { date -> Date in
+                    // Should not happen
+                    expectation.fulfill()
+                    return date
+                }
+                .sinkSingle(receive: { _ in })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that we don't receive any value when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "value not received")
+            expectation.isInverted = true
+            let cancellable = makePublisher()
+                .sinkSingle(receive: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that we don't receive any value when the subscription is
+        // cancelled, even with `preventCancellation`
+        do {
+            let expectation = self.expectation(description: "value not received")
+            expectation.isInverted = true
+            let cancellable = makePublisher()
+                .preventCancellation()
+                .sinkSingle(receive: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that value is produced when the subscription and we
+        // call `preventCancellation`.
+        do {
+            let expectation = self.expectation(description: "value produced")
+            let cancellable = makePublisher()
+                .map { date -> Date in
+                    // Should happen
+                    expectation.fulfill()
+                    return date
+                }
+                .preventCancellation()
+                .sinkSingle(receive: { _ in })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 1)
+        }
+    }
+    
     // MARK: - sinkSingle
     
     func test_sinkSingle() {

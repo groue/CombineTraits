@@ -1,9 +1,9 @@
 Trait Operators
 ===============
 
-#### `assertSingle()`, `assertMaybe()`
+#### `assertSingle()`, `assertMaybe()`, `assertImmediate()`
 
-Use these operators for internal sanity checks, when you want to make sure that a publisher follows the rules of the [single] or [maybe] trait.
+Use these operators for internal sanity checks, when you want to make sure that a publisher follows the rules of the [single], [maybe], or [immediate] trait.
 
 The returned publisher raises a fatal error, in both development/testing and shipping versions of code, whenever the upstream publisher fails to follow the rules.
 
@@ -19,9 +19,9 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 ```
 
-#### `eraseToAnySinglePublisher()`, `eraseToAnyMaybePublisher()`
+#### `eraseToAnySinglePublisher()`, `eraseToAnyMaybePublisher()`, `eraseToAnyImmediatePublisher()`
 
-Use these operators instead of `eraseToAnyPublisher()` when you want to expose a [single] or [maybe] guarantee.
+Use these operators instead of `eraseToAnyPublisher()` when you want to expose a [single], [maybe], or [immediate] guarantee.
 
 For example:
 
@@ -32,8 +32,28 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 
 /// Maybe publishes a name
-func namePublisher() -> AnyMaybePublisher<String, Error> {
+func namePublisher() -> AnyMaybePublisher<String, Error> {O
     /* some maybe publisher */.eraseToAnyMaybePublisher()
+}
+```
+
+#### `preventCancellation()`
+
+This operator on a [single] publisher makes sure it proceeds to completion, even if a subscription is cancelled and its output is eventually ignored.
+
+Use this operator in order to guarantee that the consequences of some intent are fully applied. For example:
+
+```swift
+func signOutPublisher() -> AnySinglePublisher<Void, Never> {
+    Publishers
+        .Zip3(
+            invalidateSessionsPublisher(),
+            eraseLocalDataPublisher(),
+            unregisterFromRemoteNotificationsPublisher())
+        .map { _ in }
+        // Make sure sign out proceeds to completion
+        .preventCancellation()
+        .eraseToAnySinglePublishers()
 }
 ```
 
@@ -53,9 +73,9 @@ func nameSinglePublisher() -> AnySinglePublisher<String, Error> {
 }
 ```
 
-#### `uncheckedSingle()`, `uncheckedMaybe()`
+#### `uncheckedSingle()`, `uncheckedMaybe()`, `uncheckedImmediate()`
 
-Use these operators when you are sure that a publisher follows the rules of the [single] or [maybe] trait.
+Use these operators when you are sure that a publisher follows the rules of the [single], [maybe], or [immediate] trait.
 
 For example:
 
@@ -81,3 +101,4 @@ The consequences of using those operators on a publisher that does not follow th
 
 [single]: Single.md
 [maybe]: Maybe.md
+[immediate]: Immediate.md
