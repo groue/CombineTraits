@@ -508,7 +508,7 @@ class SinglePublisherTests: XCTestCase {
             wait(for: [expectation], timeout: 0.2)
         }
         
-        // Test that value is produced when the subscription and we
+        // Test that value is produced when the subscription is cancelled and we
         // call `preventCancellation`.
         do {
             let expectation = self.expectation(description: "value produced")
@@ -521,6 +521,21 @@ class SinglePublisherTests: XCTestCase {
                 .preventCancellation()
                 .sinkSingle(receive: { _ in })
             cancellable.cancel()
+            wait(for: [expectation], timeout: 1)
+        }
+        
+        // Test that value is produced when the cancellable is ignored and we
+        // call `preventCancellation`.
+        do {
+            let expectation = self.expectation(description: "value produced")
+            _ = makePublisher()
+                .map { date -> Date in
+                    // Should happen
+                    expectation.fulfill()
+                    return date
+                }
+                .preventCancellation()
+                .sinkSingle(receive: { _ in })
             wait(for: [expectation], timeout: 1)
         }
     }
