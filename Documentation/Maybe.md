@@ -150,7 +150,7 @@ There are a few ways to get such a maybe publisher:
     
     The consequences of using `uncheckedMaybe()` on a publisher that does not publish exactly zero value, or one value, or an error, are undefined.
 
-See also [Basic Maybe Publishers], [TraitPublishers.Maybe] and [TraitSubscriptions.Maybe].
+See also [Basic Maybe Publishers], [DeferredFutureMaybe] and [TraitSubscriptions.Maybe].
 
 ### Basic Maybe Publishers
 
@@ -178,16 +178,16 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 }
 ```
 
-### TraitPublishers.Maybe
+### DeferredFutureMaybe
 
-`TraitPublishers.Maybe` is a ready-made Combine [Publisher] which allows you to dynamically send success or failure events.
+`DeferredFutureMaybe` is a ready-made Combine [Publisher] which allows you to dynamically send success or failure events.
 
 It lets you easily create custom maybe publishers to wrap most non-publisher asynchronous work.
 
 You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
 
 ```swift
-let publisher = TraitPublishers.Maybe<String, MyError> { promise in
+let publisher = DeferredFutureMaybe<String, MyError> { promise in
     // Eventually send completion event, now or in the future:
     promise(.finished)
     // OR
@@ -201,15 +201,17 @@ let publisher = TraitPublishers.Maybe<String, MyError> { promise in
 }
 ```
 
-`TraitPublishers.Maybe` is a "deferred" maybe publisher:
+`DeferredFutureMaybe` is a "deferred future" maybe publisher, because:
 
-- Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
-- It can complete right on subscription, or at any time in the future.
+- Like the [Deferred] Combine publisher, nothing happens until `DeferredFutureMaybe` is subscribed to. A new job starts on each subscription.
+- Like the [Future] Combine publisher, It can complete any time, immediately after subscription, or in the future.
 
-When needed, `TraitPublishers.Maybe` can forward its job to another maybe publisher:
+However, `DeferredFutureMaybe` allows cancellation cleanup.
+
+When needed, `DeferredFutureMaybe` can forward its job to another maybe publisher:
 
 ```swift
-let publisher = TraitPublishers.Maybe<String, MyError> { promise in
+let publisher = DeferredFutureMaybe<String, MyError> { promise in
     return otherMaybePublisher.sinkMaybe(receive: promise)
 }
 ```
@@ -325,7 +327,9 @@ class MyViewController: UIViewController {
 [`sinkMaybe(receive:)`]: #sinkmaybereceive
 [Building Maybe Publishers]: #building-maybe-publishers
 [Basic Maybe Publishers]: #basic-maybe-publishers
-[TraitPublishers.Maybe]: #TraitPublishersmaybe
+[DeferredFutureMaybe]: #deferredfuturemaybe
 [TraitSubscriptions.Maybe]: #traitsubscriptionsmaybe
 [Publisher]: https://developer.apple.com/documentation/combine/publisher
 [Subscription]: https://developer.apple.com/documentation/combine/subscription
+[Deferred]: https://developer.apple.com/documentation/combine/deferred
+[Future]: https://developer.apple.com/documentation/combine/future

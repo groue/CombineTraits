@@ -2,18 +2,18 @@ import Combine
 import CombineTraits
 import XCTest
 
-class TraitPublishersSingleTests: XCTestCase {
-    func test_TraitPublishersSingle_is_a_SinglePublisher() {
+class DeferredFutureSingleTests: XCTestCase {
+    func test_DeferredFutureSingle_is_a_SinglePublisher() {
         // This test passes if this test compiles
         func acceptSomeSinglePublisher<P: SinglePublisher>(_ p: P) { }
-        func f<Output, Failure>(_ p: TraitPublishers.Single<Output, Failure>) {
+        func f<Output, Failure>(_ p: DeferredFutureSingle<Output, Failure>) {
             acceptSomeSinglePublisher(p)
         }
     }
     
-    func test_TraitPublishersSingle_is_deferred() {
+    func test_DeferredFutureSingle_is_deferred() {
         var subscribed = false
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             subscribed = true
             return AnyCancellable({ })
         }
@@ -23,9 +23,9 @@ class TraitPublishersSingleTests: XCTestCase {
         XCTAssertTrue(subscribed)
     }
     
-    func test_TraitPublishersSingle_is_not_shared() {
+    func test_DeferredFutureSingle_is_not_shared() {
         var subscriptionCount = 0
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             subscriptionCount += 1
             return AnyCancellable({ })
         }
@@ -37,8 +37,8 @@ class TraitPublishersSingleTests: XCTestCase {
         XCTAssertEqual(subscriptionCount, 2)
     }
     
-    func test_TraitPublishersSingle_as_never() {
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+    func test_DeferredFutureSingle_as_never() {
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             return AnyCancellable({ })
         }
         
@@ -63,8 +63,8 @@ class TraitPublishersSingleTests: XCTestCase {
         }
     }
     
-    func test_TraitPublishersSingle_as_just() {
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+    func test_DeferredFutureSingle_as_just() {
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             promise(.success(1))
             return AnyCancellable({ })
         }
@@ -79,9 +79,9 @@ class TraitPublishersSingleTests: XCTestCase {
         XCTAssertEqual(completion, .finished)
     }
     
-    func test_TraitPublishersSingle_as_fail() {
+    func test_DeferredFutureSingle_as_fail() {
         struct TestError: Error { }
-        let publisher = TraitPublishers.Single<Int, Error> { promise in
+        let publisher = DeferredFutureSingle<Int, Error> { promise in
             promise(.failure(TestError()))
             return AnyCancellable({ })
         }
@@ -101,8 +101,8 @@ class TraitPublishersSingleTests: XCTestCase {
         }
     }
     
-    func test_TraitPublishersSingle_as_delayed_just() {
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+    func test_DeferredFutureSingle_as_delayed_just() {
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
                 promise(.success(1))
             }
@@ -129,9 +129,9 @@ class TraitPublishersSingleTests: XCTestCase {
         }
     }
     
-    func test_TraitPublishersSingle_as_delayed_fail() {
+    func test_DeferredFutureSingle_as_delayed_fail() {
         struct TestError: Error { }
-        let publisher = TraitPublishers.Single<Int, Error> { promise in
+        let publisher = DeferredFutureSingle<Int, Error> { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
                 promise(.failure(TestError()))
             }
@@ -165,7 +165,7 @@ class TraitPublishersSingleTests: XCTestCase {
     
     func test_cancellation_after_completion() {
         var disposed = false
-        let publisher = TraitPublishers.Single<Int, Error> { promise in
+        let publisher = DeferredFutureSingle<Int, Error> { promise in
             promise(.success(1))
             return AnyCancellable({ disposed = true })
         }
@@ -179,7 +179,7 @@ class TraitPublishersSingleTests: XCTestCase {
     
     func test_cancellation_before_completion() {
         var disposed = false
-        let publisher = TraitPublishers.Single<Int, Error> { promise in
+        let publisher = DeferredFutureSingle<Int, Error> { promise in
             return AnyCancellable({ disposed = true })
         }
         
@@ -194,7 +194,7 @@ class TraitPublishersSingleTests: XCTestCase {
     
     func test_forwarding() {
         let upstream = Just(1)
-        let publisher = TraitPublishers.Single<Int, Never> { promise in
+        let publisher = DeferredFutureSingle<Int, Never> { promise in
             return upstream.sinkSingle(receive: promise)
         }
         

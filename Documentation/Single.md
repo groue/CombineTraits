@@ -177,7 +177,7 @@ There are a few ways to get such a single publisher:
     
     The consequences of using `uncheckedSingle()` on a publisher that does not publish exactly one value, or an error, are undefined.
 
-See also [Basic Single Publishers], [TraitPublishers.Single] and [TraitSubscriptions.Single].
+See also [Basic Single Publishers], [DeferredFutureSingle] and [TraitSubscriptions.Single].
 
 ### Basic Single Publishers
 
@@ -202,16 +202,16 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
 }
 ```
 
-### TraitPublishers.Single
+### DeferredFutureSingle
 
-`TraitPublishers.Single` is a ready-made Combine [Publisher] which which allows you to dynamically send success or failure events.
+`DeferredFutureSingle` is a ready-made Combine [Publisher] which allows you to dynamically send success or failure events.
 
 It lets you easily create custom single publishers to wrap most non-publisher asynchronous work.
 
 You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
 
 ```swift
-let publisher = TraitPublishers.Single<String, MyError> { promise in
+let publisher = DeferredFutureSingle<String, MyError> { promise in
     // Eventually send completion event, now or in the future:
     promise(.success("Alice"))
     // OR
@@ -223,15 +223,17 @@ let publisher = TraitPublishers.Single<String, MyError> { promise in
 }
 ```
 
-`TraitPublishers.Single` can be seen as a "deferred future" single publisher:
+`DeferredFutureSingle` is a "deferred future" single publisher, because:
 
-- Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
-- It can complete right on subscription, or at any time in the future.
+- Like the [Deferred] Combine publisher, nothing happens until `DeferredFutureSingle` is subscribed to. A new job starts on each subscription.
+- Like the [Future] Combine publisher, It can complete any time, immediately after subscription, or in the future.
 
-When needed, `TraitPublishers.Single` can forward its job to another single publisher:
+However, `DeferredFutureSingle` allows cancellation cleanup.
+
+When needed, `DeferredFutureSingle` can forward its job to another single publisher:
 
 ```swift
-let publisher = TraitPublishers.Single<String, MyError> { promise in
+let publisher = DeferredFutureSingle<String, MyError> { promise in
     return otherSinglePublisher.sinkSingle(receive: promise)
 }
 ```
@@ -348,7 +350,9 @@ class MyViewController: UIViewController {
 [Composing Single Publishers]: #composing-single-publishers
 [Building Single Publishers]: #building-single-publishers
 [Basic Single Publishers]: #basic-single-publishers
-[TraitPublishers.Single]: #TraitPublisherssingle
+[DeferredFutureSingle]: #deferredfuturesingle
 [TraitSubscriptions.Single]: #traitsubscriptionssingle
 [Publisher]: https://developer.apple.com/documentation/combine/publisher
 [Subscription]: https://developer.apple.com/documentation/combine/subscription
+[Deferred]: https://developer.apple.com/documentation/combine/deferred
+[Future]: https://developer.apple.com/documentation/combine/future
