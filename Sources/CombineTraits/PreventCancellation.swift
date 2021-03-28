@@ -40,3 +40,16 @@ extension MaybePublisher {
     }
 }
 
+extension MaybePublisher where Output == Void {
+    /// Subscribes to the publisher and let it proceed to completion.
+    public func fireAndForgetIgnoringFailure() {
+        _ = preventCancellation().sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+    }
+}
+
+extension MaybePublisher where Output == Void, Failure == Never {
+    /// Subscribes to the publisher and let it proceed to completion.
+    public func fireAndForget() {
+        _ = preventCancellation().sink(receiveValue: { _ in })
+    }
+}

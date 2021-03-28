@@ -759,6 +759,158 @@ class MaybePublisherTests: XCTestCase {
             wait(for: [expectation], timeout: 1)
         }
     }
+    
+    // MARK: - fireAndForget
+    
+    func test_fireAndForget_single() {
+        // Returns a well-behaved publisher that does not publish any value
+        // after a subscription has been cancelled.
+        func makePublisher() -> AnyMaybePublisher<Void, Never> {
+            // The two publisher belows are NOT well-behaved:
+            //
+            // - Just(Date()).receive(on: DispatchQueue.main)
+            // - Just(Date()).delay(for: 0.01, scheduler: DispatchQueue.main)
+            Timer
+                .publish(every: 0.01, on: .main, in: .common)
+                .autoconnect()
+                .first()
+                .map { _ in }
+                .eraseToAnyMaybePublisher()
+        }
+        
+        // Test that we can receive a result
+        do {
+            let expectation = self.expectation(description: "value received")
+            expectation.expectedFulfillmentCount = 2
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                })
+            withExtendedLifetime(cancellable) {
+                wait(for: [expectation], timeout: 1)
+            }
+        }
+        
+        // Test that value is not produced when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "value not produced")
+            expectation.isInverted = true
+            let cancellable = makePublisher()
+                .handleEvents(receiveOutput: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                })
+                .sinkMaybe(receive: { _ in })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that we don't receive any value when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "value not received")
+            expectation.isInverted = true
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that value is produced with `fireAndForget`.
+        do {
+            let expectation = self.expectation(description: "value produced")
+            makePublisher()
+                .handleEvents(receiveOutput: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                })
+                .fireAndForget()
+            wait(for: [expectation], timeout: 1)
+        }
+    }
+    
+    func test_fireAndForget_empty() {
+        // Returns a well-behaved publisher that does not publish any completion
+        // after a subscription has been cancelled.
+        func makePublisher() -> AnyMaybePublisher<Void, Never> {
+            AnyMaybePublisher
+                .empty()
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyMaybePublisher()
+        }
+        
+        // Test that we can receive a completion
+        do {
+            let expectation = self.expectation(description: "completion received")
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in
+                    // Should happen
+                    XCTFail("Unexpected value")
+                })
+            withExtendedLifetime(cancellable) {
+                wait(for: [expectation], timeout: 1)
+            }
+        }
+        
+        // Test that completion is not produced when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "completion not produced")
+            expectation.isInverted = true
+            let cancellable = makePublisher()
+                .handleEvents(receiveCompletion: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                })
+                .sinkMaybe(receive: { _ in })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that we don't receive any completion when the subscription
+        // is cancelled.
+        do {
+            let expectation = self.expectation(description: "completion not received")
+            expectation.isInverted = true
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in })
+            cancellable.cancel()
+            wait(for: [expectation], timeout: 0.2)
+        }
+        
+        // Test that completion is produced with `fireAndForget`.
+        do {
+            let expectation = self.expectation(description: "completion produced")
+            makePublisher()
+                .handleEvents(receiveCompletion: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                })
+                .fireAndForget()
+            wait(for: [expectation], timeout: 1)
+        }
+    }
 
     // MARK: - sinkMaybe
     
