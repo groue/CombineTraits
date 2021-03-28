@@ -16,6 +16,9 @@ let package = Package(
         .library(
             name: "CombineTraits",
             targets: ["CombineTraits"]),
+        .library(
+            name: "CancelBag",
+            targets: ["CancelBag"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -26,9 +29,18 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "CombineTraits",
-            dependencies: []),
+            dependencies: ["CancelBag"]),
         .testTarget(
             name: "CombineTraitsTests",
             dependencies: ["CombineTraits"]),
+        .testTarget(
+            name: "CombineTraitsCancelBagTests",
+            dependencies: ["CombineTraits"]),
+        .target(
+            name: "CancelBag",
+            dependencies: []),
+        .testTarget(
+            name: "CancelBagTests",
+            dependencies: ["CancelBag"]),
     ]
 )
