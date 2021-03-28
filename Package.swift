@@ -30,7 +30,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "CombineTraits",
-            dependencies: ["CancelBag"]),
+            dependencies: ["AsynchronousOperation", "CancelBag"]),
         .testTarget(
             name: "CombineTraitsTests",
             dependencies: ["CombineTraits", "CombineExpectations"]),
@@ -43,5 +43,8 @@ let package = Package(
         .testTarget(
             name: "CancelBagTests",
             dependencies: ["CancelBag"]),
+        .target(
+            name: "AsynchronousOperation",
+            dependencies: []),
     ]
 )
