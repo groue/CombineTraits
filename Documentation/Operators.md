@@ -37,6 +37,16 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {O
 }
 ```
 
+#### `fireAndForget()`, `fireAndForgetIgnoringFailure()`
+
+Those methods subscribe to a [maybe] or [single] publisher, and let it proceed to completion, but do not report eventual element or completion.
+
+```swift
+myNetworkPublisher().fireAndForgetIgnoringFailure()
+```
+
+> :point_up: **Note**: Both methods are available when `Output` is `Void`. `fireAndForget()` is available when `Failure` is `Never`.
+
 #### `preventCancellation()`
 
 This operator on a [single] or [maybe] publisher makes sure it proceeds to completion, even if a subscription is cancelled and its output is eventually ignored.
