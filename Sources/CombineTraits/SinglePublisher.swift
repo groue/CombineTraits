@@ -144,24 +144,6 @@ extension SinglePublisher {
                 receive(.success(value))
             })
     }
-    
-    /// Returns a single publisher that outputs the same value and error as
-    /// the receiver publisher.
-    ///
-    /// When a subscription to the returned publisher is cancelled, the receiver
-    /// still proceeds to completion.
-    public func preventCancellation() -> AnySinglePublisher<Output, Failure> {
-        TraitPublishers.Single { promise in
-            var cancellable: AnyCancellable? = nil
-            cancellable = self.sinkSingle(receive: { result in
-                promise(result)
-                withExtendedLifetime(cancellable) {
-                    cancellable = nil
-                }
-            })
-            return AnyCancellable { }
-        }.eraseToAnySinglePublisher()
-    }
 }
 
 // MARK: - Checked & Unchecked Single Publishers

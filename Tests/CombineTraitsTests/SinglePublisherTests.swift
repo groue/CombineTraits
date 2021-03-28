@@ -440,21 +440,32 @@ class SinglePublisherTests: XCTestCase {
     // MARK: - preventCancellation
     
     func test_preventCancellation() {
-        // Returns a cancellable publisher
-        func makePublisher() -> AnySinglePublisher<Date, Never> {
+        // Returns a well-behaved publisher that does not publish any value
+        // after a subscription has been cancelled.
+        func makePublisher() -> AnySinglePublisher<Void, Never> {
+            // The two publisher belows are NOT well-behaved:
+            //
+            // - Just(Date()).receive(on: DispatchQueue.main)
+            // - Just(Date()).delay(for: 0.01, scheduler: DispatchQueue.main)
             Timer
-            .publish(every: 0.01, on: .main, in: .common)
-            .autoconnect()
-            .first()
-            .assertSingle()
-            .eraseToAnySinglePublisher()
+                .publish(every: 0.01, on: .main, in: .common)
+                .autoconnect()
+                .first()
+                .map { _ in }
+                .assertSingle()
+                .eraseToAnySinglePublisher()
         }
         
-        // Test that we can receive a value
+        // Test that we can receive a result
         do {
             let expectation = self.expectation(description: "value received")
-            let cancellable = makePublisher()
-                .sinkSingle(receive: { _ in
+            expectation.expectedFulfillmentCount = 2
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in
                     // Should happen
                     expectation.fulfill()
                 })
@@ -469,11 +480,10 @@ class SinglePublisherTests: XCTestCase {
             let expectation = self.expectation(description: "value not produced")
             expectation.isInverted = true
             let cancellable = makePublisher()
-                .map { date -> Date in
+                .handleEvents(receiveOutput: { _ in
                     // Should not happen
                     expectation.fulfill()
-                    return date
-                }
+                })
                 .sinkSingle(receive: { _ in })
             cancellable.cancel()
             wait(for: [expectation], timeout: 0.2)
@@ -484,8 +494,12 @@ class SinglePublisherTests: XCTestCase {
         do {
             let expectation = self.expectation(description: "value not received")
             expectation.isInverted = true
-            let cancellable = makePublisher()
-                .sinkSingle(receive: { _ in
+            let cancellable = makePublisher().sink(
+                receiveCompletion: { _ in
+                    // Should not happen
+                    expectation.fulfill()
+                },
+                receiveValue: { _ in
                     // Should not happen
                     expectation.fulfill()
                 })
@@ -500,10 +514,15 @@ class SinglePublisherTests: XCTestCase {
             expectation.isInverted = true
             let cancellable = makePublisher()
                 .preventCancellation()
-                .sinkSingle(receive: { _ in
-                    // Should not happen
-                    expectation.fulfill()
-                })
+                .sink(
+                    receiveCompletion: { _ in
+                        // Should not happen
+                        expectation.fulfill()
+                    },
+                    receiveValue: { _ in
+                        // Should not happen
+                        expectation.fulfill()
+                    })
             cancellable.cancel()
             wait(for: [expectation], timeout: 0.2)
         }
@@ -513,11 +532,10 @@ class SinglePublisherTests: XCTestCase {
         do {
             let expectation = self.expectation(description: "value produced")
             let cancellable = makePublisher()
-                .map { date -> Date in
+                .handleEvents(receiveOutput: { _ in
                     // Should happen
                     expectation.fulfill()
-                    return date
-                }
+                })
                 .preventCancellation()
                 .sinkSingle(receive: { _ in })
             cancellable.cancel()
@@ -529,11 +547,10 @@ class SinglePublisherTests: XCTestCase {
         do {
             let expectation = self.expectation(description: "value produced")
             _ = makePublisher()
-                .map { date -> Date in
+                .handleEvents(receiveOutput: { _ in
                     // Should happen
                     expectation.fulfill()
-                    return date
-                }
+                })
                 .preventCancellation()
                 .sinkSingle(receive: { _ in })
             wait(for: [expectation], timeout: 1)

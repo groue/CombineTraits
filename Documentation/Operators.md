@@ -39,7 +39,7 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {O
 
 #### `preventCancellation()`
 
-This operator on a [single] publisher makes sure it proceeds to completion, even if a subscription is cancelled and its output is eventually ignored.
+This operator on a [single] or [maybe] publisher makes sure it proceeds to completion, even if a subscription is cancelled and its output is eventually ignored.
 
 Use this operator in order to guarantee that the consequences of some intent are fully applied. For example:
 
