@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 
 - [Operators](Documentation/Operators.md) Introduce `MaybePublisher.fireAndForget()` and `fireAndForgetIgnoringFailure()`
 - [Operators](Documentation/Operators.md) Introduce `MaybePublisher.preventCancellation()`
+- Introduce `CancelBag`
+- Introduce `TraitPublishers.ZipSingle`
 
 **2021-01-11**
 
