@@ -133,11 +133,8 @@ extension SinglePublisher {
     public func sinkSingle(receive: @escaping (Result<Output, Failure>) -> Void) -> AnyCancellable {
         sink(
             receiveCompletion: { completion in
-                switch completion {
-                case let .failure(error):
+                if case let .failure(error) = completion {
                     receive(.failure(error))
-                case .finished:
-                    break
                 }
             },
             receiveValue: { value in
