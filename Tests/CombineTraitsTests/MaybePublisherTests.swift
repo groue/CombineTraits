@@ -1255,6 +1255,9 @@ class MaybePublisherTests: XCTestCase {
         
         // Just
         XCTAssertTrue(isMaybe(Just(1)))
+        
+        // TraitPublishers.PreventCancellation
+        XCTAssertTrue(isMaybe(maybe.preventCancellation()))
     }
 }
 

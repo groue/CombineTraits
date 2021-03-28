@@ -1106,6 +1106,9 @@ class SinglePublisherTests: XCTestCase {
         
         // Just
         XCTAssertTrue(isSingle(Just(1)))
+        
+        // TraitPublishers.PreventCancellation
+        XCTAssertTrue(isSingle(single.preventCancellation()))
     }
 }
 
