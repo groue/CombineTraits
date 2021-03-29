@@ -14,8 +14,8 @@ extension SinglePublisher {
     ///     let operation = upstreamPublisher
     ///         .subscribe(on: DispatchQueue.main)
     ///         .operation()
-    public func makeOperation() -> TraitPublishers.Operation<Self> {
-        TraitPublishers.Operation(self)
+    public func makeOperation() -> SinglePublisherOperation<Self> {
+        SinglePublisherOperation(self)
     }
     
     /// Returns a publisher which, on subscription, wraps the upstream publisher
@@ -46,6 +46,37 @@ extension SinglePublisher {
         TraitPublishers.AsOperation(
             upstream: self,
             operationQueue: operationQueue)
+    }
+}
+
+/// An operation that subscribe to a single publisher.
+public class SinglePublisherOperation<Upstream: SinglePublisher>: AsynchronousOperation<Upstream.Output, Upstream.Failure> {
+    private var upstream: Upstream?
+    private var cancellable: AnyCancellable?
+    
+    fileprivate init(_ upstream: Upstream) {
+        self.upstream = upstream
+    }
+    
+    override public func main() {
+        guard let upstream = upstream else {
+            // It can only get nil if operation was cancelled. Who would
+            // call main() on a cancelled operation? Nobody.
+            preconditionFailure("Operation started without upstream publisher")
+        }
+        
+        cancellable = upstream.sinkSingle { [weak self] result in
+            self?.result = result
+        }
+        
+        // Release memory
+        self.upstream = nil
+    }
+    
+    override public func cancel() {
+        super.cancel()
+        upstream = nil
+        cancellable = nil
     }
 }
 
@@ -82,7 +113,7 @@ extension TraitPublishers {
             Downstream.Input == Output,
             Downstream.Failure == Failure
         {
-            private weak var operation: Operation<Upstream>?
+            private weak var operation: SinglePublisherOperation<Upstream>?
             
             override func start(with context: Context) {
                 let operation = context.upstream.makeOperation()
@@ -104,37 +135,6 @@ extension TraitPublishers {
             override func didCancel(with context: Context) {
                 operation?.cancel()
             }
-        }
-    }
-    
-    /// An operation that subscribe to a single publisher.
-    public class Operation<Upstream: SinglePublisher>: AsynchronousOperation<Upstream.Output, Upstream.Failure> {
-        private var upstream: Upstream?
-        private var cancellable: AnyCancellable?
-        
-        fileprivate init(_ upstream: Upstream) {
-            self.upstream = upstream
-        }
-        
-        override public func main() {
-            guard let upstream = upstream else {
-                // It can only get nil if operation was cancelled. Who would
-                // call main() on a cancelled operation? Nobody.
-                preconditionFailure("Operation started without upstream publisher")
-            }
-            
-            cancellable = upstream.sinkSingle { [weak self] result in
-                self?.result = result
-            }
-            
-            // Release memory
-            self.upstream = nil
-        }
-        
-        override public func cancel() {
-            super.cancel()
-            upstream = nil
-            cancellable = nil
         }
     }
 }
