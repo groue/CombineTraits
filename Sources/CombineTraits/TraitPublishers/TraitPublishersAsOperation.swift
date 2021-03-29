@@ -18,12 +18,9 @@ extension SinglePublisher {
         SinglePublisherOperation(self)
     }
     
-    /// Returns a publisher which, on subscription, wraps the upstream publisher
-    /// in an operation, and adds the operation to the provided operation queue.
-    ///
-    /// The uptream publisher is subscribed when the operation starts. The
-    /// operation completes when the uptream publisher completes. The returned
-    /// publisher completes with the operation.
+    /// When it is subscribed, the returned publisher creates and schedules a
+    /// new Operation in `operationQueue`. The subscription completes with the
+    /// operation, when the `uptream` publisher completes.
     ///
     /// Use `subscribe(on:options:)` when you need to control when the upstream
     /// publisher is subscribed:
@@ -33,7 +30,7 @@ extension SinglePublisher {
     ///         .asOperation(in: queue)
     ///
     /// Use `receive(on:options:)` when you need to control when the returned
-    /// publisher publishes its elements and completion:
+    /// publisher publishes its element and completion:
     ///
     ///     let publisher = upstreamPublisher
     ///         .asOperation(in: queue)
@@ -81,29 +78,41 @@ public class SinglePublisherOperation<Upstream: SinglePublisher>: AsynchronousOp
 }
 
 extension TraitPublishers {
-    /// A publisher that runs an asynchronous operation.
+    /// `AsOperation` is a publisher that wraps the upstream single publisher in
+    /// a Foundation Operation.
     public struct AsOperation<Upstream: SinglePublisher>: SinglePublisher {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
         
         private struct Context {
             let upstream: Upstream
-            let queue: OperationQueue
+            let operationQueue: OperationQueue
         }
         
-        private let context: Context
+        public let upstream: Upstream
+        public let operationQueue: OperationQueue
         
-        fileprivate init(
+        /// When it is subscribed, `AsOperation` creates and schedules a new
+        /// Operation in `operationQueue`. The subscription completes with the
+        /// operation, when the uptream publisher completes.
+        ///
+        /// - parameter upstream: The upstream publisher.
+        /// - parameter operationQueue: The `OperationQueue` to run the
+        ///   publisher in.
+        public init(
             upstream: Upstream,
             operationQueue: OperationQueue)
         {
-            context = Context(upstream: upstream, queue: operationQueue)
+            self.upstream = upstream
+            self.operationQueue = operationQueue
         }
         
         public func receive<S>(subscriber: S)
         where S: Subscriber, S.Failure == Self.Failure, S.Input == Self.Output
         {
-            let subscription = Subscription(downstream: subscriber, context: context)
+            let subscription = Subscription(
+                downstream: subscriber,
+                context: Context(upstream: upstream, operationQueue: operationQueue))
             subscriber.receive(subscription: subscription)
         }
         
@@ -129,7 +138,7 @@ extension TraitPublishers {
                     }
                 }
                 self.operation = operation
-                context.queue.addOperation(operation)
+                context.operationQueue.addOperation(operation)
             }
             
             override func didCancel(with context: Context) {

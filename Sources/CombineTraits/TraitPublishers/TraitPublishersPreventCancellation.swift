@@ -1,11 +1,8 @@
 import Combine
 
 extension TraitPublishers {
-    /// `PreventCancellation` is a publisher that outputs the same element and
-    /// completion as its upstream publisher.
-    ///
-    /// When a subscription to `PreventCancellation` is cancelled, the uptream
-    /// subscription still proceeds to completion.
+    /// `PreventCancellation` prevents its upstream publisher from
+    /// being cancelled.
     public struct PreventCancellation<Upstream: MaybePublisher>: MaybePublisher {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
@@ -30,24 +27,21 @@ extension TraitPublishers {
 extension TraitPublishers.PreventCancellation: SinglePublisher where Upstream: SinglePublisher { }
 
 extension MaybePublisher {
-    /// Returns a publisher that outputs the same element and completion as the
-    /// receiver publisher.
-    ///
-    /// When a subscription to the returned publisher is cancelled, the receiver
-    /// still proceeds to completion.
+    /// Returns a publisher that prevents the `upstream` publisher from
+    /// being cancelled.
     public func preventCancellation() -> TraitPublishers.PreventCancellation<Self> {
         TraitPublishers.PreventCancellation(upstream: self)
     }
 }
 
-extension MaybePublisher where Output == Void {
+extension MaybePublisher where Output == Never {
     /// Subscribes to the publisher and let it proceed to completion.
     public func fireAndForgetIgnoringFailure() {
         _ = preventCancellation().sink(receiveCompletion: { _ in }, receiveValue: { _ in })
     }
 }
 
-extension MaybePublisher where Output == Void, Failure == Never {
+extension MaybePublisher where Output == Never, Failure == Never {
     /// Subscribes to the publisher and let it proceed to completion.
     public func fireAndForget() {
         _ = preventCancellation().sink(receiveValue: { _ in })

@@ -837,6 +837,7 @@ class MaybePublisherTests: XCTestCase {
                     // Should happen
                     expectation.fulfill()
                 })
+                .ignoreOutput()
                 .fireAndForget()
             wait(for: [expectation], timeout: 1)
         }
@@ -907,6 +908,7 @@ class MaybePublisherTests: XCTestCase {
                     // Should happen
                     expectation.fulfill()
                 })
+                .ignoreOutput()
                 .fireAndForget()
             wait(for: [expectation], timeout: 1)
         }
