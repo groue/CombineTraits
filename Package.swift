@@ -35,6 +35,9 @@ let package = Package(
             name: "CombineTraitsTests",
             dependencies: ["CombineTraits", "CombineExpectations"]),
         .testTarget(
+            name: "CombineTraitsAsynchronousOperationTests",
+            dependencies: ["CombineTraits", "CombineExpectations"]),
+        .testTarget(
             name: "CombineTraitsCancelBagTests",
             dependencies: ["CombineTraits"]),
         .target(

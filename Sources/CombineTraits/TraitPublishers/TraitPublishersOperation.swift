@@ -3,7 +3,7 @@ import Combine
 import Foundation
 
 extension SinglePublisher {
-    /// Returns an asynchronous operation that wraps the upstream publisher.
+    /// Creates an asynchronous operation that wraps the upstream publisher.
     ///
     /// The uptream publisher is subscribed when the operation starts. The
     /// operation completes when the uptream publisher completes.
@@ -14,8 +14,8 @@ extension SinglePublisher {
     ///     let operation = upstreamPublisher
     ///         .subscribe(on: DispatchQueue.main)
     ///         .operation()
-    func operation() -> TraitPublishers.SingleOperation<Self> {
-        TraitPublishers.SingleOperation(self)
+    public func makeOperation() -> TraitPublishers.Operation<Self> {
+        TraitPublishers.Operation(self)
     }
     
     /// Returns a publisher which, on subscription, wraps the upstream publisher
@@ -30,17 +30,17 @@ extension SinglePublisher {
     ///
     ///     let publisher = upstreamPublisher
     ///         .subscribe(on: DispatchQueue.main)
-    ///         .inOperationQueue(queue)
+    ///         .asOperation(in: queue)
     ///
     /// Use `receive(on:options:)` when you need to control when the returned
     /// publisher publishes its elements and completion:
     ///
     ///     let publisher = upstreamPublisher
-    ///         .inOperationQueue(queue)
+    ///         .asOperation(in: queue)
     ///         .receive(on: DispatchQueue.main)
     ///
     /// - parameter operationQueue: The `OperationQueue` to run the publisher in.
-    func inOperationQueue(_ operationQueue: OperationQueue)
+    public func asOperation(in operationQueue: OperationQueue)
     -> TraitPublishers.AsOperation<Self>
     {
         TraitPublishers.AsOperation(
@@ -49,30 +49,43 @@ extension SinglePublisher {
     }
 }
 
-// MARK: - AsynchronousOperationPublisher
-
 extension TraitPublishers {
     /// A publisher that runs an asynchronous operation.
-    struct AsOperation<Upstream: SinglePublisher>: SinglePublisher {
-        typealias Output = Upstream.Output
-        typealias Failure = Upstream.Failure
+    public struct AsOperation<Upstream: SinglePublisher>: SinglePublisher {
+        public typealias Output = Upstream.Output
+        public typealias Failure = Upstream.Failure
         
         private struct Context {
             let upstream: Upstream
             let queue: OperationQueue
         }
         
-        // swiftlint:disable:next colon
+        private let context: Context
+        
+        fileprivate init(
+            upstream: Upstream,
+            operationQueue: OperationQueue)
+        {
+            context = Context(upstream: upstream, queue: operationQueue)
+        }
+        
+        public func receive<S>(subscriber: S)
+        where S: Subscriber, S.Failure == Self.Failure, S.Input == Self.Output
+        {
+            let subscription = Subscription(downstream: subscriber, context: context)
+            subscriber.receive(subscription: subscription)
+        }
+        
         private class Subscription<Downstream: Subscriber>:
             TraitSubscriptions.Single<Downstream, Context>
         where
             Downstream.Input == Output,
             Downstream.Failure == Failure
         {
-            private weak var operation: SingleOperation<Upstream>?
+            private weak var operation: Operation<Upstream>?
             
             override func start(with context: Context) {
-                let operation = context.upstream.operation()
+                let operation = context.upstream.makeOperation()
                 operation.handleCompletion(onQueue: nil) { [weak self] result in
                     guard let self = self else { return }
                     switch result {
@@ -92,26 +105,10 @@ extension TraitPublishers {
                 operation?.cancel()
             }
         }
-        
-        private let context: Context
-        
-        fileprivate init(
-            upstream: Upstream,
-            operationQueue: OperationQueue)
-        {
-            context = Context(upstream: upstream, queue: operationQueue)
-        }
-        
-        func receive<S>(subscriber: S)
-        where S: Subscriber, S.Failure == Self.Failure, S.Input == Self.Output
-        {
-            let subscription = Subscription(downstream: subscriber, context: context)
-            subscriber.receive(subscription: subscription)
-        }
     }
     
-    /// An operation that runs a publisher.
-    public class SingleOperation<Upstream: SinglePublisher>: AsynchronousOperation<Upstream.Output, Upstream.Failure> {
+    /// An operation that subscribe to a single publisher.
+    public class Operation<Upstream: SinglePublisher>: AsynchronousOperation<Upstream.Output, Upstream.Failure> {
         private var upstream: Upstream?
         private var cancellable: AnyCancellable?
         
@@ -123,7 +120,7 @@ extension TraitPublishers {
             guard let upstream = upstream else {
                 // It can only get nil if operation was cancelled. Who would
                 // call main() on a cancelled operation? Nobody.
-                preconditionFailure("SingleOperation started without upstream publisher")
+                preconditionFailure("Operation started without upstream publisher")
             }
             
             cancellable = upstream.sinkSingle { [weak self] result in
