@@ -3,6 +3,11 @@ Release Notes
 
 All notable changes to this project will be documented in this file.
 
+**2021-03-29**
+
+- Introduce `SinglePublisherOperation`
+- Introduce `TraitPublishers.AsOperation`
+
 **2021-03-28**
 
 - [Operators](Documentation/Operators.md) Introduce `MaybePublisher.fireAndForget()` and `fireAndForgetIgnoringFailure()`
