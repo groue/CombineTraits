@@ -84,13 +84,13 @@ extension TraitPublishers {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
         
+        public let upstream: Upstream
+        public let operationQueue: OperationQueue
+        
         private struct Context {
             let upstream: Upstream
             let operationQueue: OperationQueue
         }
-        
-        public let upstream: Upstream
-        public let operationQueue: OperationQueue
         
         /// When it is subscribed, `AsOperation` creates and schedules a new
         /// Operation in `operationQueue`. The subscription completes with the

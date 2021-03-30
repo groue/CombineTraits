@@ -2,21 +2,26 @@ import Combine
 
 extension TraitPublishers {
     /// `ZipSingle` is a publisher that zips several single publishers together
-    /// and publishes an array that contains as many elements as the
-    /// zipped collection.
+    /// and publishes one array of all published elements.
     ///
     /// It exists as a complement to `Publishers.Zip`, `Zip3` and `Zip4` that
     /// supports any number of publishers.
     ///
     /// When the collection is empty, `ZipSingle` publishes an empty array.
-    public struct ZipSingle<Upstream>: SinglePublisher
-    where Upstream: Collection,
-          Upstream.Element: Publisher
+    public struct ZipSingle<UpstreamCollection>: SinglePublisher
+    where UpstreamCollection: Collection,
+          UpstreamCollection.Element: Publisher
     {
-        public typealias Output = [Upstream.Element.Output]
-        public typealias Failure = Upstream.Element.Failure
+        public typealias Output = [UpstreamCollection.Element.Output]
+        public typealias Failure = UpstreamCollection.Element.Failure
         
-        fileprivate let collection: Upstream
+        /// The zipped collection
+        public let collection: UpstreamCollection
+        
+        /// Creates a `ZipSingle` publisher
+        public init(collection: UpstreamCollection) {
+            self.collection = collection
+        }
         
         public func receive<S>(subscriber: S)
         where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input
@@ -32,7 +37,7 @@ extension TraitPublishers {
 
 extension Collection where Element: SinglePublisher {
     /// Returns a publisher that zips all publishers together and publishes
-    /// an array that contains as many elements as the zipped collection.
+    /// one array of all published elements.
     ///
     /// This method is a complement to `Publishers.Zip`, `Zip3` and `Zip4` that
     /// supports any number of publishers.

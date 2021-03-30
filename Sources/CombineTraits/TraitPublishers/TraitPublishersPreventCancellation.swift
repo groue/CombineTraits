@@ -7,7 +7,13 @@ extension TraitPublishers {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
         
-        let upstream: Upstream
+        /// The upstream publisher
+        public let upstream: Upstream
+        
+        /// Creates a `PreventCancellation` publisher
+        public init(upstream: Upstream) {
+            self.upstream = upstream
+        }
         
         public func receive<S>(subscriber: S) where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
             TraitPublishers.Maybe { promise in

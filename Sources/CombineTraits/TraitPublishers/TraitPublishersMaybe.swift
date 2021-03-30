@@ -42,8 +42,7 @@ extension TraitPublishers {
         typealias Start = (@escaping Promise) -> AnyCancellable
         let start: Start
         
-        // TODO: doc
-        // TODO: allow any cancellable
+        /// Creates a `Maybe` publisher.
         public init(_ start: @escaping (@escaping Promise) -> AnyCancellable) {
             self.start = start
         }
