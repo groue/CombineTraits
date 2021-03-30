@@ -1,5 +1,5 @@
-Immediate Publishers
-====================
+ImmediatePublisher
+==================
 
 **`ImmediatePublisher` is the protocol for publishers that publish a value or fail, right on subscription.**
 

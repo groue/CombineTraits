@@ -21,4 +21,4 @@ All notable changes to this project will be documented in this file.
 
 **2020-12-16**
 
-- [Immediate](Documentation/Immediate.md) Introduce `ImmediatePublisher`
+- [Immediate](Documentation/ImmediatePublisher.md) Introduce `ImmediatePublisher`

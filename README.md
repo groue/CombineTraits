@@ -52,7 +52,18 @@ This library provides compiler-checked definition, and subscription, to publishe
 - [Single Publishers]
 - [Maybe Publishers]
 - [Immediate Publishers]
+
+**Derived Tools**
+
 - [Trait Operators]
+- [SinglePublisherOperation]
+- [TraitPublishers.AsOperation]
+- [TraitPublishers.Maybe]
+- [TraitPublishers.PreventCancellation]
+- [TraitPublishers.Single]
+- [TraitPublishers.ZipSingle]
+- [TraitSubscriptions.Maybe]
+- [TraitSubscriptions.Single]
 
 ## Usage
 
@@ -84,7 +95,15 @@ let cancellable = refreshPublisher().sinkSingle { result in
 [Combine]: https://developer.apple.com/documentation/combine
 [Release Notes]: CHANGELOG.md
 [Usage]: #usage
-[Single Publishers]: Documentation/Single.md
-[Maybe Publishers]: Documentation/Maybe.md
-[Immediate Publishers]: Documentation/Immediate.md
+[Single Publishers]: Documentation/SinglePublisher.md
+[Maybe Publishers]: Documentation/MaybePublisher.md
+[Immediate Publishers]: Documentation/ImmediatePublisher.md
 [Trait Operators]: Documentation/Operators.md
+[SinglePublisherOperation]: Documentation/SinglePublisherOperation.md
+[TraitPublishers.AsOperation]: Documentation/TraitPublishers-AsOperation.md
+[TraitPublishers.Maybe]: TraitPublishers-Maybe.md
+[TraitPublishers.PreventCancellation]: TraitPublishers-PreventCancellation.md
+[TraitPublishers.Single]: TraitPublishers-Single.md
+[TraitPublishers.ZipSingle]: TraitPublishers-ZipSingle.md
+[TraitSubscriptions.Maybe]: TraitSubscriptions-Maybe.md
+[TraitSubscriptions.Single]: TraitSubscriptions-Single.md

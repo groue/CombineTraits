@@ -1,6 +1,18 @@
 Trait Operators
 ===============
 
+#### `asOperation(in:)`
+
+This operator builds a publisher that wraps the upstream [single] publisher in a Foundation Operation:
+
+```swift
+let operationQueue = OperationQueue()
+let upstreamPublisher = ... // some single publisher
+let publisher = upstreamPublisher.asOperation(in: operationQueue)
+```
+
+See [TraitPublishers.AsOperation].
+
 #### `assertSingle()`, `assertMaybe()`, `assertImmediate()`
 
 Use these operators for internal sanity checks, when you want to make sure that a publisher follows the rules of the [single], [maybe], or [immediate] trait.
@@ -18,6 +30,8 @@ func namePublisher() -> AnySinglePublisher<String, Error> {
         .eraseToAnySinglePublisher()
 }
 ```
+
+See [SinglePublisher], [MaybePublisher], [ImmediatePublisher].
 
 #### `eraseToAnySinglePublisher()`, `eraseToAnyMaybePublisher()`, `eraseToAnyImmediatePublisher()`
 
@@ -37,6 +51,8 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {O
 }
 ```
 
+See [SinglePublisher], [MaybePublisher], [ImmediatePublisher].
+
 #### `fireAndForget()`, `fireAndForgetIgnoringFailure()`
 
 Those methods subscribe to a [maybe] or [single] publisher, and let it proceed to completion, but do not report eventual element or completion.
@@ -45,27 +61,33 @@ Those methods subscribe to a [maybe] or [single] publisher, and let it proceed t
 myNetworkPublisher().fireAndForgetIgnoringFailure()
 ```
 
-> :point_up: **Note**: Both methods are available when `Output` is `Void`. `fireAndForget()` is available when `Failure` is `Never`.
+See [TraitPublishers.PreventCancellation].
+
+#### `makeOperation()`
+
+This operator creates a Foundation [Operation] that wraps an upstream publisher.
+
+The publisher is subscribed when the operation starts, and the operation completes when the uptream publisher completes.
+
+```swift
+let publisher = ... // some single publisher
+let operation = publisher.makeOperation()
+let queue = OperationQueue()
+queue.addOperation(operation)
+```
+
+See [SinglePublisherOperation].
 
 #### `preventCancellation()`
 
 This operator on a [single] or [maybe] publisher makes sure it proceeds to completion, even if a subscription is cancelled and its output is eventually ignored.
 
-Use this operator in order to guarantee that the consequences of some intent are fully applied. For example:
-
 ```swift
-func signOutPublisher() -> AnySinglePublisher<Void, Never> {
-    Publishers
-        .Zip3(
-            invalidateSessionsPublisher(),
-            eraseLocalDataPublisher(),
-            unregisterFromRemoteNotificationsPublisher())
-        .map { _ in }
-        // Make sure sign out proceeds to completion
-        .preventCancellation()
-        .eraseToAnySinglePublishers()
-}
+let upstreamPublisher = ... // some maybe or single publisher
+let publisher = upstreamPublisher.preventCancellation()
 ```
+
+See [TraitPublishers.PreventCancellation].
 
 #### `replaceEmpty(withError:)`
 
@@ -82,6 +104,8 @@ func nameSinglePublisher() -> AnySinglePublisher<String, Error> {
         .replaceEmpty(withError: MissingNameError())
 }
 ```
+
+See [SinglePublisher], [MaybePublisher].
 
 #### `uncheckedSingle()`, `uncheckedMaybe()`, `uncheckedImmediate()`
 
@@ -109,6 +133,31 @@ someSubject.prefix(1).uncheckedSingle()
 
 The consequences of using those operators on a publisher that does not follow the rules are undefined.
 
-[single]: Single.md
-[maybe]: Maybe.md
-[immediate]: Immediate.md
+See [SinglePublisher], [MaybePublisher], [ImmediatePublisher].
+
+#### `zipSingle()`
+
+This operator builds a [single] publisher out of a collection of [single] publishers:
+
+```swift
+let collection = [
+    Just(1),
+    Just(2),
+]
+let publisher = collection.zipSingle()
+```
+
+See [TraitPublishers.ZipSingle].
+
+
+[single]: SinglePublisher.md
+[maybe]: MaybePublisher.md
+[immediate]: ImmediatePublisher.md
+[SinglePublisher]: SinglePublisher.md
+[MaybePublisher]: MaybePublisher.md
+[ImmediatePublisher]: ImmediatePublisher.md
+[Operation]: https://developer.apple.com/documentation/foundation/operation
+[TraitPublishers.AsOperation]: TraitPublishers-AsOperation.md
+[TraitPublishers.PreventCancellation]: TraitPublishers-PreventCancellation.md
+[TraitPublishers.ZipSingle]: TraitPublishers-ZipSingle.md
+[SinglePublisherOperation]: SinglePublisherOperation.md

@@ -1,5 +1,5 @@
-Maybe Publishers
-================
+MaybePublisher
+==============
 
 **`MaybePublisher` is the protocol for publishers that publish exactly zero value, or one value, or an error.**
 
@@ -178,154 +178,11 @@ func namePublisher() -> AnyMaybePublisher<String, Error> {
 }
 ```
 
-### TraitPublishers.Maybe
-
-`TraitPublishers.Maybe` is a ready-made Combine [Publisher] which allows you to dynamically send success or failure events.
-
-It lets you easily create custom maybe publishers to wrap most non-publisher asynchronous work.
-
-You create this publisher by providing a closure. This closure runs when the publisher is subscribed to. It returns a cancellable object in which you define any cleanup actions to execute when the publisher completes, or when the subscription is canceled.
-
-```swift
-let publisher = TraitPublishers.Maybe<String, MyError> { promise in
-    // Eventually send completion event, now or in the future:
-    promise(.finished)
-    // OR
-    promise(.success("Alice"))
-    // OR
-    promise(.failure(MyError()))
-    
-    return AnyCancellable { 
-        // Perform cleanup
-    }
-}
-```
-
-`TraitPublishers.Maybe` is a "deferred" maybe publisher:
-
-- Nothing happens until the publisher is subscribed to. A new job starts on each subscription.
-- It can complete right on subscription, or at any time in the future.
-
-When needed, `TraitPublishers.Maybe` can forward its job to another maybe publisher:
-
-```swift
-let publisher = TraitPublishers.Maybe<String, MyError> { promise in
-    return otherMaybePublisher.sinkMaybe(receive: promise)
-}
-```
-
-### TraitSubscriptions.Maybe
-
-`TraitSubscriptions.Maybe` is a ready-made Combine [Subscription] that helps you building maybe publishers that wrap complex asynchronous apis.
-
-```swift
-open class Maybe<Downstream: Subscriber, Context>: NSObject, Subscription {
-    public init(downstream: Downstream, context: Context)
-    
-    /// Subclasses must override and eventually call the `receive` function
-    open func start(with context: Context) { }
-    
-    /// Subclasses can override and perform eventual cleanup after the
-    /// subscription was cancelled.
-    ///
-    /// The default implementation does nothing.
-    open func didCancel(with context: Context) { }
-    
-    /// Subclasses can override and perform eventual cleanup after the
-    /// subscription was completed.
-    ///
-    /// The default implementation does nothing.
-    open func didComplete(with context: Context) { }
-    
-    /// Completes the subscription with the publisher result.
-    public func receive(_ result: MaybeResult<Downstream.Input, Downstream.Failure>)
-}
-```
-
-It is designed to be subclassed. Your custom subscriptions will override the `start(with:)` method in order to start their job, call the `receive(_:)` method in order to complete, and override `didCancel(with:)` when they should perform cancellation cleanup. Use `context` in order to pass any useful information.
-
-For example, let's build a maybe publisher that lets a user pick a phone number from their address book. This publisher defines a subscription that subclasses `TraitSubscriptions.Maybe`:
-
-```swift
-import Combine
-import CombineTraits
-import ContactsUI
-import UIKit
-
-/// A publisher that presents the contact picker and lets the user pick
-/// a phone number.
-///
-/// It publishes a phone number, or nothing if the user dismisses the contact
-/// picker without making any choice.
-///
-/// It must be subscribed from the main thread.
-struct PhoneNumberPublisher: MaybePublisher {
-    typealias Output = CNPhoneNumber
-    typealias Failure = Never
-    
-    let viewController: UIViewController
-    
-    init(presentingContactPickerFrom viewController: UIViewController) {
-        self.viewController = viewController
-    }
-    
-    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-        let subscription = Subscription(
-            downstream: subscriber,
-            context: viewController)
-        subscriber.receive(subscription: subscription)
-    }
-    
-    private class Subscription<Downstream: Subscriber>:
-        TraitSubscriptions.Maybe<Downstream, UIViewController>,
-        CNContactPickerDelegate
-    where
-        Downstream.Input == Output,
-        Downstream.Failure == Failure
-    {
-        override func start(with viewController: UIViewController) {
-            let contactPicker = CNContactPickerViewController()
-            contactPicker.displayedPropertyKeys = [CNContactPhoneNumbersKey]
-            contactPicker.delegate = self
-            viewController.present(contactPicker, animated: true, completion: nil)
-        }
-        
-        override func didCancel(with viewController: UIViewController) {
-            viewController.dismiss(animated: true)
-        }
-        
-        // CNContactPickerDelegate
-        func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-            receive(.finished)
-        }
-        
-        // CNContactPickerDelegate
-        func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
-            if let phoneNumber = contactProperty.value as? CNPhoneNumber {
-                receive(.success(phoneNumber))
-            }
-        }
-    }
-}
-
-// Usage:
-
-class MyViewController: UIViewController {
-    @IBAction func pickPhoneNumber() {
-        PhoneNumberPublisher(presentingContactPickerFrom: self)
-            .sinkMaybe { result in
-                // handle result
-            }
-            .store(in: &cancellables)
-    }
-}
-```
-
 [AnyMaybePublisher]: #anymaybepublisher
 [`sinkMaybe(receive:)`]: #sinkmaybereceive
 [Building Maybe Publishers]: #building-maybe-publishers
 [Basic Maybe Publishers]: #basic-maybe-publishers
-[TraitPublishers.Maybe]: #TraitPublishersmaybe
-[TraitSubscriptions.Maybe]: #traitsubscriptionsmaybe
+[TraitPublishers.Maybe]: TraitPublishers-Maybe.md
+[TraitSubscriptions.Maybe]: TraitSubscriptions-Maybe.md
 [Publisher]: https://developer.apple.com/documentation/combine/publisher
 [Subscription]: https://developer.apple.com/documentation/combine/subscription
