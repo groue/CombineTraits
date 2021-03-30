@@ -26,7 +26,7 @@ This publisher produces the same element and completion as its upstream publishe
 
 **fireAndForget()**
 
-When you want to subscribe to a publisher, and let it proceed to completion without handling its output and completion, you can use the `fireAndForget` subscription method. `fireAndForget` is available on [maybe] publishers when `Output` is `Never`. You can use `ignoreOutput()` in order to get such a `Never` publisher:
+When you want to subscribe to a publisher, and let it proceed to completion without handling its output and completion, you can use the `fireAndForget` subscription method. `fireAndForget` is available on [maybe] publishers when `Output` is `Never`. You can use [`ignoreOutput()`] in order to get such a `Never` publisher:
 
 ```swift
 publisher.ignoreOutput().fireAndForget() // Available if Failure is Never
@@ -35,3 +35,4 @@ publisher.ignoreOutput().fireAndForgetIgnoringFailure()
 
 [maybe]: MaybePublisher.md
 [single]: SinglePublisher.md
+[`ignoreOutput()`]: https://developer.apple.com/documentation/combine/publisher/ignoreoutput()
