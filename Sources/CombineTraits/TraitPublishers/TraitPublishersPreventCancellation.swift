@@ -27,8 +27,9 @@ extension TraitPublishers {
 extension TraitPublishers.PreventCancellation: SinglePublisher where Upstream: SinglePublisher { }
 
 extension MaybePublisher {
-    /// Returns a publisher that prevents the `upstream` publisher from
-    /// being cancelled.
+    /// Returns a publisher that produces the same element and completion as the
+    /// upstream publisher. If it is cancelled, upstream proceeds to completion
+    /// nevertheless (and its element and completion are left unhandled).
     public func preventCancellation() -> TraitPublishers.PreventCancellation<Self> {
         TraitPublishers.PreventCancellation(upstream: self)
     }
