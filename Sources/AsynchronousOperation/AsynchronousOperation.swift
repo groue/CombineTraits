@@ -8,31 +8,30 @@ import Foundation
 /// 2. Use makeOperation { op in ... }, and eventually cancel the
 ///    operation, or set result to a non-nil value.
 open class AsynchronousOperation<Output, Failure: Error>: Operation {
-    /// Setting the result to a non-nil value finishes the operation.
+    public var result: Result<Output, Failure>? { synchronized { _result } }
+    
+    /// Finish the operation with the given result.
     ///
-    /// If operation is already finished, setting the result has no effect.
-    public var result: Result<Output, Failure>? {
-        get { return _result }
-        set {
-            synchronized {
-                if _isFinished { return }
-                if _isEarlyFinished { return }
-
-                if _isExecuting {
-                    willChangeValue(forKey: isExecutingKey)
-                    willChangeValue(forKey: isFinishedKey)
-                    _isExecuting = false
-                    _result = newValue
-                    _isFinished = true
-                    didChangeValue(forKey: isFinishedKey)
-                    didChangeValue(forKey: isExecutingKey)
-                } else {
-                    _isEarlyFinished = true
-                    _result = newValue
-                }
-                
-                didComplete()
+    /// If operation is already finished, this method does nothing.
+    public func finish(with result: Result<Output, Failure>) {
+        synchronized {
+            if _isFinished { return }
+            if _isEarlyFinished { return }
+            
+            if _isExecuting {
+                willChangeValue(forKey: isExecutingKey)
+                willChangeValue(forKey: isFinishedKey)
+                _isExecuting = false
+                _result = result
+                _isFinished = true
+                didChangeValue(forKey: isFinishedKey)
+                didChangeValue(forKey: isExecutingKey)
+            } else {
+                _isEarlyFinished = true
+                _result = result
             }
+            
+            didComplete()
         }
     }
     

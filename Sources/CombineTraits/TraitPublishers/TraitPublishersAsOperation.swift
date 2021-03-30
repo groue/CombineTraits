@@ -63,7 +63,7 @@ public class SinglePublisherOperation<Upstream: SinglePublisher>: AsynchronousOp
         }
         
         cancellable = upstream.sinkSingle { [weak self] result in
-            self?.result = result
+            self?.finish(with: result)
         }
         
         // Release memory
