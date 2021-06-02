@@ -101,9 +101,9 @@ let cancellable = refreshPublisher().sinkSingle { result in
 [Trait Operators]: Documentation/Operators.md
 [SinglePublisherOperation]: Documentation/SinglePublisherOperation.md
 [TraitPublishers.AsOperation]: Documentation/TraitPublishers-AsOperation.md
-[TraitPublishers.Maybe]: TraitPublishers-Maybe.md
-[TraitPublishers.PreventCancellation]: TraitPublishers-PreventCancellation.md
-[TraitPublishers.Single]: TraitPublishers-Single.md
-[TraitPublishers.ZipSingle]: TraitPublishers-ZipSingle.md
-[TraitSubscriptions.Maybe]: TraitSubscriptions-Maybe.md
-[TraitSubscriptions.Single]: TraitSubscriptions-Single.md
+[TraitPublishers.Maybe]: Documentation/TraitPublishers-Maybe.md
+[TraitPublishers.PreventCancellation]: Documentation/TraitPublishers-PreventCancellation.md
+[TraitPublishers.Single]: Documentation/TraitPublishers-Single.md
+[TraitPublishers.ZipSingle]: Documentation/TraitPublishers-ZipSingle.md
+[TraitSubscriptions.Maybe]: Documentation/TraitSubscriptions-Maybe.md
+[TraitSubscriptions.Single]: Documentation/TraitSubscriptions-Single.md
