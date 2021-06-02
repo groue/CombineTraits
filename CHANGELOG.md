@@ -3,6 +3,11 @@ Release Notes
 
 All notable changes to this project will be documented in this file.
 
+**2021-06-02**
+
+- Expose the `AsynchronousOperation` target.
+- Add the `asOperation(in:queuePriority:)` operator.
+
 **2021-03-29**
 
 - Introduce `SinglePublisherOperation`
