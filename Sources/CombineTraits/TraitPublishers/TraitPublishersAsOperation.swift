@@ -106,6 +106,8 @@ extension TraitPublishers {
         /// - parameter upstream: The upstream publisher.
         /// - parameter operationQueue: The `OperationQueue` to run the
         ///   publisher in.
+        /// - parameter queuePriority: The relative execution priority in the
+        ///   operation queue.
         public init(
             upstream: Upstream,
             operationQueue: OperationQueue,

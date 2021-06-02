@@ -7,9 +7,13 @@ TraitPublishers.AsOperation
 struct AsOperation<Upstream: SinglePublisher>: SinglePublisher {
     let upstream: Upstream
     let operationQueue: OperationQueue
+    let queuePriority: Operation.QueuePriority
     
     /// Creates an `AsOperation` publisher
-    init(upstream: Upstream, operationQueue: OperationQueue)
+    init(
+        upstream: Upstream,
+        operationQueue: OperationQueue,
+        queuePriority: Operation.QueuePriority)
 }
 ```
 
