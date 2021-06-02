@@ -37,12 +37,17 @@ extension SinglePublisher {
     ///         .receive(on: DispatchQueue.main)
     ///
     /// - parameter operationQueue: The `OperationQueue` to run the publisher in.
-    public func asOperation(in operationQueue: OperationQueue)
+    /// - parameter queuePriority: The execution priority of the operation.
+    ///   Defaults to `.normal`.
+    public func asOperation(
+        in operationQueue: OperationQueue,
+        queuePriority: Operation.QueuePriority = .normal)
     -> TraitPublishers.AsOperation<Self>
     {
         TraitPublishers.AsOperation(
             upstream: self,
-            operationQueue: operationQueue)
+            operationQueue: operationQueue,
+            queuePriority: queuePriority)
     }
 }
 
@@ -86,10 +91,12 @@ extension TraitPublishers {
         
         public let upstream: Upstream
         public let operationQueue: OperationQueue
+        public let queuePriority: Operation.QueuePriority
         
         private struct Context {
             let upstream: Upstream
             let operationQueue: OperationQueue
+            let queuePriority: Operation.QueuePriority
         }
         
         /// When it is subscribed, `AsOperation` creates and schedules a new
@@ -101,10 +108,12 @@ extension TraitPublishers {
         ///   publisher in.
         public init(
             upstream: Upstream,
-            operationQueue: OperationQueue)
+            operationQueue: OperationQueue,
+            queuePriority: Operation.QueuePriority)
         {
             self.upstream = upstream
             self.operationQueue = operationQueue
+            self.queuePriority = queuePriority
         }
         
         public func receive<S>(subscriber: S)
@@ -112,7 +121,7 @@ extension TraitPublishers {
         {
             let subscription = Subscription(
                 downstream: subscriber,
-                context: Context(upstream: upstream, operationQueue: operationQueue))
+                context: Context(upstream: upstream, operationQueue: operationQueue, queuePriority: queuePriority))
             subscriber.receive(subscription: subscription)
         }
         
@@ -126,6 +135,7 @@ extension TraitPublishers {
             
             override func start(with context: Context) {
                 let operation = context.upstream.makeOperation()
+                operation.queuePriority = context.queuePriority
                 operation.handleCompletion(onQueue: nil) { [weak self] result in
                     guard let self = self else { return }
                     switch result {

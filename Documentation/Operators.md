@@ -1,7 +1,7 @@
 Trait Operators
 ===============
 
-#### `asOperation(in:)`
+#### `asOperation(in:queuePriority:)`
 
 This operator builds a publisher that wraps the upstream [single] publisher in a Foundation Operation:
 
@@ -9,6 +9,7 @@ This operator builds a publisher that wraps the upstream [single] publisher in a
 let operationQueue = OperationQueue()
 let upstreamPublisher = ... // some single publisher
 let publisher = upstreamPublisher.asOperation(in: operationQueue)
+let publisher = upstreamPublisher.asOperation(in: operationQueue, queuePriority: .normal)
 ```
 
 See [TraitPublishers.AsOperation].

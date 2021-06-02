@@ -21,6 +21,7 @@ struct AsOperation<Upstream: SinglePublisher>: SinglePublisher {
 let operationQueue = OperationQueue()
 let upstreamPublisher = ... // some single publisher
 let publisher = upstreamPublisher.asOperation(in: operationQueue)
+let publisher = upstreamPublisher.asOperation(in: operationQueue, queuePriority: .normal)
 ```
 
 When it is subscribed, the publisher creates and schedules a new Operation in the OperationQueue. The subscription completes with the operation, when the uptream publisher completes.
