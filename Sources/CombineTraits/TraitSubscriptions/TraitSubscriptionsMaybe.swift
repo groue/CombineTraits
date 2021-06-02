@@ -47,7 +47,7 @@ extension TraitSubscriptions {
         }
         
         private var state: State
-        private let lock = NSRecursiveLock() // Allow re-entrancy
+        private let lock = NSLock()
         
         public init(
             downstream: Downstream,
