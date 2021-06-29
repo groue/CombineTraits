@@ -277,7 +277,7 @@ extension AnyImmediatePublisher {
     /// then finishes.
     public static func just(_ value: Output) -> Self {
         Just(value)
-            .setFailureType(to: Self.Failure)
+            .setFailureType(to: Failure.self)
             .eraseToAnyImmediatePublisher()
     }
 
