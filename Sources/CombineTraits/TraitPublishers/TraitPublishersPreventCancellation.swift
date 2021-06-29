@@ -18,7 +18,7 @@ extension TraitPublishers {
         public func receive<S>(subscriber: S) where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
             TraitPublishers.Maybe { promise in
                 var cancellable: AnyCancellable? = nil
-                cancellable = upstream.sinkMaybe(receive: { result in
+                cancellable = self.upstream.sinkMaybe(receive: { result in
                     promise(result)
                     withExtendedLifetime(cancellable) {
                         cancellable = nil

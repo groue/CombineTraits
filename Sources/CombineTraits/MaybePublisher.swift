@@ -315,7 +315,7 @@ public struct AnyMaybePublisher<Output, Failure: Error>: MaybePublisher {
     ///
     /// See `Publisher.uncheckedMaybe()`.
     fileprivate init<P>(unchecked publisher: P)
-    where P: Publisher, P.Failure == Self.Failure, P.Output == Output
+    where P: Publisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -325,7 +325,7 @@ public struct AnyMaybePublisher<Output, Failure: Error>: MaybePublisher {
     /// See `Publisher.uncheckedMaybe()`.
     @available(*, deprecated, message: "Publisher is already a maybe publisher: use AnyMaybePublisher.init(_:) instead.")
     fileprivate init<P>(unchecked publisher: P)
-    where P: MaybePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: MaybePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -334,13 +334,13 @@ public struct AnyMaybePublisher<Output, Failure: Error>: MaybePublisher {
     ///
     /// See `MaybePublisher.eraseToAnyPublisher()`.
     public init<P>(_ maybePublisher: P)
-    where P: MaybePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: MaybePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = maybePublisher.eraseToAnyPublisher()
     }
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         upstream.receive(subscriber: subscriber)
     }
@@ -423,7 +423,7 @@ public struct CheckMaybePublisher<Upstream: Publisher>: MaybePublisher {
     let upstream: Upstream
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         let subscription = CheckMaybeSubscription(
             upstream: upstream,
