@@ -486,7 +486,7 @@ class SinglePublisherTests: XCTestCase {
                 })
                 .sinkSingle(receive: { _ in })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that we don't receive any value when the subscription
@@ -504,7 +504,7 @@ class SinglePublisherTests: XCTestCase {
                     expectation.fulfill()
                 })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that we don't receive any value when the subscription is
@@ -524,7 +524,7 @@ class SinglePublisherTests: XCTestCase {
                         expectation.fulfill()
                     })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that value is produced when the subscription is cancelled and we
