@@ -374,7 +374,15 @@ extension AnyMaybePublisher {
     
     /// Creates an `AnyMaybePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output) -> Self {
+        Just(value)
+            .setFailureType(to: Self.Failure)
+            .eraseToAnyMaybePublisher()
+    }
+
+    /// Creates an `AnyMaybePublisher` which emits one value, and
+    /// then finishes.
+    public static func just(_ value: Output, failureType: Failure.Type) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnyMaybePublisher()

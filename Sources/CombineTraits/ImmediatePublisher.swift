@@ -275,7 +275,15 @@ extension AnyImmediatePublisher where Failure == Never {
 extension AnyImmediatePublisher {
     /// Creates an `AnyImmediatePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output) -> Self {
+        Just(value)
+            .setFailureType(to: Self.Failure)
+            .eraseToAnyImmediatePublisher()
+    }
+
+    /// Creates an `AnyImmediatePublisher` which emits one value, and
+    /// then finishes.
+    public static func just(_ value: Output, failureType: Failure.Type) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnyImmediatePublisher()

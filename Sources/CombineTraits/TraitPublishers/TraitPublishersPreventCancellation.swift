@@ -15,7 +15,7 @@ extension TraitPublishers {
             self.upstream = upstream
         }
         
-        public func receive<S>(subscriber: S) where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
             TraitPublishers.Maybe { promise in
                 var cancellable: AnyCancellable? = nil
                 cancellable = self.upstream.sinkMaybe(receive: { result in

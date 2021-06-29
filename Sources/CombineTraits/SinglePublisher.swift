@@ -330,7 +330,15 @@ extension AnySinglePublisher where Failure == Never {
 extension AnySinglePublisher {
     /// Creates an `AnySinglePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output) -> Self {
+        Just(value)
+            .setFailureType(to: Self.Failure)
+            .eraseToAnySinglePublisher()
+    }
+
+    /// Creates an `AnySinglePublisher` which emits one value, and
+    /// then finishes.
+    public static func just(_ value: Output, failureType: Failure.Type) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnySinglePublisher()
