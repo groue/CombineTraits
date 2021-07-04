@@ -1,0 +1,40 @@
+name: Continuous Integration
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-test:
+    name: ${{ matrix.name || 'Build & Test' }} (Swift ${{ matrix.swift }}, ${{ matrix.platform }})
+    runs-on: macos-${{ matrix.macos || '11' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ['5.1', '5.2', '5.3', '5.4', '5.5']
+        platform: [macOS, iOS, tvOS, watchOS]
+        include:
+          # The macOS 11 runner no longer includes Swift 5.1.
+          - swift: '5.1'
+            macos: '10.15'
+          # XCTest for watchOS requires Swift 5.4 or later.
+          - swift: '5.1'
+            platform: watchOS
+            name: Build
+          - swift: '5.2'
+            platform: watchOS
+            name: Build
+          - swift: '5.3'
+            platform: watchOS
+            name: Build
+    steps:
+    - name: Clone
+      uses: actions/checkout@v2
+    - name: ${{ matrix.name || 'Build & Test' }}
+      uses: mxcl/xcodebuild@v1
+      with:
+        swift: ~${{ matrix.swift }}
+        platform: ${{ matrix.platform }}

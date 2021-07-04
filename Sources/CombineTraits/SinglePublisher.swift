@@ -286,7 +286,7 @@ public struct AnySinglePublisher<Output, Failure: Error>: SinglePublisher {
     ///
     /// See `Publisher.uncheckedSingle()`.
     fileprivate init<P>(unchecked publisher: P)
-    where P: Publisher, P.Failure == Self.Failure, P.Output == Output
+    where P: Publisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -296,7 +296,7 @@ public struct AnySinglePublisher<Output, Failure: Error>: SinglePublisher {
     /// See `Publisher.uncheckedSingle()`.
     @available(*, deprecated, message: "Publisher is already a single publisher: use AnySinglePublisher.init(_:) instead.")
     fileprivate init<P>(unchecked publisher: P)
-    where P: SinglePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: SinglePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -305,13 +305,13 @@ public struct AnySinglePublisher<Output, Failure: Error>: SinglePublisher {
     ///
     /// See `SinglePublisher.eraseToAnyPublisher()`.
     public init<P>(_ singlePublisher: P)
-    where P: SinglePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: SinglePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = singlePublisher.eraseToAnyPublisher()
     }
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         upstream.receive(subscriber: subscriber)
     }
@@ -330,7 +330,15 @@ extension AnySinglePublisher where Failure == Never {
 extension AnySinglePublisher {
     /// Creates an `AnySinglePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output) -> Self {
+        Just(value)
+            .setFailureType(to: Failure.self)
+            .eraseToAnySinglePublisher()
+    }
+
+    /// Creates an `AnySinglePublisher` which emits one value, and
+    /// then finishes.
+    public static func just(_ value: Output, failureType: Failure.Type) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnySinglePublisher()
@@ -382,7 +390,7 @@ public struct CheckSinglePublisher<Upstream: Publisher>: SinglePublisher {
     let upstream: Upstream
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         let subscription = CheckSingleSubscription(
             upstream: upstream,

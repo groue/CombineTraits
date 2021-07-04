@@ -1,4 +1,7 @@
-import AsynchronousOperation
+#if !COCOAPODS
+    import AsynchronousOperation
+#endif
+
 import Combine
 import Foundation
 
@@ -119,7 +122,7 @@ extension TraitPublishers {
         }
         
         public func receive<S>(subscriber: S)
-        where S: Subscriber, S.Failure == Self.Failure, S.Input == Self.Output
+        where S: Subscriber, S.Failure == Failure, S.Input == Output
         {
             let subscription = Subscription(
                 downstream: subscriber,

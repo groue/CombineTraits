@@ -24,7 +24,7 @@ extension TraitPublishers {
         }
         
         public func receive<S>(subscriber: S)
-        where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input
+        where S: Subscriber, Failure == S.Failure, Output == S.Input
         {
             collection
                 .reduce(into: Just([]).setFailureType(to: Failure.self).eraseToAnyPublisher()) { zipped, publisher in

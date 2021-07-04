@@ -585,7 +585,7 @@ class MaybePublisherTests: XCTestCase {
                 })
                 .sinkMaybe(receive: { _ in })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that we don't receive any value when the subscription
@@ -603,7 +603,7 @@ class MaybePublisherTests: XCTestCase {
                     expectation.fulfill()
                 })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that we don't receive any value when the subscription is
@@ -623,7 +623,7 @@ class MaybePublisherTests: XCTestCase {
                         expectation.fulfill()
                     })
             cancellable.cancel()
-            wait(for: [expectation], timeout: 0.2)
+            wait(for: [expectation], timeout: 1)
         }
         
         // Test that value is produced when the subscription is cancelled and we

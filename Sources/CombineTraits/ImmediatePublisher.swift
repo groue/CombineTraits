@@ -229,7 +229,7 @@ public struct AnyImmediatePublisher<Output, Failure: Error>: ImmediatePublisher 
     ///
     /// See `Publisher.uncheckedImmediate()`.
     fileprivate init<P>(unchecked publisher: P)
-    where P: Publisher, P.Failure == Self.Failure, P.Output == Output
+    where P: Publisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -240,7 +240,7 @@ public struct AnyImmediatePublisher<Output, Failure: Error>: ImmediatePublisher 
     /// See `Publisher.uncheckedImmediate()`.
     @available(*, deprecated, message: "Publisher is already an immediate publisher: use AnyImmediatePublisher.init(_:) instead.")
     fileprivate init<P>(unchecked publisher: P)
-    where P: ImmediatePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: ImmediatePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = publisher.eraseToAnyPublisher()
     }
@@ -250,13 +250,13 @@ public struct AnyImmediatePublisher<Output, Failure: Error>: ImmediatePublisher 
     ///
     /// See `ImmediatePublisher.eraseToAnyImmediatePublisher()`.
     public init<P>(_ immediatePublisher: P)
-    where P: ImmediatePublisher, P.Failure == Self.Failure, P.Output == Output
+    where P: ImmediatePublisher, P.Failure == Failure, P.Output == Output
     {
         self.upstream = immediatePublisher.eraseToAnyPublisher()
     }
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         upstream.receive(subscriber: subscriber)
     }
@@ -275,7 +275,15 @@ extension AnyImmediatePublisher where Failure == Never {
 extension AnyImmediatePublisher {
     /// Creates an `AnyImmediatePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output) -> Self {
+        Just(value)
+            .setFailureType(to: Failure.self)
+            .eraseToAnyImmediatePublisher()
+    }
+
+    /// Creates an `AnyImmediatePublisher` which emits one value, and
+    /// then finishes.
+    public static func just(_ value: Output, failureType: Failure.Type) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnyImmediatePublisher()
@@ -312,7 +320,7 @@ public struct CheckImmediatePublisher<Upstream: Publisher>: ImmediatePublisher {
     let upstream: Upstream
     
     public func receive<S>(subscriber: S)
-    where S: Combine.Subscriber, S.Failure == Self.Failure, S.Input == Output
+    where S: Combine.Subscriber, S.Failure == Failure, S.Input == Output
     {
         let subscription = CheckImmediateSubscription(
             upstream: upstream,
