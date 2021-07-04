@@ -23,15 +23,12 @@ jobs:
           # XCTest for watchOS requires Swift 5.4 or later.
           - swift: '5.1'
             platform: watchOS
-            action: build
             name: Build
           - swift: '5.2'
             platform: watchOS
-            action: build
             name: Build
           - swift: '5.3'
             platform: watchOS
-            action: build
             name: Build
     steps:
     - name: Clone
@@ -41,4 +38,3 @@ jobs:
       with:
         swift: ~${{ matrix.swift }}
         platform: ${{ matrix.platform }}
-        action: ${{ matrix.action }}
