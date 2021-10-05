@@ -1,7 +1,4 @@
-#if !COCOAPODS
-    import CancelBag
-#endif
-
+import CancelBag
 import Combine
 import Foundation
 

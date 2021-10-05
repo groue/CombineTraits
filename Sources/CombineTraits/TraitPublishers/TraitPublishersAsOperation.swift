@@ -1,7 +1,4 @@
-#if !COCOAPODS
-    import AsynchronousOperation
-#endif
-
+import AsynchronousOperation
 import Combine
 import Foundation
 
