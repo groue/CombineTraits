@@ -137,7 +137,7 @@ extension MaybePublisher {
         map { Optional.some($0) }
             .replaceEmpty(with: nil)
             .flatMap { output -> AnySinglePublisher<Output, Failure> in
-                if let output = output {
+                if let output {
                     return .just(output)
                 } else {
                     return .fail(error)

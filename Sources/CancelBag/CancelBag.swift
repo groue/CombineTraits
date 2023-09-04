@@ -117,12 +117,12 @@ extension Publisher {
                 receiveCancel: { [weak cancellables] in
                     // Postpone cleanup in case subscription finishes
                     // before cancellable is set.
-                    if let unmanagedCancellable = unmanagedCancellable {
+                    if let unmanagedCancellable {
                         cancellables?.remove(unmanagedCancellable.takeUnretainedValue())
                         unmanagedCancellable.release()
                     } else {
                         DispatchQueue.main.async {
-                            if let unmanagedCancellable = unmanagedCancellable {
+                            if let unmanagedCancellable {
                                 cancellables?.remove(unmanagedCancellable.takeUnretainedValue())
                                 unmanagedCancellable.release()
                             }
@@ -134,12 +134,12 @@ extension Publisher {
                     receiveCompletion(completion)
                     // Postpone cleanup in case subscription finishes
                     // before cancellable is set.
-                    if let unmanagedCancellable = unmanagedCancellable {
+                    if let unmanagedCancellable {
                         cancellables?.remove(unmanagedCancellable.takeUnretainedValue())
                         unmanagedCancellable.release()
                     } else {
                         DispatchQueue.main.async {
-                            if let unmanagedCancellable = unmanagedCancellable {
+                            if let unmanagedCancellable {
                                 cancellables?.remove(unmanagedCancellable.takeUnretainedValue())
                                 unmanagedCancellable.release()
                             }

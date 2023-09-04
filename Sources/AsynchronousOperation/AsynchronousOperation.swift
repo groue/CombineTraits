@@ -89,7 +89,7 @@ open class AsynchronousOperation<Output, Failure: Error>: Operation {
         completionBlock = { [unowned self] in
             let result = self.result
             assert(result != nil || self.isCancelled)
-            if let queue = queue {
+            if let queue {
                 queue.async {
                     resultHandler(result)
                 }
