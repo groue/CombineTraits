@@ -3,6 +3,12 @@
 
 import PackageDescription
 
+let swiftSettings: [SwiftSetting] = [
+    // Uncomment in order to perform complete concurrency checking
+    // .enableExperimentalFeature("StrictConcurrency"),
+    .enableExperimentalFeature("ExistentialAny"),
+]
+
 let package = Package(
     name: "CombineTraits",
     platforms: [
@@ -33,24 +39,36 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "CombineTraits",
-            dependencies: ["AsynchronousOperation", "CancelBag"]),
+            dependencies: ["AsynchronousOperation", "CancelBag"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "CombineTraitsTests",
-            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "CombineTraitsAsynchronousOperationTests",
-            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "CombineTraitsCancelBagTests",
-            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag"],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "CancelBag",
-            dependencies: []),
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "CancelBagTests",
-            dependencies: ["CancelBag"]),
+            dependencies: ["CancelBag"],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "AsynchronousOperation",
-            dependencies: []),
+            swiftSettings: swiftSettings
+        ),
     ]
 )
