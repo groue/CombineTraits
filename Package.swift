@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
     name: "CombineTraits",
     platforms: [
-        .iOS("13.0"),
-        .macOS("10.15"),
-        .tvOS("13.0"),
-        .watchOS("6.0"),
+        .iOS(.v13),
+        .macOS(.v10_15),
+        .tvOS(.v13),
+        .watchOS(.v6),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -18,7 +18,7 @@ let package = Package(
             targets: ["AsynchronousOperation"]),
         .library(
             name: "CombineTraits",
-            targets: ["CombineTraits"]),
+            targets: ["CombineTraits", "AsynchronousOperation", "CancelBag"]),
         .library(
             name: "CancelBag",
             targets: ["CancelBag"]),
@@ -36,13 +36,13 @@ let package = Package(
             dependencies: ["AsynchronousOperation", "CancelBag"]),
         .testTarget(
             name: "CombineTraitsTests",
-            dependencies: ["CombineTraits", "CombineExpectations"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"]),
         .testTarget(
             name: "CombineTraitsAsynchronousOperationTests",
-            dependencies: ["CombineTraits", "CombineExpectations"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag", "CombineExpectations"]),
         .testTarget(
             name: "CombineTraitsCancelBagTests",
-            dependencies: ["CombineTraits"]),
+            dependencies: ["CombineTraits", "AsynchronousOperation", "CancelBag"]),
         .target(
             name: "CancelBag",
             dependencies: []),

@@ -1,3 +1,4 @@
+import CancelBag
 import Combine
 import CombineTraits
 import XCTest
