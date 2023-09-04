@@ -137,7 +137,7 @@ extension MaybePublisher {
         map { Optional.some($0) }
             .replaceEmpty(with: nil)
             .flatMap { output -> AnySinglePublisher<Output, Failure> in
-                if let output = output {
+                if let output {
                     return .just(output)
                 } else {
                     return .fail(error)
@@ -374,7 +374,7 @@ extension AnyMaybePublisher {
     
     /// Creates an `AnyMaybePublisher` which emits one value, and
     /// then finishes.
-    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure) -> Self {
+    public static func just(_ value: Output, failureType: Failure.Type = Self.Failure.self) -> Self {
         Just(value)
             .setFailureType(to: failureType)
             .eraseToAnyMaybePublisher()
