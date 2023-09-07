@@ -1,9 +1,9 @@
-CombineTraits [![Swift 5.9](https://img.shields.io/badge/swift-5.9-orange.svg?style=flat)](https://developer.apple.com/swift/)
+CombineTraits [![Swift 5.8](https://img.shields.io/badge/swift-5.8-orange.svg?style=flat)](https://developer.apple.com/swift/)
 =============
 
 ### Combine Publishers with Guarantees
 
-**Requirements**: iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+ &bull; Swift 5.9+ / Xcode 15.0+
+**Requirements**: iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+ &bull; Swift 5.8+ / Xcode 14.3+
 
 ---
 
