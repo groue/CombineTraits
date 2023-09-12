@@ -105,7 +105,7 @@ import Foundation
 ///
 ///         // Never publishes any value, never completes.
 ///         AnyMaybePublisher.never()
-public protocol MaybePublisher: Publisher { }
+public protocol MaybePublisher<Output, Failure>: Publisher { }
 
 extension MaybePublisher {
     /// Wraps this maybe publisher with a type eraser.

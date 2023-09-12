@@ -103,7 +103,7 @@ import Foundation
 ///
 ///         // Never publishes any value, never completes.
 ///         AnySinglePublisher.never()
-public protocol SinglePublisher: MaybePublisher { }
+public protocol SinglePublisher<Output, Failure>: MaybePublisher { }
 
 extension SinglePublisher {
     /// Wraps this single publisher with a type eraser.

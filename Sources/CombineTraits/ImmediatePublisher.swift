@@ -81,7 +81,7 @@ import Foundation
 ///
 ///         // Fails with the given error.
 ///         AnyImmediatePublisher.fail(error)
-public protocol ImmediatePublisher: Publisher { }
+public protocol ImmediatePublisher<Output, Failure>: Publisher { }
 
 extension ImmediatePublisher {
     /// Wraps this immediate publisher with a type eraser.
